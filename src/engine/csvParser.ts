@@ -3,10 +3,8 @@ import type { SalesTransaction } from '../types/models'
 
 function parseDateTime(value: string): Date | null {
   if (!value) return null
-  // Try ISO format first
   const iso = new Date(value)
   if (!isNaN(iso.getTime())) return iso
-  // Try "MM/DD/YYYY HH:MM:SS" style
   const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/)
   if (match) {
     const [, m, d, y, h, min, sec] = match
@@ -38,7 +36,6 @@ export function parseCSVContent(content: string): Omit<SalesTransaction, 'id'>[]
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
 
-    // Find columns by common Square export header names
     const dateStr = row['Date'] ?? row['Transaction Date'] ?? row['Created At'] ?? ''
     const netSalesStr = row['Net Sales'] ?? row['Net Amount'] ?? row['Total'] ?? row['Amount'] ?? ''
     const staff = row['Employee'] ?? row['Staff'] ?? row['Cashier'] ?? row['Team Member'] ?? ''
@@ -58,7 +55,7 @@ export function parseCSVContent(content: string): Omit<SalesTransaction, 'id'>[]
       staffName: staff.trim(),
       paymentMethod: payment.trim(),
       itemDescription: description.trim(),
-      dayOfWeek: date.getDay() + 1,  // JS getDay() 0=Sun, +1 → 1=Sun…7=Sat
+      dayOfWeek: date.getDay() + 1,
       hour: date.getHours(),
     })
   }

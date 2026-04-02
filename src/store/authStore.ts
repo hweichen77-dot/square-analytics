@@ -6,10 +6,10 @@ interface AuthStore {
   accessToken: string
   refreshToken: string
   merchantID: string
-  tokenExpiresAt: number | null   // unix ms
+  tokenExpiresAt: number | null
   locationID: string
   daysBack: number
-  lastSyncDate: string | null     // ISO string
+  lastSyncDate: string | null
   lastSyncCount: number
 
   setCredentials: (creds: Partial<AuthStore>) => void

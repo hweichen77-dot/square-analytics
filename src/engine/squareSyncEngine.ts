@@ -91,7 +91,6 @@ export async function runSquareSync(
   const invCounts = await fetchInventory(accessToken, locationID)
   const invMap = new Map(invCounts.map(c => [c.catalog_object_id, parseInt(c.quantity, 10)]))
 
-  // Patch catalogue products with inventory counts
   for (const product of products) {
     const matchedItem = catItems.find(i => i.item_data?.name === product.name)
     if (!matchedItem) continue
@@ -110,5 +109,4 @@ export async function runSquareSync(
   onStatus({ phase: 'done', message: 'Sync complete', ordersAdded, productsAdded: products.length })
 }
 
-// Re-export parseProductItems so views don't need to import from models
 export { parseProductItems }

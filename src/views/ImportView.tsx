@@ -64,7 +64,6 @@ export default function ImportView() {
         </p>
       </div>
 
-      {/* CSV Drop zone */}
       <div
         onDragOver={e => { e.preventDefault(); setDragging(true) }}
         onDragLeave={() => setDragging(false)}
@@ -81,7 +80,6 @@ export default function ImportView() {
           onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f) }} />
       </div>
 
-      {/* XLSX */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="font-semibold text-gray-800 mb-3">Catalogue Import (XLSX)</h2>
         <p className="text-sm text-gray-500 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
@@ -96,7 +94,6 @@ export default function ImportView() {
           onChange={e => { const f = e.target.files?.[0]; if (f) handleXLSX(f) }} />
       </div>
 
-      {/* Clear */}
       {(txCount > 0 || catCount > 0) && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
           <h2 className="font-semibold text-red-800 mb-1">Clear All Data</h2>

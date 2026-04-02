@@ -36,14 +36,12 @@ export default function TimeAnalysisView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Time Analysis</h1>
 
-      {/* Sales Heatmap */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900">Sales Heatmap</h2>
         <p className="text-xs text-gray-500 mt-0.5 mb-4">Sales volume by day and hour</p>
 
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full">
-            {/* Hour header */}
             <div className="flex gap-1 mb-1 ml-10">
               {HOURS.map(h => (
                 <div key={h} className="text-center text-xs text-gray-400 font-medium" style={{ width: 36 }}>
@@ -52,7 +50,6 @@ export default function TimeAnalysisView() {
               ))}
             </div>
 
-            {/* Day rows */}
             {Array.from({ length: 7 }, (_, i) => i + 1).map(dow => (
               <div key={dow} className="flex gap-1 mb-1 items-center">
                 <div className="text-xs text-gray-500 w-9 text-right pr-1 shrink-0">
@@ -84,7 +81,6 @@ export default function TimeAnalysisView() {
               </div>
             ))}
 
-            {/* Legend */}
             <div className="flex items-center gap-1 mt-3 ml-10">
               <span className="text-xs text-gray-400">Less</span>
               {[0, 0.25, 0.5, 0.75, 1].map(v => (
@@ -105,7 +101,6 @@ export default function TimeAnalysisView() {
         </div>
       </div>
 
-      {/* Monthly Comparison */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Monthly Comparison</h2>
         {monthly.length === 0 ? (
@@ -140,6 +135,17 @@ export default function TimeAnalysisView() {
                       <td className="py-1.5 text-gray-700 font-mono text-xs text-right">{m.transactions}</td>
                       <td className="py-1.5 text-gray-700 font-mono text-xs text-right">{formatCurrency(m.avgTransaction)}</td>
                     </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+/tr>
                   ))}
                 </tbody>
               </table>

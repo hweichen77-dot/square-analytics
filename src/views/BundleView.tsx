@@ -220,7 +220,6 @@ export default function BundleView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Bundle & Cross-Sell</h1>
 
-      {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: 'Multi-Item Transactions', value: multiItemTxCount },
@@ -234,7 +233,6 @@ export default function BundleView() {
         ))}
       </div>
 
-      {/* Affinity lookup */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Product Affinity Lookup</h2>
         <select
@@ -275,7 +273,6 @@ export default function BundleView() {
         )}
       </div>
 
-      {/* Top co-purchase pairs */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Top Co-Purchase Pairs</h2>
         {pairs.length === 0 ? (
@@ -320,7 +317,6 @@ export default function BundleView() {
         )}
       </div>
 
-      {/* Saved bundles */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900">Saved Bundles</h2>

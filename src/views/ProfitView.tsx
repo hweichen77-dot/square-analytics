@@ -325,7 +325,6 @@ export default function ProfitView() {
         </button>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-5 gap-3">
         {[
           { label: 'Total Revenue', value: formatCurrency(totalRevenue), color: '#3b82f6' },
@@ -341,7 +340,6 @@ export default function ProfitView() {
         ))}
       </div>
 
-      {/* Money losers banner */}
       {moneyLosers.length > 0 && (
         <div className="bg-red-600 rounded-xl p-5 text-white">
           <p className="font-semibold mb-2">
@@ -359,7 +357,6 @@ export default function ProfitView() {
         </div>
       )}
 
-      {/* Product table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">Product Profit Analysis</h2>
@@ -408,7 +405,6 @@ export default function ProfitView() {
         </div>
       </div>
 
-      {/* Top 15 profit chart */}
       {top15Profit.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Top 15 Products by Profit</h2>
@@ -425,7 +421,6 @@ export default function ProfitView() {
         </div>
       )}
 
-      {/* Scatter + Pie row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {scatterData.length > 0 && (
           <div className="bg-white border border-gray-200 rounded-xl p-5">

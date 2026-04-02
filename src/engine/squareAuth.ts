@@ -4,7 +4,6 @@ const SQUARE_OAUTH_URL = 'https://connect.squareup.com/oauth2/authorize'
 const SQUARE_TOKEN_URL = 'https://connect.squareup.com/oauth2/token'
 const SCOPES = 'MERCHANT_PROFILE_READ ORDERS_READ ITEMS_READ INVENTORY_READ'
 
-// Deep-link URI registered in capacitor.config.ts, tauri.conf.json, and Square Dashboard.
 const NATIVE_REDIRECT_URI = 'walleys://square/callback'
 
 function isCapacitorNative(): boolean {
@@ -32,7 +31,6 @@ async function generatePKCE(): Promise<{ verifier: string; challenge: string }> 
 
 export function getRedirectURI(): string {
   if (isCapacitorNative() || isTauri()) return NATIVE_REDIRECT_URI
-  // Web: derive from current origin + base path
   const base = window.location.origin + window.location.pathname.replace(/\/$/, '')
   return `${base}/square-callback`
 }
@@ -55,20 +53,17 @@ export async function startOAuthFlow(appID: string): Promise<void> {
   const url = `${SQUARE_OAUTH_URL}?${params}`
 
   if (isTauri()) {
-    // Open Square OAuth in the system browser so the OS can handle the walleys:// redirect.
     const { openUrl } = await import('@tauri-apps/plugin-opener')
     await openUrl(url)
     return
   }
 
   if (isCapacitorNative()) {
-    // Open in an in-app browser sheet so the user stays in-app until redirect fires.
     const { Browser } = await import('@capacitor/browser')
     await Browser.open({ url })
     return
   }
 
-  // Web fallback
   window.location.href = url
 }
 

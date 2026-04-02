@@ -13,7 +13,7 @@ export interface PurchaseOrderItem {
   reasoning: string
 }
 
-const REORDER_DAYS = 14  // how many days of stock to order
+const REORDER_DAYS = 14
 
 export function generatePurchaseOrder(
   transactions: SalesTransaction[],
@@ -25,7 +25,6 @@ export function generatePurchaseOrder(
   const today = new Date()
   const items: PurchaseOrderItem[] = []
 
-  // Upcoming events in next 30 days — used for demand boost
   const upcomingEvents = events.filter(e => {
     const daysUntil = differenceInDays(e.startDate, today)
     return daysUntil >= 0 && daysUntil <= 30
@@ -35,10 +34,8 @@ export function generatePurchaseOrder(
     const velocity = productVelocity(product)
     if (velocity <= 0) continue
 
-    // Base recommended quantity
     let multiplier = 1.0
 
-    // Boost for upcoming events
     if (upcomingEvents.length > 0) {
       const isHighDemandEvent = upcomingEvents.some(e =>
         ['Spirit Week', 'Homecoming', 'Back to School', 'Sports Game'].includes(e.eventType)

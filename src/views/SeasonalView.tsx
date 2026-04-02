@@ -201,7 +201,6 @@ export default function SeasonalView() {
         </button>
       </div>
 
-      {/* Event management */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Store Events</h2>
         {events.length === 0 ? (
@@ -233,7 +232,6 @@ export default function SeasonalView() {
         )}
       </div>
 
-      {/* Revenue timeline */}
       {chartData.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Revenue Timeline</h2>
@@ -258,7 +256,6 @@ export default function SeasonalView() {
         </div>
       )}
 
-      {/* Event impact */}
       {events.length > 0 && impacts.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Event Impact Analysis</h2>
@@ -325,6 +322,13 @@ export default function SeasonalView() {
         <EventEditModal
           event={editingEvent}
           onSave={(name, type, start, end, notes) => updateEvent(editingEvent, name, type, start, end, notes)}
+          onClose={() => setEditingEvent(null)}
+        />
+      )}
+    </div>
+  )
+}
+s)}
           onClose={() => setEditingEvent(null)}
         />
       )}

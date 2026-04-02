@@ -12,7 +12,6 @@ export function formatPercent(value: number, decimals = 1): string {
 
 export const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-/** dayOfWeek: 1=Sun…7=Sat → "Sun" etc. */
 export function dayName(dayOfWeek: number): string {
   return DAY_NAMES[(dayOfWeek - 1) % 7]
 }

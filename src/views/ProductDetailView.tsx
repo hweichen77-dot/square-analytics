@@ -86,7 +86,6 @@ export default function ProductDetailView() {
           trend={trend === 'Growing' ? 'Month over month ↑' : trend === 'Declining' ? 'Month over month ↓' : undefined} />
       </div>
 
-      {/* Time series chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-gray-800">Sales Over Time</h2>
@@ -116,7 +115,6 @@ export default function ProductDetailView() {
         </ResponsiveContainer>
       </div>
 
-      {/* Day of week chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <h2 className="font-semibold text-gray-800 mb-4">Sales by Day of Week</h2>
         <ResponsiveContainer width="100%" height={160}>
@@ -129,7 +127,6 @@ export default function ProductDetailView() {
         </ResponsiveContainer>
       </div>
 
-      {/* Transaction history */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-4 py-3 border-b border-gray-100">
           <h2 className="font-semibold text-gray-800">Transaction History ({txRows.length})</h2>

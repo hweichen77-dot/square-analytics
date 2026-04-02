@@ -1,5 +1,3 @@
-// Mirrors CategoryClassifier.swift — keyword-based product categorizer
-
 export const ALL_CATEGORY_NAMES = ['Food', 'Drinks', 'Ice Cream', 'Ramen/Hot Food', 'Merch', 'Other'] as const
 export type Category = typeof ALL_CATEGORY_NAMES[number]
 

@@ -21,13 +21,12 @@ export default function StaffView() {
     return <EmptyState title="No staff data" subtitle="No staff names found in the imported transactions." />
   }
 
-  const chartData = [...staffStats].reverse() // bottom to top for horizontal bar
+  const chartData = [...staffStats].reverse()
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Staff Performance</h1>
 
-      {/* Revenue Bar Chart */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Revenue by Staff Member</h2>
         <ResponsiveContainer width="100%" height={Math.max(200, staffStats.length * 40)}>
@@ -49,7 +48,6 @@ export default function StaffView() {
         </ResponsiveContainer>
       </div>
 
-      {/* Staff Breakdown Table */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-4">Staff Breakdown</h2>
         <div className="overflow-x-auto">

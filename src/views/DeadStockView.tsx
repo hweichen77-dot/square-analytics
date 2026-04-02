@@ -41,7 +41,6 @@ function buildDeadStockItems(
   const costByName: Record<string, number> = {}
   for (const c of costData) costByName[c.productName] = effectiveUnitCost(c)
 
-  // Build sorted active days
   const activeDaySet = new Set(transactions.map(tx => startOfDay(tx.date).getTime()))
   const activeDaysSorted = Array.from(activeDaySet).sort((a, b) => b - a)
   if (activeDaysSorted.length < 2) return []
@@ -49,7 +48,6 @@ function buildDeadStockItems(
   const last30Days = new Set(activeDaysSorted.slice(0, 30))
   const prior30Days = new Set(activeDaysSorted.slice(30, 60))
 
-  // Product daily sales + last sale map
   const productDailySales: Record<string, Record<number, number>> = {}
   const productLastSale: Record<string, number> = {}
 
@@ -216,7 +214,6 @@ export default function DeadStockView() {
         <p className="text-sm text-gray-500 mt-1">Products with no or declining sales activity</p>
       </div>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Dead', count: deadItems.length, color: '#ef4444' },
@@ -238,7 +235,6 @@ export default function DeadStockView() {
         ))}
       </div>
 
-      {/* Recommendations */}
       {(deadItems.length > 0 || dyingItems.length > 0) && (
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-orange-700 mb-3">Recommended Actions</h2>
@@ -268,12 +264,10 @@ export default function DeadStockView() {
         </div>
       )}
 
-      {/* Tier sections */}
       <TierSection tier="Dead" tierItems={deadItems} />
       <TierSection tier="Dying" tierItems={dyingItems} />
       <TierSection tier="Slow Mover" tierItems={slowItems} />
 
-      {/* Velocity chart */}
       {chartData.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900">30-Day Sales by Product</h2>

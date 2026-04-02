@@ -59,7 +59,6 @@ export default function CatalogueCheckerView() {
         <p className="text-sm text-gray-500 mt-1">Compare your sales data against your Square catalogue for gaps and mismatches.</p>
       </div>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
           <p className="text-sm text-yellow-700 font-medium">Sold — Not in Catalogue</p>
@@ -78,7 +77,6 @@ export default function CatalogueCheckerView() {
         </div>
       </div>
 
-      {/* Sold but not in catalogue */}
       {inSalesNotCatalogue.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
@@ -110,7 +108,6 @@ export default function CatalogueCheckerView() {
         </div>
       )}
 
-      {/* In catalogue but never sold */}
       {inCatalogueNotSales.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
@@ -144,7 +141,6 @@ export default function CatalogueCheckerView() {
         </div>
       )}
 
-      {/* Price mismatches */}
       {discrepancies.filter(d => d.severity === 'info').length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">

@@ -146,7 +146,6 @@ export default function PriceOptimizationView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Price Optimization</h1>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-xs text-gray-500">Price Changes Detected</p>
@@ -166,7 +165,6 @@ export default function PriceOptimizationView() {
         </div>
       </div>
 
-      {/* Insight banner */}
       {changes.length > 0 && (
         <div
           className={`p-4 rounded-xl border flex items-start gap-3 ${improved >= declined ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'}`}
@@ -182,7 +180,6 @@ export default function PriceOptimizationView() {
         </div>
       )}
 
-      {/* Changes table */}
       {changes.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-1">All Detected Price Changes</h2>
@@ -225,7 +222,6 @@ export default function PriceOptimizationView() {
         </div>
       )}
 
-      {/* Per-product analysis */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Per-Product Price History</h2>
         <select
@@ -255,7 +251,6 @@ export default function PriceOptimizationView() {
         )}
       </div>
 
-      {/* Simulator */}
       {selectedProduct && currentPrice !== undefined && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-1">Price Simulator</h2>

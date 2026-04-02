@@ -112,7 +112,6 @@ export default function InventoryView() {
         </div>
       </div>
 
-      {/* Context menu for category override */}
       {ctxMenu && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setCtxMenu(null)} />
@@ -132,6 +131,12 @@ export default function InventoryView() {
               </button>
             ))}
           </div>
+        </>
+      )}
+    </div>
+  )
+}
+    </div>
         </>
       )}
     </div>

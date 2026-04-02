@@ -51,7 +51,6 @@ export default function SquareSyncView() {
     <div className="space-y-6 max-w-xl">
       <h1 className="text-2xl font-bold text-gray-900">Square Sync</h1>
 
-      {/* App ID */}
       <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
         <h2 className="font-semibold text-gray-800">Square Application ID</h2>
         <input
@@ -81,7 +80,6 @@ export default function SquareSyncView() {
         )}
       </div>
 
-      {/* Location picker */}
       {isConnected && (
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
           <h2 className="font-semibold text-gray-800">Location</h2>
@@ -105,7 +103,6 @@ export default function SquareSyncView() {
         </div>
       )}
 
-      {/* Days back */}
       {isConnected && (
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
           <h2 className="font-semibold text-gray-800">Sync Period</h2>
@@ -119,7 +116,6 @@ export default function SquareSyncView() {
         </div>
       )}
 
-      {/* Sync button */}
       {isConnected && store.locationID && (
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
@@ -142,6 +138,13 @@ export default function SquareSyncView() {
             className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"
           >
             {syncing ? 'Syncing…' : 'Start Sync'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+{syncing ? 'Syncing…' : 'Start Sync'}
           </button>
         </div>
       )}

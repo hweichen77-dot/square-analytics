@@ -119,7 +119,6 @@ export default function StaffShiftView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Staff Shift Analysis</h1>
 
-      {/* Summary */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-xs text-gray-500">Top Earner</p>
@@ -139,7 +138,6 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      {/* Leaderboard */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-gray-900">Staff Leaderboard</h2>
@@ -206,7 +204,6 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      {/* Day-of-week heatmap */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-1">Staff × Day of Week Revenue Heatmap</h2>
         <p className="text-xs text-gray-400 mb-4">Color intensity = revenue generated in that slot</p>
@@ -248,7 +245,6 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      {/* Staff detail */}
       {selectedProfile && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">

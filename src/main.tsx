@@ -5,9 +5,6 @@ import App from './App'
 import { db } from './db/database'
 import './index.css'
 
-// Open DB before rendering
-// BASE_URL is './' for native builds (Tauri/Capacitor) and '/walleys-analytics/' for web.
-// React Router requires an absolute basename, so normalise './' → '/'.
 const basename = import.meta.env.BASE_URL === './' ? '/' : import.meta.env.BASE_URL
 
 db.open().then(() => {

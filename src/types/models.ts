@@ -1,5 +1,3 @@
-// Mirrors SwiftData @Model classes from Models.swift and FeatureModels.swift
-
 export interface SalesTransaction {
   id?: number
   transactionID: string
@@ -7,9 +5,9 @@ export interface SalesTransaction {
   netSales: number
   staffName: string
   paymentMethod: string
-  itemDescription: string   // "2 x Takis, 1 x Coke"
-  dayOfWeek: number         // 1=Sun … 7=Sat  (matches Calendar.component(.weekday))
-  hour: number              // 0–23
+  itemDescription: string
+  dayOfWeek: number
+  hour: number
   customerID?: string
   customerName?: string
 }
@@ -30,7 +28,7 @@ export interface RestockLog {
 
 export interface ProductCostData {
   id?: number
-  productName: string       // unique
+  productName: string
   unitCost: number
   casePrice: number
   unitsPerCase: number
@@ -68,14 +66,11 @@ export interface CatalogueProduct {
   squareItemID: string
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 export interface ProductItem {
   name: string
   qty: number
 }
 
-/** Parse "2 x Takis, 1 x Coke" → [{name:"Takis",qty:2}, {name:"Coke",qty:1}] */
 export function parseProductItems(description: string): ProductItem[] {
   if (!description.trim()) return []
   return description.split(',').flatMap(part => {
@@ -87,7 +82,6 @@ export function parseProductItems(description: string): ProductItem[] {
   })
 }
 
-/** Unique product names from itemDescription */
 export function splitProducts(description: string): string[] {
   return parseProductItems(description).map(i => i.name)
 }

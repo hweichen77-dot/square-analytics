@@ -62,14 +62,12 @@ function computeAlerts(
 
   const stats = computeProductStats(transactions)
 
-  // Latest restock log per product
   const latestLog: Record<string, RestockLog> = {}
   for (const log of restockLogs) {
     const existing = latestLog[log.productName]
     if (!existing || log.date > existing.date) latestLog[log.productName] = log
   }
 
-  // Catalogue qty map
   const catalogueQty: Record<string, number> = {}
   for (const p of catalogueProducts) {
     if (p.quantity !== null) catalogueQty[p.name] = p.quantity
@@ -233,7 +231,6 @@ export default function RestockView() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Restock Alerts & Forecasting</h1>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Total Products', value: alerts.length, color: 'text-gray-900' },
@@ -248,7 +245,6 @@ export default function RestockView() {
         ))}
       </div>
 
-      {/* Suggested restock list */}
       {suggestedList.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-orange-600 mb-3">Suggested Restock List</h2>
@@ -288,7 +284,6 @@ export default function RestockView() {
         </div>
       )}
 
-      {/* All products table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100">
           <h2 className="text-base font-semibold text-gray-900">All Products — Stock Status</h2>
@@ -355,6 +350,13 @@ export default function RestockView() {
           </div>
         )}
       </div>
+
+      {productToRestock && (
+        <LogRestockModal productName={productToRestock} onClose={() => setProductToRestock(null)} />
+      )}
+    </div>
+  )
+}
 
       {productToRestock && (
         <LogRestockModal productName={productToRestock} onClose={() => setProductToRestock(null)} />

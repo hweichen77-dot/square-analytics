@@ -26,7 +26,6 @@ function useDeepLinkHandler() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // Handle walleys://square/callback deep links on Capacitor (iOS / Android)
     if ((window as any).Capacitor?.isNativePlatform?.()) {
       let cleanup: (() => void) | undefined
 
@@ -38,11 +37,9 @@ function useDeepLinkHandler() {
               const code = parsed.searchParams.get('code') ?? ''
               const state = parsed.searchParams.get('state') ?? ''
               navigate(`/square/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`)
-              // Close the in-app browser sheet after redirect
               import('@capacitor/browser').then(({ Browser }) => Browser.close())
             }
           } catch {
-            // ignore malformed URLs
           }
         }).then(handle => {
           cleanup = () => handle.remove()
@@ -52,7 +49,6 @@ function useDeepLinkHandler() {
       return () => cleanup?.()
     }
 
-    // Handle walleys://square/callback deep links on Tauri (macOS / Windows)
     if ((window as any).__TAURI_INTERNALS__ !== undefined) {
       let cancel: (() => void) | undefined
 
@@ -67,7 +63,6 @@ function useDeepLinkHandler() {
                 navigate(`/square/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`)
               }
             } catch {
-              // ignore malformed URLs
             }
           }
         }).then(unlisten => {

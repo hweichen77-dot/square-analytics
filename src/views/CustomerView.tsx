@@ -95,7 +95,6 @@ function buildProfiles(transactions: SalesTransaction[]): {
     }
   }).sort((a, b) => b.totalSpent - a.totalSpent)
 
-  // Compute retention cohorts
   const cohorts: Record<string, Set<string>> = {}
   for (const [cid, txs] of Object.entries(byCustomer)) {
     const first = txs.map(t => t.date).sort((a, b) => a.getTime() - b.getTime())[0]
@@ -201,7 +200,6 @@ export default function CustomerView() {
       <h1 className="text-2xl font-bold text-gray-900">Customer Frequency</h1>
       <p className="text-sm text-gray-500 -mt-4">{identifiedPct}% of transactions have customer data</p>
 
-      {/* Summary */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <p className="text-xs text-gray-500">Identified Customers</p>
@@ -225,7 +223,6 @@ export default function CustomerView() {
         </div>
       </div>
 
-      {/* Segments */}
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <h2 className="text-base font-semibold text-gray-900 mb-3">Customer Segments</h2>
         <div className="grid grid-cols-4 gap-3 mb-4">
@@ -261,7 +258,6 @@ export default function CustomerView() {
         )}
       </div>
 
-      {/* Retention */}
       {retention.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-1">Retention Curve</h2>
@@ -280,7 +276,6 @@ export default function CustomerView() {
         </div>
       )}
 
-      {/* Customer table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-4 flex-wrap">
           <h2 className="text-base font-semibold text-gray-900 flex-1">
@@ -345,7 +340,6 @@ export default function CustomerView() {
         </div>
       </div>
 
-      {/* Customer detail */}
       {selectedCustomer && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <div className="flex items-start justify-between mb-4">

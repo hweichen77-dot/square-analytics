@@ -14,12 +14,10 @@ interface ParsedRow {
 
 function colIndex(header: string[]): (keywords: string[]) => number | null {
   return (keywords) => {
-    // Exact match first
     for (const kw of keywords) {
       const idx = header.findIndex(h => h.toLowerCase().trim() === kw)
       if (idx !== -1) return idx
     }
-    // Contains match
     for (const kw of keywords) {
       const idx = header.findIndex(h => h.toLowerCase().trim().includes(kw))
       if (idx !== -1) return idx
@@ -59,7 +57,6 @@ export function parseXLSXCatalogue(buffer: ArrayBuffer): Omit<CatalogueProduct, 
   const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '' }) as unknown[][]
   if (rows.length < 2) return []
 
-  // Find the header row (first non-empty row)
   const headerRowIdx = rows.findIndex(r => Array.isArray(r) && r.some(c => String(c).trim()))
   if (headerRowIdx === -1) return []
 

@@ -153,7 +153,6 @@ export default function PurchaseOrderView() {
         </div>
       </div>
 
-      {/* Summary banner */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4">
           <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-xl">🛒</div>
@@ -181,7 +180,6 @@ export default function PurchaseOrderView() {
         </div>
       </div>
 
-      {/* Season context */}
       <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
         <span className="text-lg">🌿</span>
         <div className="flex-1">
@@ -197,7 +195,6 @@ export default function PurchaseOrderView() {
         )}
       </div>
 
-      {/* Filter row */}
       <div className="flex items-center justify-between">
         <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
           <input
@@ -211,7 +208,6 @@ export default function PurchaseOrderView() {
         <p className="text-xs text-gray-400">{displayItems.length} of {orderItems.length} items</p>
       </div>
 
-      {/* Order table */}
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -278,7 +274,6 @@ export default function PurchaseOrderView() {
         </div>
       </div>
 
-      {/* Category subtotals */}
       {categorySubtotals.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Category Subtotals</h2>

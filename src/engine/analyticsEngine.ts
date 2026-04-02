@@ -3,8 +3,6 @@ import type { SalesTransaction } from '../types/models'
 import { parseProductItems, splitProducts } from '../types/models'
 import { classifyProduct } from './categoryClassifier'
 
-// ─── Output types ──────────────────────────────────────────────────────────────
-
 export interface ProductStats {
   name: string
   category: string
@@ -13,8 +11,8 @@ export interface ProductStats {
   avgPrice: number
   firstSoldDate: Date
   lastSoldDate: Date
-  monthlySales: Record<string, number>  // "yyyy-MM" → units
-  dailySales: Record<string, number>    // "yyyy-MM-dd" → units
+  monthlySales: Record<string, number>
+  dailySales: Record<string, number>
 }
 
 export interface DailyRevenue {
@@ -66,8 +64,6 @@ export interface ProductTransactionRow {
 export type TimeGranularity = 'Daily' | 'Weekly' | 'Monthly'
 export type SalesTrend = 'Growing' | 'Stable' | 'Declining'
 
-// ─── Derived helpers ──────────────────────────────────────────────────────────
-
 export function productTrend(stats: ProductStats): SalesTrend {
   const sorted = Object.entries(stats.monthlySales).sort(([a], [b]) => a.localeCompare(b))
   if (sorted.length < 2) return 'Stable'
@@ -87,8 +83,6 @@ export function isSlowMover(stats: ProductStats): boolean {
   const daysSinceLast = (Date.now() - stats.lastSoldDate.getTime()) / 86_400_000
   return daysSinceLast > 30
 }
-
-// ─── Engine ───────────────────────────────────────────────────────────────────
 
 export function computeProductStats(
   transactions: SalesTransaction[],
