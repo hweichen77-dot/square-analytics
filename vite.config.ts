@@ -8,7 +8,7 @@ const isTauri = process.env.TAURI_ENV_TARGET_TRIPLE !== undefined
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: isTauri ? './' : '/walleys-analytics/',
+  base: isTauri ? './' : '/Walley-s-Analytics/',
 
   // Tauri dev server: use fixed port so tauri.conf.json devUrl stays in sync.
   server: {
