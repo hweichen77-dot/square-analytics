@@ -1,0 +1,71 @@
+import { differenceInDays } from 'date-fns'
+import type { SalesTransaction, StoreEvent, RestockLog } from '../types/models'
+import { computeProductStats, productVelocity } from './analyticsEngine'
+
+export interface PurchaseOrderItem {
+  productName: string
+  category: string
+  avgDailyVelocity: number
+  recommendedQty: number
+  estimatedRevenue: number
+  avgPrice: number
+  lastSoldDate: Date
+  reasoning: string
+}
+
+const REORDER_DAYS = 14  // how many days of stock to order
+
+export function generatePurchaseOrder(
+  transactions: SalesTransaction[],
+  events: StoreEvent[],
+  _restockLogs: RestockLog[],
+  overrides: Record<string, string> = {},
+): PurchaseOrderItem[] {
+  const stats = computeProductStats(transactions, overrides)
+  const today = new Date()
+  const items: PurchaseOrderItem[] = []
+
+  // Upcoming events in next 30 days — used for demand boost
+  const upcomingEvents = events.filter(e => {
+    const daysUntil = differenceInDays(e.startDate, today)
+    return daysUntil >= 0 && daysUntil <= 30
+  })
+
+  for (const product of stats) {
+    const velocity = productVelocity(product)
+    if (velocity <= 0) continue
+
+    // Base recommended quantity
+    let multiplier = 1.0
+
+    // Boost for upcoming events
+    if (upcomingEvents.length > 0) {
+      const isHighDemandEvent = upcomingEvents.some(e =>
+        ['Spirit Week', 'Homecoming', 'Back to School', 'Sports Game'].includes(e.eventType)
+      )
+      if (isHighDemandEvent) multiplier = 1.5
+      else multiplier = 1.2
+    }
+
+    const recommendedQty = Math.ceil(velocity * REORDER_DAYS * multiplier)
+    const estimatedRevenue = recommendedQty * product.avgPrice
+
+    let reasoning = `Based on ${velocity.toFixed(1)} units/active day`
+    if (multiplier > 1) {
+      reasoning += ` · ${Math.round((multiplier - 1) * 100)}% boost for upcoming event`
+    }
+
+    items.push({
+      productName: product.name,
+      category: product.category,
+      avgDailyVelocity: velocity,
+      recommendedQty,
+      estimatedRevenue,
+      avgPrice: product.avgPrice,
+      lastSoldDate: product.lastSoldDate,
+      reasoning,
+    })
+  }
+
+  return items.sort((a, b) => b.estimatedRevenue - a.estimatedRevenue)
+}
