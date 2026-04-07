@@ -15,6 +15,7 @@ export default function SquareSyncView() {
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([])
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<{ ok: boolean; message: string; detail?: string } | null>(null)
 
   const isConnected = !!store.accessToken
 
@@ -39,11 +40,19 @@ export default function SquareSyncView() {
   async function handleSync() {
     if (!store.locationID) { show('Select a location first', 'error'); return }
     setSyncing(true)
+    setSyncResult(null)
     try {
-      await runSquareSync(status => setSyncStatus(status))
-      show('Sync complete!', 'success')
+      let lastStatus: SyncStatus | null = null
+      await runSquareSync(status => { setSyncStatus(status); lastStatus = status })
+      setSyncResult({
+        ok: true,
+        message: 'Sync succeeded',
+        detail: lastStatus
+          ? `${(lastStatus as SyncStatus).ordersAdded} orders · ${(lastStatus as SyncStatus).productsAdded} products synced`
+          : undefined,
+      })
     } catch (e) {
-      show(`Sync failed: ${(e as Error).message}`, 'error')
+      setSyncResult({ ok: false, message: 'Sync failed', detail: (e as Error).message })
     } finally {
       setSyncing(false)
     }
@@ -136,11 +145,28 @@ export default function SquareSyncView() {
               </p>
             )}
           </div>
-          {syncStatus && (
-            <p className="text-sm text-gray-600">
+          {syncing && syncStatus && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-indigo-500 rounded-full animate-spin shrink-0" />
               {syncStatus.message}
-              {syncStatus.phase === 'done' && ` · ${syncStatus.ordersAdded} orders added, ${syncStatus.productsAdded} products`}
-            </p>
+            </div>
+          )}
+          {!syncing && syncResult && (
+            <div className={`flex items-start gap-3 rounded-lg px-4 py-3 text-sm ${
+              syncResult.ok ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+            }`}>
+              <span className="text-base leading-none mt-0.5">{syncResult.ok ? '✓' : '✕'}</span>
+              <div>
+                <p className={`font-semibold ${syncResult.ok ? 'text-green-700' : 'text-red-700'}`}>
+                  {syncResult.message}
+                </p>
+                {syncResult.detail && (
+                  <p className={`mt-0.5 ${syncResult.ok ? 'text-green-600' : 'text-red-600'}`}>
+                    {syncResult.detail}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
           <button
             onClick={handleSync}
