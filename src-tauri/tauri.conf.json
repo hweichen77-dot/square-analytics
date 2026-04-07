@@ -37,11 +37,7 @@
       "icons/icon.ico"
     ],
     "macOS": {
-      "minimumSystemVersion": "11.0",
-      "urlSchemes": ["walleys"]
-    },
-    "windows": {
-      "urlSchemes": ["walleys"]
+      "minimumSystemVersion": "11.0"
     }
   },
   "plugins": {

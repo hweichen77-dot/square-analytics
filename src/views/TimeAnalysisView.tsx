@@ -145,14 +145,3 @@ export default function TimeAnalysisView() {
     </div>
   )
 }
-/tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}

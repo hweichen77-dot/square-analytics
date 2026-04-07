@@ -41,7 +41,7 @@ function useDeepLinkHandler() {
             }
           } catch {
           }
-        }).then(handle => {
+        }).then((handle: { remove: () => void }) => {
           cleanup = () => handle.remove()
         })
       })
@@ -65,7 +65,7 @@ function useDeepLinkHandler() {
             } catch {
             }
           }
-        }).then(unlisten => {
+        }).then((unlisten: () => void) => {
           cancel = unlisten
         })
       })

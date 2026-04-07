@@ -32,7 +32,7 @@ async function generatePKCE(): Promise<{ verifier: string; challenge: string }> 
 export function getRedirectURI(): string {
   if (isCapacitorNative() || isTauri()) return NATIVE_REDIRECT_URI
   const base = window.location.origin + window.location.pathname.replace(/\/$/, '')
-  return `${base}/square-callback`
+  return `${base}/square/callback`
 }
 
 export async function startOAuthFlow(appID: string): Promise<void> {

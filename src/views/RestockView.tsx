@@ -4,7 +4,6 @@ import { useDateRangeStore } from '../store/dateRangeStore'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
-import { formatCurrency } from '../utils/format'
 import type { SalesTransaction, RestockLog, CatalogueProduct } from '../types/models'
 import { startOfDay } from 'date-fns'
 import { format } from 'date-fns'
@@ -50,7 +49,6 @@ function computeAlerts(
 ): RestockAlert[] {
   if (!transactions.length) return []
 
-  const cal = { startOfDay }
   const activeDays = new Set(transactions.map(tx => startOfDay(tx.date).getTime()))
   const totalActiveDays = Math.max(activeDays.size, 1)
   const sortedDays = Array.from(activeDays).sort()
@@ -350,13 +348,6 @@ export default function RestockView() {
           </div>
         )}
       </div>
-
-      {productToRestock && (
-        <LogRestockModal productName={productToRestock} onClose={() => setProductToRestock(null)} />
-      )}
-    </div>
-  )
-}
 
       {productToRestock && (
         <LogRestockModal productName={productToRestock} onClose={() => setProductToRestock(null)} />

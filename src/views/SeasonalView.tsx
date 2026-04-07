@@ -11,7 +11,7 @@ import { db } from '../db/database'
 import { formatCurrency } from '../utils/format'
 import type { StoreEvent, SalesTransaction } from '../types/models'
 import { EVENT_TYPES, eventColor } from '../types/models'
-import { format, startOfDay, differenceInDays } from 'date-fns'
+import { format, startOfDay } from 'date-fns'
 import { parseProductItems } from '../types/models'
 
 interface EventImpact {
@@ -322,13 +322,6 @@ export default function SeasonalView() {
         <EventEditModal
           event={editingEvent}
           onSave={(name, type, start, end, notes) => updateEvent(editingEvent, name, type, start, end, notes)}
-          onClose={() => setEditingEvent(null)}
-        />
-      )}
-    </div>
-  )
-}
-s)}
           onClose={() => setEditingEvent(null)}
         />
       )}

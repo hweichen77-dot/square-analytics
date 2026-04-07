@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useAllTransactions, useProductCostData, useCatalogueProducts, useStoreEvents } from '../db/useTransactions'
+import { useAllTransactions, useCatalogueProducts, useStoreEvents } from '../db/useTransactions'
 import { generatePurchaseOrder } from '../engine/purchaseOrderEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
@@ -30,7 +30,7 @@ function seasonLabel(month: number) {
   return 'Summer'
 }
 
-function exportToXLSX(items: PurchaseOrderItem[], qtyOverrides: Record<string, number>, weeksAhead: number) {
+function exportToXLSX(items: PurchaseOrderItem[], qtyOverrides: Record<string, number>) {
   const rows = items.map(item => {
     const qty = qtyOverrides[item.productName] ?? item.recommendedQty
     const estTotal = item.avgPrice * qty
@@ -52,7 +52,6 @@ function exportToXLSX(items: PurchaseOrderItem[], qtyOverrides: Record<string, n
 
 export default function PurchaseOrderView() {
   const transactions = useAllTransactions()
-  const costData = useProductCostData()
   const catalogueProducts = useCatalogueProducts()
   const events = useStoreEvents()
   const [weeksAhead, setWeeksAhead] = useState(2)
@@ -144,7 +143,7 @@ export default function PurchaseOrderView() {
             <button onClick={() => setWeeksAhead(w => Math.min(4, w + 1))} className="w-7 h-7 rounded border border-gray-200 flex items-center justify-center text-sm hover:bg-gray-50">+</button>
           </div>
           <button
-            onClick={() => exportToXLSX(displayItems, qtyOverrides, weeksAhead)}
+            onClick={() => exportToXLSX(displayItems, qtyOverrides)}
             disabled={displayItems.length === 0}
             className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
           >

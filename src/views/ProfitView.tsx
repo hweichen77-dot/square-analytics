@@ -240,7 +240,7 @@ export default function ProfitView() {
 
   const { rawStats, profitRows } = useMemo(() => {
     const stats = computeProductStats(transactions)
-    const byName = Object.fromEntries(costData.map(c => [c.productName, c]))
+    const byName = Object.fromEntries(costData.map((c: ProductCostData) => [c.productName, c]))
     function lookupCost(name: string) {
       return byName[name] ?? byName[baseName(name)]
     }

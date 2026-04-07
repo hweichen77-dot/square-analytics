@@ -30,8 +30,8 @@ export async function upsertCatalogueProducts(products: Omit<CatalogueProduct, '
 
 export async function clearAllData(): Promise<void> {
   await db.transaction('rw',
-    db.salesTransactions, db.categoryOverrides, db.restockLogs,
-    db.productCostData, db.storeEvents, db.productBundles, db.catalogueProducts,
+    [db.salesTransactions, db.categoryOverrides, db.restockLogs,
+    db.productCostData, db.storeEvents, db.productBundles, db.catalogueProducts],
     async () => {
       await Promise.all([
         db.salesTransactions.clear(),

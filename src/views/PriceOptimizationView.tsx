@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ComposedChart, Line, ReferenceLine, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useFilteredTransactions } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { computeProductStats } from '../engine/analyticsEngine'

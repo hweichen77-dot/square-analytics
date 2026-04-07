@@ -33,7 +33,7 @@ export default function InventoryView() {
   }, [stats, search, categoryFilter])
 
   async function setOverride(productName: string, category: string) {
-    const existing = overrides.find(o => o.productName === productName)
+    const existing = overrides.find((o: { productName: string }) => o.productName === productName)
     if (existing) await db.categoryOverrides.update(existing.id!, { category })
     else await db.categoryOverrides.add({ productName, category })
     show(`Set "${productName}" → ${category}`, 'success')
@@ -131,12 +131,6 @@ export default function InventoryView() {
               </button>
             ))}
           </div>
-        </>
-      )}
-    </div>
-  )
-}
-    </div>
         </>
       )}
     </div>

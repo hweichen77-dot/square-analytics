@@ -1,4 +1,4 @@
-import Dexie, { type EntityTable } from 'dexie'
+import Dexie from 'dexie'
 import type {
   SalesTransaction,
   CategoryOverride,
@@ -10,13 +10,13 @@ import type {
 } from '../types/models'
 
 class WalleysDB extends Dexie {
-  salesTransactions!: EntityTable<SalesTransaction, 'id'>
-  categoryOverrides!: EntityTable<CategoryOverride, 'id'>
-  restockLogs!: EntityTable<RestockLog, 'id'>
-  productCostData!: EntityTable<ProductCostData, 'id'>
-  storeEvents!: EntityTable<StoreEvent, 'id'>
-  productBundles!: EntityTable<ProductBundle, 'id'>
-  catalogueProducts!: EntityTable<CatalogueProduct, 'id'>
+  salesTransactions!: Dexie.Table<SalesTransaction, number>
+  categoryOverrides!: Dexie.Table<CategoryOverride, number>
+  restockLogs!: Dexie.Table<RestockLog, number>
+  productCostData!: Dexie.Table<ProductCostData, number>
+  storeEvents!: Dexie.Table<StoreEvent, number>
+  productBundles!: Dexie.Table<ProductBundle, number>
+  catalogueProducts!: Dexie.Table<CatalogueProduct, number>
 
   constructor() {
     super('WalleysDB')

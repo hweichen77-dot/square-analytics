@@ -144,10 +144,3 @@ export default function SquareSyncView() {
     </div>
   )
 }
-{syncing ? 'Syncing…' : 'Start Sync'}
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
