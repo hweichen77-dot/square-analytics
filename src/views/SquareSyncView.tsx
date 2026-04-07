@@ -11,6 +11,7 @@ export default function SquareSyncView() {
   const store = useAuthStore()
   const { show } = useToastStore()
   const [appIDInput, setAppIDInput] = useState(store.appID)
+  const [appSecretInput, setAppSecretInput] = useState(store.appSecret)
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([])
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [syncing, setSyncing] = useState(false)
@@ -19,7 +20,8 @@ export default function SquareSyncView() {
 
   async function handleConnect() {
     if (!appIDInput.trim()) { show('Enter your Square Application ID first', 'error'); return }
-    store.setCredentials({ appID: appIDInput.trim() })
+    if (!appSecretInput.trim()) { show('Enter your Square Application Secret first', 'error'); return }
+    store.setCredentials({ appID: appIDInput.trim(), appSecret: appSecretInput.trim() })
     await startOAuthFlow(appIDInput.trim())
   }
 
@@ -58,6 +60,14 @@ export default function SquareSyncView() {
           value={appIDInput}
           onChange={e => setAppIDInput(e.target.value)}
           placeholder="sq0idp-…"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        />
+        <label className="block text-sm font-medium text-gray-700 mt-3 mb-1">Application Secret</label>
+        <input
+          type="password"
+          value={appSecretInput}
+          onChange={e => setAppSecretInput(e.target.value)}
+          placeholder="sq0csp-…"
           className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300"
         />
         {!isConnected ? (

@@ -69,13 +69,14 @@ export async function startOAuthFlow(appID: string): Promise<void> {
 
 export async function exchangeCodeForToken(code: string): Promise<void> {
   const verifier = sessionStorage.getItem('square_pkce_verifier') ?? ''
-  const { appID } = useAuthStore.getState()
+  const { appID, appSecret } = useAuthStore.getState()
 
   const res = await fetch(SQUARE_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       client_id: appID,
+      client_secret: appSecret,
       code,
       redirect_uri: getRedirectURI(),
       grant_type: 'authorization_code',
@@ -104,12 +105,13 @@ export async function exchangeCodeForToken(code: string): Promise<void> {
 }
 
 export async function refreshAccessToken(): Promise<void> {
-  const { appID, refreshToken } = useAuthStore.getState()
+  const { appID, appSecret, refreshToken } = useAuthStore.getState()
   const res = await fetch(SQUARE_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       client_id: appID,
+      client_secret: appSecret,
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     }),

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 
 interface AuthStore {
   appID: string
+  appSecret: string
   accessToken: string
   refreshToken: string
   merchantID: string
@@ -20,6 +21,7 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     set => ({
       appID: '',
+      appSecret: '',
       accessToken: '',
       refreshToken: '',
       merchantID: '',
