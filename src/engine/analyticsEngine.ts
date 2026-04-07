@@ -1,6 +1,6 @@
 import { startOfDay, startOfWeek, startOfMonth, format } from 'date-fns'
 import type { SalesTransaction } from '../types/models'
-import { parseProductItems, splitProducts } from '../types/models'
+import { parseProductItems } from '../types/models'
 import { classifyProduct } from './categoryClassifier'
 
 export interface ProductStats {
@@ -189,11 +189,12 @@ export function computeCategoryRevenue(
   const total = transactions.reduce((s, tx) => s + tx.netSales, 0)
 
   for (const tx of transactions) {
-    const products = splitProducts(tx.itemDescription)
-    const revenuePerItem = tx.netSales / Math.max(products.length, 1)
-    for (const product of products) {
-      const cat = classifyProduct(product, overrides)
-      catMap.set(cat, (catMap.get(cat) ?? 0) + revenuePerItem)
+    const items = parseProductItems(tx.itemDescription)
+    const totalQty = items.reduce((s, i) => s + i.qty, 0)
+    const revenuePerUnit = tx.netSales / Math.max(totalQty, 1)
+    for (const item of items) {
+      const cat = classifyProduct(item.name, overrides)
+      catMap.set(cat, (catMap.get(cat) ?? 0) + revenuePerUnit * item.qty)
     }
   }
 

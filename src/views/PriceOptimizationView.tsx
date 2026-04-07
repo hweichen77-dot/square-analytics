@@ -25,7 +25,7 @@ interface PriceChange {
 }
 
 function buildPriceChanges(transactions: SalesTransaction[]): PriceChange[] {
-  const productPriceHistory: Record<string, { date: Date; price: number }[]> = {}
+  const productPriceHistory: Record<string, { date: Date; price: number; qty: number }[]> = {}
 
   for (const tx of transactions) {
     const items = parseProductItems(tx.itemDescription)
@@ -34,7 +34,7 @@ function buildPriceChanges(transactions: SalesTransaction[]): PriceChange[] {
     const pricePerUnit = tx.netSales / totalQty
     for (const item of items.filter(i => i.qty > 0)) {
       if (!productPriceHistory[item.name]) productPriceHistory[item.name] = []
-      productPriceHistory[item.name].push({ date: tx.date, price: pricePerUnit })
+      productPriceHistory[item.name].push({ date: tx.date, price: pricePerUnit, qty: item.qty })
     }
   }
 
@@ -52,12 +52,10 @@ function buildPriceChanges(transactions: SalesTransaction[]): PriceChange[] {
         const changeDate = sorted[i].date
         const before = sorted.slice(0, i).slice(-30)
         const after = sorted.slice(i, i + 30)
-        const beforeUnits = before.length || 0
-        const afterUnits = after.length || 0
-        const beforeRevAvg = before.length ? before.map(x => x.price).reduce((s, v) => s + v, 0) / before.length : 0
-        const afterRevAvg = after.length ? after.map(x => x.price).reduce((s, v) => s + v, 0) / after.length : 0
-        const beforeRev = beforeRevAvg * beforeUnits
-        const afterRev = afterRevAvg * afterUnits
+        const beforeUnits = before.reduce((s, x) => s + x.qty, 0)
+        const afterUnits = after.reduce((s, x) => s + x.qty, 0)
+        const beforeRev = before.reduce((s, x) => s + x.price * x.qty, 0)
+        const afterRev = after.reduce((s, x) => s + x.price * x.qty, 0)
 
         const priceChangePct = lastPrice > 0 ? ((current - lastPrice) / lastPrice) * 100 : 0
         const unitChangePct = beforeUnits > 0 ? ((afterUnits - beforeUnits) / beforeUnits) * 100 : 0

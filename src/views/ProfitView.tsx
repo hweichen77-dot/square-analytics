@@ -330,7 +330,7 @@ export default function ProfitView() {
           { label: 'Total Revenue', value: formatCurrency(totalRevenue), color: '#3b82f6' },
           { label: 'Total Cost', value: formatCurrency(totalCost), color: '#f59e0b' },
           { label: 'Total Gross Profit', value: formatCurrency(totalProfit), color: totalProfit >= 0 ? '#16a34a' : '#dc2626' },
-          { label: 'Overall Margin', value: totalCost > 0 ? `${overallMargin.toFixed(1)}%` : '—', color: totalCost > 0 ? marginColor(overallMargin) : '#9ca3af' },
+          { label: coveredRevenue < totalRevenue ? `Margin (${Math.round(coveredRevenue / totalRevenue * 100)}% of rev)` : 'Overall Margin', value: totalCost > 0 ? `${overallMargin.toFixed(1)}%` : '—', color: totalCost > 0 ? marginColor(overallMargin) : '#9ca3af' },
           { label: 'Costs Entered', value: `${profitRows.filter(r => r.hasCostData).length}/${rawStats.length}`, color: '#9ca3af' },
         ].map(c => (
           <div key={c.label} className="bg-white border border-gray-200 rounded-xl p-4">
