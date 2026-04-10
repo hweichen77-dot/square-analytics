@@ -13,7 +13,7 @@ import type { ProductCostData } from '../types/models'
 import { effectiveUnitCost } from '../types/models'
 import { useToastStore } from '../store/toastStore'
 
-const PALETTE = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6']
+const PALETTE = ['#14B8A6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#14b8a6']
 
 function marginColor(pct: number) {
   if (pct < 20) return '#ef4444'
@@ -168,19 +168,19 @@ function CostManagementModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Manage Costs</h2>
-            <p className="text-xs text-gray-400">{products.length} products</p>
+            <h2 className="text-lg font-bold text-slate-100">Manage Costs</h2>
+            <p className="text-xs text-slate-500">{products.length} products</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-400 text-xl">×</button>
         </div>
 
-        <div className="px-6 py-3 border-b border-gray-100">
+        <div className="px-6 py-3 border-b border-slate-700/50">
           <input
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
             placeholder="Search products..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -189,24 +189,24 @@ function CostManagementModal({
 
         <div className="overflow-y-auto flex-1">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
+            <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500">Product</th>
-                <th className="px-4 py-2 text-center text-xs font-semibold text-gray-500 w-20">Mode</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 w-36">Unit / Case Price</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 w-24">Units/Case</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 w-28">Eff. Cost</th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-slate-500">Product</th>
+                <th className="px-4 py-2 text-center text-xs font-semibold text-slate-500 w-20">Mode</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500 w-36">Unit / Case Price</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500 w-24">Units/Case</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500 w-28">Eff. Cost</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(draft => {
                 const eff = draftEffectiveCost(draft)
                 return (
-                  <tr key={draft.productName} className="border-b border-gray-50">
-                    <td className="px-4 py-2 text-gray-900 truncate max-w-48">{draft.productName}</td>
+                  <tr key={draft.productName} className="border-b border-slate-800">
+                    <td className="px-4 py-2 text-slate-100 truncate max-w-48">{draft.productName}</td>
                     <td className="px-4 py-2 text-center">
                       <button
-                        className={`text-xs px-2 py-0.5 rounded-full border ${draft.isPerCase ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'border-gray-200 text-gray-500'}`}
+                        className={`text-xs px-2 py-0.5 rounded-full border ${draft.isPerCase ? 'bg-teal-500/15 text-teal-400 border-teal-500/30' : 'border-slate-700 text-slate-500'}`}
                         onClick={() => update(draft.productName, { isPerCase: !draft.isPerCase })}
                       >
                         Case
@@ -215,7 +215,7 @@ function CostManagementModal({
                     <td className="px-4 py-2 text-right">
                       <input
                         type="number"
-                        className="border border-gray-200 rounded px-2 py-1 text-xs w-28 text-right"
+                        className="border border-slate-600 rounded px-2 py-1 bg-slate-700/50 text-xs w-28 text-right"
                         placeholder={draft.isPerCase ? 'Case $' : 'Unit $'}
                         value={draft.isPerCase ? draft.casePriceText : draft.unitCostText}
                         onChange={e =>
@@ -229,15 +229,15 @@ function CostManagementModal({
                       {draft.isPerCase ? (
                         <input
                           type="number"
-                          className="border border-gray-200 rounded px-2 py-1 text-xs w-20 text-right"
+                          className="border border-slate-600 rounded px-2 py-1 bg-slate-700/50 text-xs w-20 text-right"
                           placeholder="Units"
                           value={draft.unitsPerCaseText}
                           onChange={e => update(draft.productName, { unitsPerCaseText: e.target.value })}
                         />
-                      ) : <span className="text-gray-300">—</span>}
+                      ) : <span className="text-slate-600">—</span>}
                     </td>
                     <td className="px-4 py-2 text-right font-mono font-semibold text-sm">
-                      {eff !== null ? `$${eff.toFixed(3)}` : <span className="text-gray-300">—</span>}
+                      {eff !== null ? `$${eff.toFixed(3)}` : <span className="text-slate-600">—</span>}
                     </td>
                   </tr>
                 )
@@ -246,9 +246,9 @@ function CostManagementModal({
           </table>
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-          <p className="text-xs text-gray-400">Toggle 'Case' to enter bulk pricing.</p>
-          <button onClick={saveAll} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-700/50">
+          <p className="text-xs text-slate-500">Toggle 'Case' to enter bulk pricing.</p>
+          <button onClick={saveAll} className="px-4 py-2 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600">
             Save All
           </button>
         </div>
@@ -360,10 +360,10 @@ export default function ProfitView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Profit Margins</h1>
+        <h1 className="text-xl font-bold text-slate-100">Profit Margins</h1>
         <button
           onClick={() => setShowCostSheet(true)}
-          className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          className="px-4 py-2 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600"
         >
           Manage Costs
         </button>
@@ -377,37 +377,37 @@ export default function ProfitView() {
           { label: coveredRevenue < totalRevenue ? `Margin (${Math.round(coveredRevenue / totalRevenue * 100)}% of rev)` : 'Overall Margin', value: totalCost > 0 ? `${overallMargin.toFixed(1)}%` : '—', color: totalCost > 0 ? marginColor(overallMargin) : '#9ca3af' },
           { label: 'Costs Entered', value: `${profitRows.filter(r => r.hasCostData).length}/${rawStats.length}`, color: '#9ca3af' },
         ].map(c => (
-          <div key={c.label} className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500">{c.label}</p>
+          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <p className="text-xs text-slate-500">{c.label}</p>
             <p className="text-xl font-bold mt-1 font-mono" style={{ color: c.color }}>{c.value}</p>
           </div>
         ))}
       </div>
 
       {moneyLosers.length > 0 && (
-        <div className="bg-red-600 rounded-xl p-5 text-white">
-          <p className="font-semibold mb-2">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5">
+          <p className="font-semibold mb-2 text-red-400">
             Money Losers — {moneyLosers.length} product{moneyLosers.length !== 1 ? 's' : ''} at 0% or negative margin
           </p>
           <div className="space-y-1">
             {moneyLosers.map(r => (
-              <div key={r.name} className="flex items-center gap-3 text-sm">
+              <div key={r.name} className="flex items-center gap-3 text-sm text-slate-300">
                 <span className="flex-1">{r.name}</span>
-                <span className="font-mono w-14 text-right">{(r.marginPercent ?? 0).toFixed(1)}%</span>
-                <span className="font-mono w-22 text-right">{formatCurrency(r.totalProfit ?? 0)}</span>
+                <span className="font-mono w-14 text-right text-red-400">{(r.marginPercent ?? 0).toFixed(1)}%</span>
+                <span className="font-mono w-22 text-right text-red-400">{formatCurrency(r.totalProfit ?? 0)}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Product Profit Analysis</h2>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-700/50">
+          <h2 className="text-base font-semibold text-slate-100">Product Profit Analysis</h2>
         </div>
         <div className="overflow-x-auto max-h-96">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-gray-50 border-b border-gray-100">
+            <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
               <tr>
                 {([
                   ['name', 'Product'], ['category', 'Category'], ['unitCost', 'Unit Cost'],
@@ -417,7 +417,7 @@ export default function ProfitView() {
                 ] as [keyof ProfitRow, string][]).map(([key, label]) => (
                   <th
                     key={key}
-                    className="px-4 py-2.5 font-semibold text-gray-500 text-left cursor-pointer hover:bg-gray-100 select-none"
+                    className="px-4 py-2.5 font-semibold text-slate-500 text-left cursor-pointer hover:bg-slate-700 select-none"
                     onClick={() => toggleSort(key)}
                   >
                     {label}{sortArrow(key)}
@@ -427,18 +427,18 @@ export default function ProfitView() {
             </thead>
             <tbody>
               {sortedRows.map(r => (
-                <tr key={r.name} className="border-b border-gray-50 hover:bg-gray-50">
-                  <td className="px-4 py-2 font-medium text-gray-900 max-w-40 truncate">{r.name}</td>
-                  <td className="px-4 py-2 text-gray-400">{r.category}</td>
-                  <td className="px-4 py-2 font-mono text-gray-700">{r.unitCost !== null ? `$${r.unitCost.toFixed(3)}` : '—'}</td>
-                  <td className="px-4 py-2 font-mono text-gray-700">${r.avgPrice.toFixed(2)}</td>
+                <tr key={r.name} className="border-b border-slate-800 hover:bg-slate-700/50">
+                  <td className="px-4 py-2 font-medium text-slate-100 max-w-40 truncate">{r.name}</td>
+                  <td className="px-4 py-2 text-slate-500">{r.category}</td>
+                  <td className="px-4 py-2 font-mono text-slate-300">{r.unitCost !== null ? `$${r.unitCost.toFixed(3)}` : '—'}</td>
+                  <td className="px-4 py-2 font-mono text-slate-300">${r.avgPrice.toFixed(2)}</td>
                   <td className="px-4 py-2 font-mono font-semibold"
                     style={{ color: r.marginPercent !== null ? marginColor(r.marginPercent) : '#9ca3af' }}>
                     {r.marginPercent !== null ? `${r.marginPercent.toFixed(1)}%` : '—'}
                   </td>
-                  <td className="px-4 py-2 font-mono text-gray-700">{r.unitsSold}</td>
-                  <td className="px-4 py-2 font-mono text-gray-700">{formatCurrency(r.totalRevenue)}</td>
-                  <td className="px-4 py-2 font-mono text-gray-600">{r.totalCost !== null ? formatCurrency(r.totalCost) : '—'}</td>
+                  <td className="px-4 py-2 font-mono text-slate-300">{r.unitsSold}</td>
+                  <td className="px-4 py-2 font-mono text-slate-300">{formatCurrency(r.totalRevenue)}</td>
+                  <td className="px-4 py-2 font-mono text-slate-400">{r.totalCost !== null ? formatCurrency(r.totalCost) : '—'}</td>
                   <td className="px-4 py-2 font-mono font-semibold" style={{ color: (r.totalProfit ?? 0) >= 0 ? '#111827' : '#dc2626' }}>
                     {r.totalProfit !== null ? formatCurrency(r.totalProfit) : '—'}
                   </td>
@@ -450,16 +450,16 @@ export default function ProfitView() {
       </div>
 
       {top15Profit.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Top 15 Products by Profit</h2>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <h2 className="text-base font-semibold text-slate-100 mb-4">Top 15 Products by Profit</h2>
           <ResponsiveContainer width="100%" height={top15Profit.length * 28 + 40}>
             <BarChart data={top15Profit} layout="vertical" margin={{ top: 4, right: 80, left: 16, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} />
               <XAxis type="number" tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={130} />
               <Tooltip formatter={(v: number) => formatCurrency(v)} />
-              <Bar dataKey="totalProfit" fill="#10b981" radius={[0, 3, 3, 0]}
-                label={{ position: 'right', formatter: (v: number) => formatCurrency(v), fontSize: 10, fill: '#6b7280' }} />
+              <Bar dataKey="totalProfit" fill="#34D399" radius={[0, 3, 3, 0]}
+                label={{ position: 'right', formatter: (v: number) => formatCurrency(v), fontSize: 10, fill: '#64748B' }} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -467,8 +467,8 @@ export default function ProfitView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {scatterData.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Popularity vs. Profitability</h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <h2 className="text-base font-semibold text-slate-100 mb-4">Popularity vs. Profitability</h2>
             <ResponsiveContainer width="100%" height={300}>
               <ScatterChart margin={{ top: 4, right: 16, left: 0, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -484,8 +484,8 @@ export default function ProfitView() {
         )}
 
         {categoryProfitData.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Profit by Category</h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <h2 className="text-base font-semibold text-slate-100 mb-4">Profit by Category</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie data={categoryProfitData} dataKey="profit" nameKey="category" cx="50%" cy="50%" outerRadius={110} innerRadius={55}>

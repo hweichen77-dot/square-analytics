@@ -55,8 +55,8 @@ export default function CatalogueCheckerView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Catalogue Checker</h1>
-        <p className="text-sm text-gray-500 mt-1">Compare your sales data against your Square catalogue for gaps and mismatches.</p>
+        <h1 className="text-xl font-bold text-slate-100">Catalogue Checker</h1>
+        <p className="text-sm text-slate-500 mt-1">Compare your sales data against your Square catalogue for gaps and mismatches.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -65,27 +65,27 @@ export default function CatalogueCheckerView() {
           <p className="text-3xl font-bold text-yellow-800 mt-1">{inSalesNotCatalogue.length}</p>
           <p className="text-xs text-yellow-600 mt-1">Products you sold that Square doesn't know about</p>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p className="text-sm text-blue-700 font-medium">In Catalogue — Never Sold</p>
-          <p className="text-3xl font-bold text-blue-800 mt-1">{inCatalogueNotSales.length}</p>
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+          <p className="text-sm text-blue-300 font-medium">In Catalogue — Never Sold</p>
+          <p className="text-3xl font-bold text-blue-300 mt-1">{inCatalogueNotSales.length}</p>
           <p className="text-xs text-blue-600 mt-1">Enabled catalogue items with no sales in this period</p>
         </div>
         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
           <p className="text-sm text-orange-700 font-medium">Price Mismatches</p>
           <p className="text-3xl font-bold text-orange-800 mt-1">{discrepancies.filter(d => d.severity === 'info').length}</p>
-          <p className="text-xs text-orange-600 mt-1">Items where catalogue price differs from avg sold price by &gt;$0.50</p>
+          <p className="text-xs text-orange-400 mt-1">Items where catalogue price differs from avg sold price by &gt;$0.50</p>
         </div>
       </div>
 
       {inSalesNotCatalogue.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-700/50 flex items-center gap-2">
             <span className="text-lg">⚠️</span>
-            <h2 className="font-semibold text-gray-800">Sold — Not in Catalogue ({inSalesNotCatalogue.length})</h2>
+            <h2 className="font-semibold text-slate-200">Sold — Not in Catalogue ({inSalesNotCatalogue.length})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+              <thead className="bg-slate-900 text-slate-500 uppercase text-xs">
                 <tr>
                   <th className="px-4 py-2 text-left">Product</th>
                   <th className="px-4 py-2 text-right">Units Sold</th>
@@ -93,13 +93,13 @@ export default function CatalogueCheckerView() {
                   <th className="px-4 py-2 text-right">Avg Price</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-700/40">
                 {inSalesNotCatalogue.map(p => (
-                  <tr key={p.name} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 font-medium text-gray-900">{p.name}</td>
-                    <td className="px-4 py-2 text-right text-gray-600">{p.totalUnitsSold}</td>
-                    <td className="px-4 py-2 text-right text-gray-600">{formatCurrency(p.totalRevenue)}</td>
-                    <td className="px-4 py-2 text-right text-gray-600">{formatCurrency(p.avgPrice)}</td>
+                  <tr key={p.name} className="hover:bg-slate-700/50">
+                    <td className="px-4 py-2 font-medium text-slate-100">{p.name}</td>
+                    <td className="px-4 py-2 text-right text-slate-400">{p.totalUnitsSold}</td>
+                    <td className="px-4 py-2 text-right text-slate-400">{formatCurrency(p.totalRevenue)}</td>
+                    <td className="px-4 py-2 text-right text-slate-400">{formatCurrency(p.avgPrice)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -109,14 +109,14 @@ export default function CatalogueCheckerView() {
       )}
 
       {inCatalogueNotSales.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-700/50 flex items-center gap-2">
             <span className="text-lg">📦</span>
-            <h2 className="font-semibold text-gray-800">In Catalogue — Never Sold ({inCatalogueNotSales.length})</h2>
+            <h2 className="font-semibold text-slate-200">In Catalogue — Never Sold ({inCatalogueNotSales.length})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+              <thead className="bg-slate-900 text-slate-500 uppercase text-xs">
                 <tr>
                   <th className="px-4 py-2 text-left">Product</th>
                   <th className="px-4 py-2 text-left">SKU</th>
@@ -125,14 +125,14 @@ export default function CatalogueCheckerView() {
                   <th className="px-4 py-2 text-right">Stock</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-700/40">
                 {inCatalogueNotSales.map(c => (
-                  <tr key={c.name} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 font-medium text-gray-900">{c.name}</td>
-                    <td className="px-4 py-2 text-gray-500">{c.sku || '—'}</td>
-                    <td className="px-4 py-2 text-gray-500">{c.category || '—'}</td>
-                    <td className="px-4 py-2 text-right text-gray-600">{c.price != null ? formatCurrency(c.price) : '—'}</td>
-                    <td className="px-4 py-2 text-right text-gray-600">{c.quantity ?? '—'}</td>
+                  <tr key={c.name} className="hover:bg-slate-700/50">
+                    <td className="px-4 py-2 font-medium text-slate-100">{c.name}</td>
+                    <td className="px-4 py-2 text-slate-500">{c.sku || '—'}</td>
+                    <td className="px-4 py-2 text-slate-500">{c.category || '—'}</td>
+                    <td className="px-4 py-2 text-right text-slate-400">{c.price != null ? formatCurrency(c.price) : '—'}</td>
+                    <td className="px-4 py-2 text-right text-slate-400">{c.quantity ?? '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -142,27 +142,27 @@ export default function CatalogueCheckerView() {
       )}
 
       {discrepancies.filter(d => d.severity === 'info').length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-2">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-700/50 flex items-center gap-2">
             <span className="text-lg">💰</span>
-            <h2 className="font-semibold text-gray-800">Price Mismatches</h2>
+            <h2 className="font-semibold text-slate-200">Price Mismatches</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+              <thead className="bg-slate-900 text-slate-500 uppercase text-xs">
                 <tr>
                   <th className="px-4 py-2 text-left">Product</th>
                   <th className="px-4 py-2 text-left">Detail</th>
                   <th className="px-4 py-2 text-left">Issue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-700/40">
                 {discrepancies.filter(d => d.severity === 'info').map((d, i) => (
-                  <tr key={i} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 font-medium text-gray-900">{d.name}</td>
-                    <td className="px-4 py-2 text-gray-600">{d.detail}</td>
+                  <tr key={i} className="hover:bg-slate-700/50">
+                    <td className="px-4 py-2 font-medium text-slate-100">{d.name}</td>
+                    <td className="px-4 py-2 text-slate-400">{d.detail}</td>
                     <td className="px-4 py-2">
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/15 text-orange-400">
                         {d.issue}
                       </span>
                     </td>
@@ -175,7 +175,7 @@ export default function CatalogueCheckerView() {
       )}
 
       {inSalesNotCatalogue.length === 0 && inCatalogueNotSales.length === 0 && discrepancies.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-slate-500">
           <p className="text-4xl mb-3">✅</p>
           <p className="font-medium">Catalogue looks clean!</p>
           <p className="text-sm mt-1">No gaps or mismatches found in this date range.</p>

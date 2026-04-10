@@ -31,7 +31,7 @@ const AccountantReportView  = lazy(() => import('./views/AccountantReportView'))
 function PageFallback() {
   return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="w-7 h-7 border-2 border-slate-700 border-t-teal-400 rounded-full animate-spin" />
     </div>
   )
 }
@@ -93,7 +93,7 @@ export default function App() {
   useDeepLinkHandler()
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-950 overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-7xl mx-auto p-6">

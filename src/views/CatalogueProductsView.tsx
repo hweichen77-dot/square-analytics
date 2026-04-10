@@ -41,8 +41,8 @@ export default function CatalogueProductsView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Catalogue Products</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-xl font-bold text-slate-100">Catalogue Products</h1>
+        <p className="text-sm text-slate-500 mt-1">
           {enabledCount} enabled · {disabledCount} archived · {catalogue.length} total
         </p>
       </div>
@@ -54,18 +54,18 @@ export default function CatalogueProductsView() {
           placeholder="Search name or SKU…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-56 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         >
           {categories.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-sm text-slate-400 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={showDisabled}
@@ -74,14 +74,14 @@ export default function CatalogueProductsView() {
           />
           Show archived
         </label>
-        <span className="ml-auto text-sm text-gray-400 self-center">{filtered.length} products</span>
+        <span className="ml-auto text-sm text-slate-500 self-center">{filtered.length} products</span>
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+            <thead className="bg-slate-900 text-slate-500 uppercase text-xs">
               <tr>
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">SKU</th>
@@ -92,36 +92,36 @@ export default function CatalogueProductsView() {
                 <th className="px-4 py-3 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-700/40">
               {filtered.map(product => (
-                <tr key={product.id ?? product.name} className={`hover:bg-gray-50 ${!product.enabled ? 'opacity-50' : ''}`}>
-                  <td className="px-4 py-3 font-medium text-gray-900">{product.name}</td>
-                  <td className="px-4 py-3 text-gray-500 font-mono text-xs">{product.sku || '—'}</td>
+                <tr key={product.id ?? product.name} className={`hover:bg-slate-700/50 ${!product.enabled ? 'opacity-50' : ''}`}>
+                  <td className="px-4 py-3 font-medium text-slate-100">{product.name}</td>
+                  <td className="px-4 py-3 text-slate-500 font-mono text-xs">{product.sku || '—'}</td>
                   <td className="px-4 py-3">
                     {product.category ? (
                       <Badge variant="secondary">{product.category}</Badge>
                     ) : (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-slate-500">—</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
+                  <td className="px-4 py-3 text-right text-slate-300">
                     {product.price != null ? formatCurrency(product.price) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
+                  <td className="px-4 py-3 text-right text-slate-300">
                     {product.quantity != null ? product.quantity : '—'}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {product.taxable ? (
-                      <span className="text-green-600 font-medium">Yes</span>
+                      <span className="text-emerald-400 font-medium">Yes</span>
                     ) : (
-                      <span className="text-gray-400">No</span>
+                      <span className="text-slate-500">No</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                       product.enabled
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-500'
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : 'bg-slate-800 text-slate-500'
                     }`}>
                       {product.enabled ? 'Active' : 'Archived'}
                     </span>
@@ -132,7 +132,7 @@ export default function CatalogueProductsView() {
           </table>
         </div>
         {filtered.length === 0 && (
-          <div className="text-center py-10 text-gray-400 text-sm">No products match your filters.</div>
+          <div className="text-center py-10 text-slate-500 text-sm">No products match your filters.</div>
         )}
       </div>
     </div>

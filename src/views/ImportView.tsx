@@ -64,8 +64,8 @@ export default function ImportView() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Import Data</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-xl font-bold text-slate-100">Import Data</h1>
+        <p className="text-sm text-slate-500 mt-1">
           {formatNumber(txCount)} transactions · {formatNumber(catCount)} catalogue products stored
         </p>
       </div>
@@ -75,23 +75,25 @@ export default function ImportView() {
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${
-          dragging ? 'border-indigo-400 bg-indigo-50' : 'border-gray-300 hover:border-indigo-300 bg-gray-50'
+          dragging ? 'border-teal-400 bg-teal-500/10' : 'border-slate-600 hover:border-teal-300 bg-slate-900'
         }`}
         onClick={() => csvRef.current?.click()}
       >
-        <p className="text-4xl mb-3">📄</p>
-        <p className="font-medium text-gray-700">Drop Square CSV here or click to browse</p>
-        <p className="text-sm text-gray-400 mt-1">Accepts Square transaction export (.csv)</p>
+        <div className="w-12 h-12 rounded-xl bg-slate-700 border border-slate-600 flex items-center justify-center mx-auto mb-3">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        </div>
+        <p className="font-medium text-slate-200">Drop Square CSV here or click to browse</p>
+        <p className="text-sm text-slate-500 mt-1">Accepts Square transaction export (.csv)</p>
         <input ref={csvRef} type="file" accept=".csv" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f) }} />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="font-semibold text-gray-800 mb-3">Catalogue Import (XLSX)</h2>
-        <p className="text-sm text-gray-500 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <h2 className="font-semibold text-slate-200 mb-3">Catalogue Import (XLSX)</h2>
+        <p className="text-sm text-slate-500 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
         <button
           onClick={() => xlsxRef.current?.click()}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+          className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-medium hover:bg-teal-600 disabled:opacity-50"
           disabled={importing}
         >
           {importing ? 'Importing…' : 'Select XLSX file'}
@@ -101,21 +103,21 @@ export default function ImportView() {
       </div>
 
       {(txCount > 0 || catCount > 0) && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <h2 className="font-semibold text-red-800 mb-1">Clear All Data</h2>
-          <p className="text-sm text-red-600 mb-3">Permanently deletes all transactions, catalogue products, and settings stored locally.</p>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <h2 className="font-semibold text-red-300 mb-1">Clear All Data</h2>
+          <p className="text-sm text-red-400 mb-3">Permanently deletes all transactions, catalogue products, and settings stored locally.</p>
           {confirmClear ? (
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-red-700">Are you sure? This cannot be undone.</span>
+              <span className="text-sm font-medium text-red-400">Are you sure? This cannot be undone.</span>
               <button
                 onClick={handleClearAll}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-700"
               >
                 Yes, delete everything
               </button>
               <button
                 onClick={() => setConfirmClear(false)}
-                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50"
+                className="px-4 py-2 bg-slate-800 border border-slate-600 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-700/50"
               >
                 Cancel
               </button>
@@ -123,7 +125,7 @@ export default function ImportView() {
           ) : (
             <button
               onClick={() => setConfirmClear(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+              className="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-700"
             >
               Clear everything
             </button>

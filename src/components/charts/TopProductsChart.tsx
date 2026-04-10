@@ -4,12 +4,12 @@ import type { ProductStats } from '../../engine/analyticsEngine'
 import { formatCurrency } from '../../utils/format'
 
 const CAT_COLORS: Record<string, string> = {
-  'Food': '#f59e0b',
-  'Drinks': '#6366f1',
-  'Ice Cream': '#10b981',
-  'Ramen/Hot Food': '#ef4444',
-  'Merch': '#8b5cf6',
-  'Other': '#94a3b8',
+  'Food':           '#F59E0B',
+  'Drinks':         '#14B8A6',
+  'Ice Cream':      '#34D399',
+  'Ramen/Hot Food': '#F87171',
+  'Merch':          '#818CF8',
+  'Other':          '#475569',
 }
 
 interface TopProductsChartProps {
@@ -27,16 +27,18 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
   }))
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-gray-800">Top Products</h2>
+        <h2 className="font-semibold text-slate-200 text-sm">Top Products</h2>
         <div className="flex gap-1">
           {(['revenue', 'units'] as const).map(m => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`px-2.5 py-1 text-xs rounded-lg font-medium capitalize ${
-                mode === m ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-100'
+              className={`px-2.5 py-1 text-xs rounded-md font-medium capitalize transition-colors cursor-pointer ${
+                mode === m
+                  ? 'bg-teal-500 text-slate-950'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700'
               }`}
             >
               {m === 'revenue' ? 'By Revenue' : 'By Qty'}
@@ -46,18 +48,20 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-          <XAxis type="number" tick={{ fontSize: 11 }}
+          <XAxis type="number" tick={{ fontSize: 10, fill: '#64748B' }} axisLine={false} tickLine={false}
             tickFormatter={v => mode === 'revenue' ? `$${v}` : String(v)} />
-          <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={120} />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: '#94A3B8' }} width={120} axisLine={false} tickLine={false} />
           <Tooltip
+            contentStyle={{ background: '#1E293B', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
+            labelStyle={{ color: '#94A3B8' }}
             formatter={(v: number, _n, props) => [
               mode === 'revenue' ? formatCurrency(v) : `${v} units`,
               props.payload?.fullName ?? '',
             ]}
           />
-          <Bar dataKey="value" maxBarSize={20}>
+          <Bar dataKey="value" maxBarSize={16} radius={[0, 3, 3, 0]}>
             {chartData.map((d, i) => (
-              <Cell key={i} fill={CAT_COLORS[d.category] ?? '#94a3b8'} />
+              <Cell key={i} fill={CAT_COLORS[d.category] ?? '#475569'} />
             ))}
           </Bar>
         </BarChart>

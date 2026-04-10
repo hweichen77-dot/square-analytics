@@ -46,7 +46,7 @@ export default function InventoryView() {
 
   return (
     <div className="space-y-4" onClick={() => setCtxMenu(null)}>
-      <h1 className="text-2xl font-bold text-gray-900">Transaction Intelligence</h1>
+      <h1 className="text-xl font-bold text-slate-100">Transactions</h1>
 
       <div className="flex flex-wrap gap-3">
         <input
@@ -54,23 +54,23 @@ export default function InventoryView() {
           placeholder="Search product…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-48 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         >
           <option value="All">All categories</option>
           {ALL_CATEGORY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <span className="text-sm text-gray-400 self-center">{filtered.length} products</span>
+        <span className="text-sm text-slate-500 self-center">{filtered.length} products</span>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+            <thead className="bg-slate-900 text-slate-500 uppercase text-xs">
               <tr>
                 <th className="px-4 py-3 text-left">Product</th>
                 <th className="px-4 py-3 text-left">Category</th>
@@ -80,27 +80,27 @@ export default function InventoryView() {
                 <th className="px-4 py-3 text-center">Trend</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-700/40">
               {filtered.map(p => {
                 const trend = productTrend(p)
                 const slow = isSlowMover(p)
                 return (
                   <tr
                     key={p.name}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="hover:bg-slate-700/50 cursor-pointer"
                     onClick={() => navigate(`/inventory/${encodeURIComponent(p.name)}`)}
                     onContextMenu={e => { e.preventDefault(); setCtxMenu({ x: e.clientX, y: e.clientY, name: p.name }) }}
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-slate-100">
                       {p.name}
-                      {slow && <span className="ml-2 text-xs text-orange-500">slow</span>}
+                      {slow && <span className="ml-2 text-xs text-orange-400">slow</span>}
                     </td>
                     <td className="px-4 py-3"><CategoryBadge category={p.category} /></td>
-                    <td className="px-4 py-3 text-right text-gray-600">{formatNumber(p.totalUnitsSold)}</td>
-                    <td className="px-4 py-3 text-right text-gray-700 font-medium">{formatCurrency(p.totalRevenue)}</td>
-                    <td className="px-4 py-3 text-right text-gray-600">{formatCurrency(p.avgPrice)}</td>
+                    <td className="px-4 py-3 text-right text-slate-400">{formatNumber(p.totalUnitsSold)}</td>
+                    <td className="px-4 py-3 text-right text-slate-300 font-medium">{formatCurrency(p.totalRevenue)}</td>
+                    <td className="px-4 py-3 text-right text-slate-400">{formatCurrency(p.avgPrice)}</td>
                     <td className="px-4 py-3 text-center">
-                      <span className={trend === 'Growing' ? 'text-green-600' : trend === 'Declining' ? 'text-red-500' : 'text-gray-400'}>
+                      <span className={trend === 'Growing' ? 'text-emerald-400' : trend === 'Declining' ? 'text-red-400' : 'text-slate-500'}>
                         {trend === 'Growing' ? '↑' : trend === 'Declining' ? '↓' : '→'}
                       </span>
                     </td>
@@ -116,16 +116,16 @@ export default function InventoryView() {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setCtxMenu(null)} />
           <div
-            className="fixed z-20 bg-white border border-gray-200 rounded-xl shadow-lg py-1 min-w-44"
+            className="fixed z-20 bg-slate-800 border border-slate-700 rounded-xl shadow-lg py-1 min-w-44"
             style={{ left: ctxMenu.x, top: ctxMenu.y }}
             onClick={e => e.stopPropagation()}
           >
-            <p className="px-3 py-1 text-xs text-gray-500 font-medium uppercase">Set category</p>
+            <p className="px-3 py-1 text-xs text-slate-500 font-medium uppercase">Set category</p>
             {ALL_CATEGORY_NAMES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setOverride(ctxMenu.name, cat)}
-                className="w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50"
+                className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-700/50"
               >
                 {cat}
               </button>

@@ -1,9 +1,9 @@
 import { useToastStore } from '../../store/toastStore'
 
 const VARIANT_STYLES = {
-  success: 'bg-green-600 text-white',
-  error: 'bg-red-600 text-white',
-  info: 'bg-gray-800 text-white',
+  success: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30',
+  error:   'bg-red-500/10 text-red-300 border border-red-500/30',
+  info:    'bg-slate-700 text-slate-200 border border-slate-600',
 }
 
 export function ToastContainer() {
@@ -14,7 +14,7 @@ export function ToastContainer() {
         <div
           key={t.id}
           onClick={() => dismiss(t.id)}
-          className={`px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium cursor-pointer min-w-48 text-center ${VARIANT_STYLES[t.variant]}`}
+          className={`px-4 py-2.5 rounded-lg shadow-xl text-sm font-medium cursor-pointer min-w-52 text-center backdrop-blur-sm ${VARIANT_STYLES[t.variant]}`}
         >
           {t.message}
         </div>

@@ -159,40 +159,40 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-96 p-6">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+      <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 w-96 p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Log Restock</h2>
-            <p className="text-sm text-gray-500">{productName}</p>
+            <h2 className="text-lg font-semibold text-slate-100">Log Restock</h2>
+            <p className="text-sm text-slate-500">{productName}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-400 text-xl leading-none">×</button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Restock Date</label>
-            <input type="date" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+            <label className="block text-sm font-medium text-slate-300 mb-1">Restock Date</label>
+            <input type="date" className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
               value={date} onChange={e => setDate(e.target.value)} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity Restocked</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Quantity Restocked</label>
             <input type="number" placeholder="e.g. 48"
-              className={`w-full border rounded-lg px-3 py-2 text-sm ${error ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-lg px-3 py-2 text-sm ${error ? 'border-red-400' : 'border-slate-700'}`}
               value={qty} onChange={e => { setQty(e.target.value); setError(false) }} />
-            {error && <p className="text-xs text-red-500 mt-1">Enter a valid whole number</p>}
+            {error && <p className="text-xs text-red-400 mt-1">Enter a valid whole number</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+            <label className="block text-sm font-medium text-slate-300 mb-1">Notes (optional)</label>
             <input type="text" placeholder="e.g. Received from supplier"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</button>
-          <button onClick={save} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
+          <button onClick={save} className="px-4 py-2 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600">
             Save Restock
           </button>
         </div>
@@ -227,25 +227,25 @@ export default function RestockView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Restock Alerts & Forecasting</h1>
+      <h1 className="text-xl font-bold text-slate-100">Restock Alerts & Forecasting</h1>
 
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Total Products', value: alerts.length, color: 'text-gray-900' },
-          { label: 'Out of Stock', value: outOfStockCount, color: outOfStockCount > 0 ? 'text-red-600' : 'text-gray-400' },
-          { label: 'Critical (≤5 days)', value: criticalCount, color: criticalCount > 0 ? 'text-red-600' : 'text-gray-400' },
-          { label: 'Low (6–10 days)', value: lowCount, color: lowCount > 0 ? 'text-orange-500' : 'text-gray-400' },
+          { label: 'Total Products', value: alerts.length, color: 'text-slate-100' },
+          { label: 'Out of Stock', value: outOfStockCount, color: outOfStockCount > 0 ? 'text-red-400' : 'text-slate-500' },
+          { label: 'Critical (≤5 days)', value: criticalCount, color: criticalCount > 0 ? 'text-red-400' : 'text-slate-500' },
+          { label: 'Low (6–10 days)', value: lowCount, color: lowCount > 0 ? 'text-orange-400' : 'text-slate-500' },
         ].map(c => (
-          <div key={c.label} className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-xs text-gray-500">{c.label}</p>
+          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <p className="text-xs text-slate-500">{c.label}</p>
             <p className={`text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
           </div>
         ))}
       </div>
 
       {suggestedList.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-orange-600 mb-3">Suggested Restock List</h2>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-orange-400 mb-3">Suggested Restock List</h2>
           <div className="space-y-2">
             {suggestedList.map(alert => (
               <div key={alert.productName} className="flex items-center gap-3 p-3 rounded-lg"
@@ -255,11 +255,11 @@ export default function RestockView() {
                   style={{ backgroundColor: urgencyColor(alert.urgency) }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 text-sm">{alert.productName}</p>
-                  <p className="text-xs text-gray-400">{alert.category}</p>
+                  <p className="font-medium text-slate-100 text-sm">{alert.productName}</p>
+                  <p className="text-xs text-slate-500">{alert.category}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-semibold text-sm text-gray-900">
+                  <p className="font-semibold text-sm text-slate-100">
                     Restock {alert.recommendedRestockQty} units
                   </p>
                   {alert.stockRemaining !== null ? (
@@ -267,12 +267,12 @@ export default function RestockView() {
                       {alert.stockRemaining <= 0 ? 'OUT OF STOCK' : `${alert.stockRemaining} remaining`}
                     </p>
                   ) : (
-                    <p className="text-xs text-gray-400">No stock data</p>
+                    <p className="text-xs text-slate-500">No stock data</p>
                   )}
                 </div>
                 <button
                   onClick={() => setProductToRestock(alert.productName)}
-                  className="shrink-0 text-xs px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  className="shrink-0 text-xs px-3 py-1.5 border border-slate-700 rounded-lg hover:bg-slate-700/50"
                 >
                   Log Restock
                 </button>
@@ -282,30 +282,30 @@ export default function RestockView() {
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">All Products — Stock Status</h2>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-700/50">
+          <h2 className="text-base font-semibold text-slate-100">All Products — Stock Status</h2>
         </div>
         {alerts.length === 0 ? (
-          <div className="p-8 text-center text-sm text-gray-400">Import CSV sales data to see restock alerts.</div>
+          <div className="p-8 text-center text-sm text-slate-500">Import CSV sales data to see restock alerts.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-100 text-left">
+                <tr className="bg-slate-900 border-b border-slate-700/50 text-left">
                   {['Product', 'Category', 'Weekly Vel.', 'Est. Stock', 'Days Left', 'Proj. Stockout', 'Last Restocked', 'Status', 'Action'].map(h => (
-                    <th key={h} className="px-4 py-2.5 font-semibold text-gray-500">{h}</th>
+                    <th key={h} className="px-4 py-2.5 font-semibold text-slate-500">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {alerts.map(alert => (
-                  <tr key={alert.productName} className="border-b border-gray-50 hover:bg-gray-50">
+                  <tr key={alert.productName} className="border-b border-slate-800 hover:bg-slate-700/50">
                     <td className="px-4 py-2.5">
-                      <div className="font-medium text-gray-900">{alert.productName}</div>
+                      <div className="font-medium text-slate-100">{alert.productName}</div>
                     </td>
-                    <td className="px-4 py-2.5 text-gray-500">{alert.category}</td>
-                    <td className="px-4 py-2.5 font-mono text-gray-700">{alert.weeklyVelocity.toFixed(1)}/wk</td>
+                    <td className="px-4 py-2.5 text-slate-500">{alert.category}</td>
+                    <td className="px-4 py-2.5 font-mono text-slate-300">{alert.weeklyVelocity.toFixed(1)}/wk</td>
                     <td className="px-4 py-2.5 font-mono font-semibold" style={{ color: urgencyColor(alert.urgency) }}>
                       {alert.stockRemaining !== null
                         ? alert.stockRemaining <= 0 ? 'OUT' : alert.stockRemaining
@@ -316,10 +316,10 @@ export default function RestockView() {
                         : alert.daysUntilStockout !== null ? Math.round(alert.daysUntilStockout)
                         : '—'}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-gray-600">
+                    <td className="px-4 py-2.5 font-mono text-slate-400">
                       {alert.projectedStockoutDate ? format(alert.projectedStockoutDate, 'MMM d') : '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-500">
+                    <td className="px-4 py-2.5 text-slate-500">
                       {alert.lastRestockedDate ? format(alert.lastRestockedDate, 'M/d/yy') : 'Never'}
                     </td>
                     <td className="px-4 py-2.5">
@@ -336,7 +336,7 @@ export default function RestockView() {
                     <td className="px-4 py-2.5">
                       <button
                         onClick={() => setProductToRestock(alert.productName)}
-                        className="text-xs px-2 py-1 border border-gray-200 rounded hover:bg-gray-50"
+                        className="text-xs px-2 py-1 border border-slate-700 rounded hover:bg-slate-700/50"
                       >
                         Log Restock
                       </button>

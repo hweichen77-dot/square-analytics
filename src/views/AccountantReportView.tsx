@@ -42,11 +42,11 @@ function getQuickDates(key: QuickRange): { start: Date; end: Date } | null {
 
 function MetricRow({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
-    <div className={`flex items-center justify-between py-2 border-b border-gray-100 last:border-0 ${highlight ? 'font-semibold' : ''}`}>
-      <span className={`text-sm ${highlight ? 'text-gray-900' : 'text-gray-600'}`}>{label}</span>
+    <div className={`flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0 ${highlight ? 'font-semibold' : ''}`}>
+      <span className={`text-sm ${highlight ? 'text-slate-100' : 'text-slate-400'}`}>{label}</span>
       <div className="text-right">
-        <span className={`text-sm ${highlight ? 'text-gray-900' : 'text-gray-800'}`}>{value}</span>
-        {sub && <p className="text-xs text-gray-400">{sub}</p>}
+        <span className={`text-sm ${highlight ? 'text-slate-100' : 'text-slate-200'}`}>{value}</span>
+        {sub && <p className="text-xs text-slate-500">{sub}</p>}
       </div>
     </div>
   )
@@ -146,15 +146,15 @@ export default function AccountantReportView() {
   return (
     <div className="space-y-6 max-w-xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Accountant Report</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="text-xl font-bold text-slate-100">Accountant Report</h1>
+        <p className="text-sm text-slate-500 mt-1">
           One-click PDF summary ready to hand to your accountant — revenue, COGS, margins, and payment breakdown.
         </p>
       </div>
 
       {/* Period selector */}
-      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-        <h2 className="font-semibold text-gray-800">Report Period</h2>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+        <h2 className="font-semibold text-slate-200">Report Period</h2>
         <div className="flex flex-wrap gap-2">
           {QUICK_RANGES.map(r => (
             <button
@@ -162,8 +162,8 @@ export default function AccountantReportView() {
               onClick={() => setQuick(r.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 quick === r.key
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-teal-500 text-slate-950'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-600'
               }`}
             >
               {r.label}
@@ -174,41 +174,41 @@ export default function AccountantReportView() {
         {quick === 'custom' && (
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs text-gray-500 mb-1">Start</label>
+              <label className="block text-xs text-slate-500 mb-1">Start</label>
               <input
                 type="date"
                 value={customStart}
                 onChange={e => setCustomStart(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-xs text-gray-500 mb-1">End</label>
+              <label className="block text-xs text-slate-500 mb-1">End</label>
               <input
                 type="date"
                 value={customEnd}
                 onChange={e => setCustomEnd(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                className="w-full border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               />
             </div>
           </div>
         )}
 
-        <div className="text-xs text-gray-400">
+        <div className="text-xs text-slate-500">
           {format(dates.start, 'MMMM d, yyyy')} — {format(dates.end, 'MMMM d, yyyy')}
         </div>
       </div>
 
       {/* Preview */}
       {transactions.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center text-sm text-gray-400">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-sm text-slate-500">
           No transactions in this period.
         </div>
       ) : (
         <>
           {/* Revenue summary */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h2 className="font-semibold text-gray-800 mb-3">Revenue Summary</h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <h2 className="font-semibold text-slate-200 mb-3">Revenue Summary</h2>
             <MetricRow label="Gross Revenue" value={formatCurrency(report.totalRevenue)} />
             <MetricRow
               label="Refunds / Adjustments"
@@ -233,23 +233,23 @@ export default function AccountantReportView() {
               </>
             )}
             {!hasCOGS && (
-              <p className="text-xs text-gray-400 mt-3">
+              <p className="text-xs text-slate-500 mt-3">
                 Import your Square catalog XLSX to include cost of goods and profit margins.
               </p>
             )}
           </div>
 
           {/* Payment breakdown */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h2 className="font-semibold text-gray-800 mb-3">Payment Breakdown</h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <h2 className="font-semibold text-slate-200 mb-3">Payment Breakdown</h2>
             {report.paymentBreakdown.map(p => (
-              <div key={p.method} className="flex items-center gap-3 py-1.5 border-b border-gray-100 last:border-0">
-                <span className="text-sm text-gray-700 flex-1">{p.method}</span>
-                <div className="w-24 bg-gray-100 rounded-full h-1.5">
+              <div key={p.method} className="flex items-center gap-3 py-1.5 border-b border-slate-700/50 last:border-0">
+                <span className="text-sm text-slate-300 flex-1">{p.method}</span>
+                <div className="w-24 bg-slate-800 rounded-full h-1.5">
                   <div className="h-1.5 rounded-full bg-indigo-400" style={{ width: `${Math.min(p.pct, 100)}%` }} />
                 </div>
-                <span className="text-xs text-gray-500 w-10 text-right">{p.pct.toFixed(0)}%</span>
-                <span className="text-sm font-medium text-gray-900 w-24 text-right">{formatCurrency(p.revenue)}</span>
+                <span className="text-xs text-slate-500 w-10 text-right">{p.pct.toFixed(0)}%</span>
+                <span className="text-sm font-medium text-slate-100 w-24 text-right">{formatCurrency(p.revenue)}</span>
               </div>
             ))}
           </div>
@@ -257,7 +257,7 @@ export default function AccountantReportView() {
           {/* Export button */}
           <button
             onClick={handleExport}
-            className="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors"
+            className="w-full py-3 bg-teal-500 text-slate-950 rounded-xl text-sm font-semibold hover:bg-teal-600 transition-colors"
           >
             Download PDF Report
           </button>

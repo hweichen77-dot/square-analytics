@@ -1,6 +1,6 @@
 import { differenceInDays } from 'date-fns'
 import type { SalesTransaction, StoreEvent, RestockLog } from '../types/models'
-import { computeProductStats, productVelocity } from './analyticsEngine'
+import { computeProductStats } from './analyticsEngine'
 
 export interface PurchaseOrderItem {
   productName: string
@@ -23,16 +23,22 @@ export function generatePurchaseOrder(
   const reorderDays = weeksAhead * 7
   const stats = computeProductStats(transactions, overrides)
   const today = new Date()
-  const items: PurchaseOrderItem[] = []
 
   const upcomingEvents = events.filter(e => {
     const daysUntil = differenceInDays(e.startDate, today)
     return daysUntil >= 0 && daysUntil <= 30
   })
 
+  const items: PurchaseOrderItem[] = []
+
   for (const product of stats) {
-    const velocity = productVelocity(product)
-    if (velocity <= 0) continue
+    // Weekly velocity based on each product's own introduction span:
+    // units sold ÷ weeks since first sale (minimum 1 week).
+    const spanDays = (product.lastSoldDate.getTime() - product.firstSoldDate.getTime()) / 86_400_000
+    const weeksIntroduced = Math.max(1, spanDays / 7)
+    const weeklyVelocity = product.totalUnitsSold / weeksIntroduced
+    const dailyVelocity = weeklyVelocity / 7
+    if (dailyVelocity <= 0) continue
 
     let multiplier = 1.0
 
@@ -40,14 +46,13 @@ export function generatePurchaseOrder(
       const isHighDemandEvent = upcomingEvents.some(e =>
         ['Spirit Week', 'Homecoming', 'Back to School', 'Sports Game'].includes(e.eventType)
       )
-      if (isHighDemandEvent) multiplier = 1.5
-      else multiplier = 1.2
+      multiplier = isHighDemandEvent ? 1.5 : 1.2
     }
 
-    const recommendedQty = Math.ceil(velocity * reorderDays * multiplier)
+    const recommendedQty = Math.ceil(dailyVelocity * reorderDays * multiplier)
     const estimatedRevenue = recommendedQty * product.avgPrice
 
-    let reasoning = `Based on ${velocity.toFixed(2)} units/day (calendar)`
+    let reasoning = `${weeklyVelocity.toFixed(1)} units/wk over ${Math.round(weeksIntroduced)}w since intro`
     if (multiplier > 1) {
       reasoning += ` · ${Math.round((multiplier - 1) * 100)}% boost for upcoming event`
     }
@@ -55,7 +60,7 @@ export function generatePurchaseOrder(
     items.push({
       productName: product.name,
       category: product.category,
-      avgDailyVelocity: velocity,
+      avgDailyVelocity: dailyVelocity,
       recommendedQty,
       estimatedRevenue,
       avgPrice: product.avgPrice,

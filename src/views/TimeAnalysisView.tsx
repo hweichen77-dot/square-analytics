@@ -34,17 +34,17 @@ export default function TimeAnalysisView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Time Analysis</h1>
+      <h1 className="text-xl font-bold text-slate-100">Time Analysis</h1>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="text-base font-semibold text-gray-900">Sales Heatmap</h2>
-        <p className="text-xs text-gray-500 mt-0.5 mb-4">Sales volume by day and hour</p>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <h2 className="text-base font-semibold text-slate-100">Sales Heatmap</h2>
+        <p className="text-xs text-slate-500 mt-0.5 mb-4">Sales volume by day and hour</p>
 
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full">
             <div className="flex gap-1 mb-1 ml-10">
               {HOURS.map(h => (
-                <div key={h} className="text-center text-xs text-gray-400 font-medium" style={{ width: 36 }}>
+                <div key={h} className="text-center text-xs text-slate-500 font-medium" style={{ width: 36 }}>
                   {hourLabel(h)}
                 </div>
               ))}
@@ -52,7 +52,7 @@ export default function TimeAnalysisView() {
 
             {Array.from({ length: 7 }, (_, i) => i + 1).map(dow => (
               <div key={dow} className="flex gap-1 mb-1 items-center">
-                <div className="text-xs text-gray-500 w-9 text-right pr-1 shrink-0">
+                <div className="text-xs text-slate-500 w-9 text-right pr-1 shrink-0">
                   {DAY_NAMES[dow - 1]}
                 </div>
                 {HOURS.map(hour => {
@@ -82,7 +82,7 @@ export default function TimeAnalysisView() {
             ))}
 
             <div className="flex items-center gap-1 mt-3 ml-10">
-              <span className="text-xs text-gray-400">Less</span>
+              <span className="text-xs text-slate-500">Less</span>
               {[0, 0.25, 0.5, 0.75, 1].map(v => (
                 <div
                   key={v}
@@ -95,45 +95,45 @@ export default function TimeAnalysisView() {
                   }}
                 />
               ))}
-              <span className="text-xs text-gray-400">More</span>
+              <span className="text-xs text-slate-500">More</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Monthly Comparison</h2>
+      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <h2 className="text-base font-semibold text-slate-100 mb-4">Monthly Comparison</h2>
         {monthly.length === 0 ? (
-          <p className="text-sm text-gray-400">No monthly data available.</p>
+          <p className="text-sm text-slate-500">No monthly data available.</p>
         ) : (
           <>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthly} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                <Bar dataKey="revenue" fill="#6366f1" radius={[3, 3, 0, 0]} />
+                <Bar dataKey="revenue" fill="#14B8A6" radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
 
             <div className="mt-4 overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 text-left">
-                    <th className="pb-2 font-semibold text-gray-600 text-xs">Month</th>
-                    <th className="pb-2 font-semibold text-gray-600 text-xs text-right">Revenue</th>
-                    <th className="pb-2 font-semibold text-gray-600 text-xs text-right">Transactions</th>
-                    <th className="pb-2 font-semibold text-gray-600 text-xs text-right">Avg Value</th>
+                  <tr className="border-b border-slate-700/50 text-left">
+                    <th className="pb-2 font-semibold text-slate-400 text-xs">Month</th>
+                    <th className="pb-2 font-semibold text-slate-400 text-xs text-right">Revenue</th>
+                    <th className="pb-2 font-semibold text-slate-400 text-xs text-right">Transactions</th>
+                    <th className="pb-2 font-semibold text-slate-400 text-xs text-right">Avg Value</th>
                   </tr>
                 </thead>
                 <tbody>
                   {monthly.map(m => (
-                    <tr key={m.month} className="border-b border-gray-50">
-                      <td className="py-1.5 text-gray-700 font-mono text-xs">{m.month}</td>
-                      <td className="py-1.5 text-gray-900 font-mono text-xs text-right">{formatCurrency(m.revenue)}</td>
-                      <td className="py-1.5 text-gray-700 font-mono text-xs text-right">{m.transactions}</td>
-                      <td className="py-1.5 text-gray-700 font-mono text-xs text-right">{formatCurrency(m.avgTransaction)}</td>
+                    <tr key={m.month} className="border-b border-slate-800">
+                      <td className="py-1.5 text-slate-300 font-mono text-xs">{m.month}</td>
+                      <td className="py-1.5 text-slate-100 font-mono text-xs text-right">{formatCurrency(m.revenue)}</td>
+                      <td className="py-1.5 text-slate-300 font-mono text-xs text-right">{m.transactions}</td>
+                      <td className="py-1.5 text-slate-300 font-mono text-xs text-right">{formatCurrency(m.avgTransaction)}</td>
                     </tr>
                   ))}
                 </tbody>
