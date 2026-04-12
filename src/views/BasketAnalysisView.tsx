@@ -32,12 +32,12 @@ function PairRow({ pair, rank }: { pair: BasketPair; rank: number }) {
       <span className="text-xs text-slate-500 w-5 text-right shrink-0">{rank}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-sm font-medium text-slate-200 truncate max-w-[140px]" title={pair.itemA}>{pair.itemA}</span>
+          <span className="text-sm font-medium text-slate-200">{pair.itemA}</span>
           <span className="text-xs text-slate-500">+</span>
-          <span className="text-sm font-medium text-slate-200 truncate max-w-[140px]" title={pair.itemB}>{pair.itemB}</span>
+          <span className="text-sm font-medium text-slate-200">{pair.itemB}</span>
         </div>
         <p className="text-xs text-slate-500 mt-0.5">
-          {formatPercent(pair.confidence * 100, 0)} who buy {pair.itemA.split(' ')[0]}… also buy {pair.itemB.split(' ')[0]}…
+          {formatPercent(pair.confidence * 100, 0)} who buy {pair.itemA} also buy {pair.itemB}
         </p>
       </div>
       <div className="flex items-center gap-3 shrink-0">
@@ -80,7 +80,7 @@ export default function BasketAnalysisView() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-slate-100">Basket Analysis</h1>
         <p className="text-sm text-slate-500 mt-1">

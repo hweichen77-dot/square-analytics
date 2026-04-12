@@ -1,5 +1,5 @@
 import type { SalesTransaction } from '../types/models'
-import { parseProductItems } from '../types/models'
+import { parseProductItems, splitItemVariation } from '../types/models'
 
 export interface BasketPair {
   itemA: string
@@ -32,7 +32,7 @@ export function computeBasketAnalysis(
     const items = parseProductItems(tx.itemDescription)
     if (items.length === 0) continue
     const basket = baskets.get(tx.transactionID) ?? new Set<string>()
-    for (const item of items) basket.add(item.name)
+    for (const item of items) basket.add(splitItemVariation(item.name).itemName)
     baskets.set(tx.transactionID, basket)
   }
 
