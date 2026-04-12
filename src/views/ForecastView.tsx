@@ -25,6 +25,23 @@ export default function ForecastView() {
   const navigate = useNavigate()
   const forecast = useMemo(() => computeForecast(transactions), [transactions])
 
+  // Must be before any early returns (Rules of Hooks)
+  const accuracyData = useMemo(() => {
+    if (!forecast.hasEnoughData) return null
+    const elapsedDays = forecast.thisWeek.days.filter(d => d.actualRevenue !== null)
+    if (elapsedDays.length === 0) return null
+    const totalProjected = elapsedDays.reduce((s, d) => s + d.projectedRevenue, 0)
+    const totalActual = elapsedDays.reduce((s, d) => s + (d.actualRevenue ?? 0), 0)
+    const accuracyPct = totalProjected > 0 ? Math.min(200, (totalActual / totalProjected) * 100) : 0
+    const diff = totalActual - totalProjected
+    return { accuracyPct, diff, elapsedDays: elapsedDays.length, totalActual, totalProjected }
+  }, [forecast])
+
+  const topProducts = useMemo(() => {
+    if (transactions.length === 0) return []
+    return computeProductStats(transactions).slice(0, 5)
+  }, [transactions])
+
   if (transactions.length === 0) {
     return (
       <EmptyState
@@ -48,23 +65,6 @@ export default function ForecastView() {
   }
 
   const { thisWeek, nextWeek, trendLabel } = forecast
-
-  // Forecast accuracy: compare projected vs actual for elapsed days this week
-  const accuracyData = useMemo(() => {
-    const elapsedDays = thisWeek.days.filter(d => d.actualRevenue !== null)
-    if (elapsedDays.length === 0) return null
-    const totalProjected = elapsedDays.reduce((s, d) => s + d.projectedRevenue, 0)
-    const totalActual = elapsedDays.reduce((s, d) => s + (d.actualRevenue ?? 0), 0)
-    const accuracyPct = totalProjected > 0 ? Math.min(200, (totalActual / totalProjected) * 100) : 0
-    const diff = totalActual - totalProjected
-    return { accuracyPct, diff, elapsedDays: elapsedDays.length, totalActual, totalProjected }
-  }, [thisWeek])
-
-  // Top 5 products by velocity (avg daily revenue)
-  const topProducts = useMemo(() => {
-    const stats = computeProductStats(transactions)
-    return stats.slice(0, 5)
-  }, [transactions])
 
   // Progress through this week
   const daysWithData = thisWeek.days.filter(d => d.actualRevenue !== null).length
