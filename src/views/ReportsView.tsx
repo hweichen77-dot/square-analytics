@@ -543,88 +543,6 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
   )
 }
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
-
-function buildInventorySuggestions(row: Extract<AnyReport, { type: 'monthly-detail' }>['rows'][number], prevRow: Extract<AnyReport, { type: 'monthly-detail' }>['rows'][number] | null): string[] {
-  const tips: string[] = []
-  const nextMonth = format(parseISO(row.month + '-01'), 'MMMM')
-
-  // Top sellers → stock more
-  row.topProducts.slice(0, 3).forEach((p, i) => {
-    const verb = i === 0 ? 'Prioritise reordering' : 'Stock up on'
-    tips.push(`${verb} **${p.name}** — your #${i + 1} seller at ${formatCurrency(p.totalRevenue)} (${formatNumber(p.totalUnitsSold)} units). Ensure sufficient inventory going into ${nextMonth}.`)
-  })
-
-  // MoM growth advice
-  if (row.momGrowth != null) {
-    if (row.momGrowth > 15) {
-      tips.push(`Revenue grew **+${row.momGrowth.toFixed(1)}%** vs last month — scale purchase orders proportionally for ${nextMonth} to avoid stockouts.`)
-    } else if (row.momGrowth < -15) {
-      tips.push(`Revenue fell **${row.momGrowth.toFixed(1)}%** vs last month — hold off on over-ordering; focus on your proven top sellers and avoid excess stock of slower items.`)
-    }
-  }
-
-  // Slow movers (bottom products with revenue > 0)
-  const slowMovers = row.topProducts.filter(p => p.totalUnitsSold <= 2 && p.totalRevenue > 0)
-  if (slowMovers.length > 0) {
-    tips.push(`**${slowMovers[0].name}** moved only ${slowMovers[0].totalUnitsSold} unit(s) this month — consider reducing order quantity or bundling it with a top seller.`)
-  }
-
-  // High avg transaction → upsell
-  if (row.avgTransaction > 20) {
-    tips.push(`Average transaction was ${formatCurrency(row.avgTransaction)} — customers are buying multiple items. Consider pre-packing combo bundles for ${nextMonth} to increase throughput.`)
-  }
-
-  // If prev month had a different top product
-  if (prevRow && prevRow.topProduct && prevRow.topProduct !== row.topProduct) {
-    tips.push(`Last month's top seller (**${prevRow.topProduct}**) was replaced by **${row.topProduct ?? '—'}** this month. Monitor both going into ${nextMonth} — seasonal rotation may be occurring.`)
-  }
-
-  return tips
-}
-
-// ─── Income statement ledger helpers ─────────────────────────────────────────
-
-function LedgerSection({ label }: { label: string }) {
-  return (
-    <div className="px-4 py-2 bg-slate-900/60 border-t border-slate-700">
-      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{label}</span>
-    </div>
-  )
-}
-
-function LedgerRow({ label, value, sub, indent = false }: { label: string; value: string; sub?: string; indent?: boolean }) {
-  return (
-    <div className={`flex items-center justify-between px-4 py-2.5 border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors ${indent ? 'pl-7' : ''}`}>
-      <span className="text-sm text-slate-400">{label}</span>
-      <div className="text-right">
-        <span className="text-sm font-mono text-slate-300">{value}</span>
-        {sub && <p className="text-[11px] text-slate-600 mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  )
-}
-
-function LedgerSubtotal({ label, value, sub, color = 'teal' }: { label: string; value: string; sub?: string; color?: 'teal' | 'emerald' | 'amber' }) {
-  const colors = {
-    teal:    'bg-teal-500/8 border-t-2 border-teal-500/30 text-teal-300',
-    emerald: 'bg-emerald-500/10 border-t-2 border-emerald-500/30 text-emerald-300',
-    amber:   'bg-amber-500/8 border-t-2 border-amber-500/30 text-amber-300',
-  }
-  const valueColors = { teal: 'text-teal-400', emerald: 'text-emerald-400', amber: 'text-amber-400' }
-  return (
-    <div className={`flex items-center justify-between px-4 py-3 ${colors[color]}`}>
-      <span className={`text-sm font-semibold ${colors[color].split(' ').find(c => c.startsWith('text-'))}`}>{label}</span>
-      <div className="text-right">
-        <span className={`text-sm font-bold font-mono ${valueColors[color]}`}>{value}</span>
-        {sub && <p className="text-[11px] text-slate-500 mt-0.5">{sub}</p>}
-      </div>
-    </div>
-  )
-}
-
 function MonthlyDetailReportView({
   report,
   overheadEnabled,
@@ -634,26 +552,137 @@ function MonthlyDetailReportView({
   overheadEnabled: boolean
   overheadPct: number
 }) {
-  const [selectedMonth, setSelectedMonth] = useState<string>(report.rows[report.rows.length - 1]?.month ?? '')
+  const rows = report.rows
+  const hasDetailed = rows.some(r => r.hasDetailedFinancials)
+  const hasCogs     = rows.some(r => r.cogs !== null)
 
-  const chartData = report.rows.map(r => ({
+  // Collect all OPEX categories that appear across any month
+  const allOpexCats = Array.from(
+    new Set(rows.flatMap(r => Object.keys(r.opexByCategory)))
+  )
+  const hasOpex = allOpexCats.length > 0 || rows.some(r => r.fees > 0)
+
+  // Totals across all months
+  const totGrossSales    = rows.reduce((s, r) => s + r.grossSales, 0)
+  const totReturns       = rows.reduce((s, r) => s + r.returns, 0)
+  const totDiscounts     = rows.reduce((s, r) => s + r.discounts, 0)
+  const totNetSales      = rows.reduce((s, r) => s + r.netSales, 0)
+  const totCollected     = rows.reduce((s, r) => s + r.totalCollected, 0)
+  const totFees          = rows.reduce((s, r) => s + r.fees, 0)
+  const totNetRevenue    = rows.reduce((s, r) => s + r.netRevenue, 0)
+  const totCogs          = hasCogs ? rows.reduce((s, r) => s + (r.cogs ?? 0), 0) : null
+  const totGrossMargin   = hasCogs ? rows.reduce((s, r) => s + (r.grossMargin ?? 0), 0) : null
+  const totGrossMarginPct = (totGrossMargin !== null && totNetSales > 0)
+    ? (totGrossMargin / totNetSales) * 100 : null
+  const totOpexCats: Record<string, number> = {}
+  allOpexCats.forEach(cat => {
+    totOpexCats[cat] = rows.reduce((s, r) => s + (r.opexByCategory[cat] ?? 0), 0)
+  })
+  const totOpexSquare    = totFees
+  const totOpexTotal     = rows.reduce((s, r) => s + r.opexTotal, 0)
+  const totNetProfit     = rows.some(r => r.netProfit !== null)
+    ? rows.reduce((s, r) => s + (r.netProfit ?? 0), 0) : null
+  const totNetProfitPct  = (totNetProfit !== null && totNetSales > 0)
+    ? (totNetProfit / totNetSales) * 100 : null
+  const totOverhead      = (overheadEnabled && totNetProfit !== null)
+    ? totNetProfit * (overheadPct / 100) : null
+  const totFinalNet      = (totOverhead !== null && totNetProfit !== null)
+    ? totNetProfit - totOverhead : null
+
+  // Row rendering helpers
+  const $ = formatCurrency
+
+  // Cell classes
+  const labelCell = 'sticky left-0 z-10 bg-slate-800 px-3 py-2 text-xs text-slate-400 whitespace-nowrap border-r border-slate-700/60 min-w-[180px]'
+  const dataCell  = 'px-3 py-2 text-right font-mono text-xs text-slate-300 whitespace-nowrap min-w-[90px]'
+  const totalCell = 'px-3 py-2 text-right font-mono text-xs font-semibold text-slate-200 whitespace-nowrap min-w-[90px] border-l border-slate-700'
+
+  // Section header row
+  const SectionRow = ({ label }: { label: string }) => (
+    <tr className="bg-slate-900/70">
+      <td className="sticky left-0 z-10 bg-slate-900/70 px-3 py-1.5 border-r border-slate-700/60">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{label}</span>
+      </td>
+      {rows.map(r => <td key={r.month} className="px-3 py-1.5" />)}
+      <td className="px-3 py-1.5 border-l border-slate-700" />
+    </tr>
+  )
+
+  // Detail row
+  const DataRow = ({
+    label,
+    vals,
+    total,
+    indent = false,
+    dim = false,
+  }: {
+    label: string
+    vals: (string | null)[]
+    total: string
+    indent?: boolean
+    dim?: boolean
+  }) => (
+    <tr className="border-t border-slate-700/20 hover:bg-slate-700/10 transition-colors">
+      <td className={`${labelCell} ${indent ? 'pl-6' : ''} ${dim ? 'text-slate-500' : ''}`}>{label}</td>
+      {vals.map((v, i) => (
+        <td key={i} className={`${dataCell} ${dim ? 'text-slate-500' : ''}`}>{v ?? '—'}</td>
+      ))}
+      <td className={`${totalCell} ${dim ? 'text-slate-500' : ''}`}>{total}</td>
+    </tr>
+  )
+
+  // Subtotal / highlighted row
+  const SubtotalRow = ({
+    label,
+    vals,
+    total,
+    color = 'teal',
+    sub,
+    totalSub,
+  }: {
+    label: string
+    vals: (string | null)[]
+    total: string
+    color?: 'teal' | 'emerald' | 'amber'
+    sub?: (string | null)[]
+    totalSub?: string
+  }) => {
+    const bgMap    = { teal: 'bg-teal-500/10',    emerald: 'bg-emerald-500/12', amber: 'bg-amber-500/10'    }
+    const textMap  = { teal: 'text-teal-300',     emerald: 'text-emerald-300',  amber: 'text-amber-300'     }
+    const valMap   = { teal: 'text-teal-400',     emerald: 'text-emerald-400',  amber: 'text-amber-400'     }
+    const bordMap  = { teal: 'border-t-2 border-teal-500/30', emerald: 'border-t-2 border-emerald-500/30', amber: 'border-t-2 border-amber-500/30' }
+    return (
+      <tr className={`${bgMap[color]} ${bordMap[color]}`}>
+        <td className={`sticky left-0 z-10 ${bgMap[color]} px-3 py-2.5 text-xs font-semibold border-r border-slate-700/60 min-w-[180px] ${textMap[color]}`}>
+          {label}
+        </td>
+        {vals.map((v, i) => (
+          <td key={i} className={`px-3 py-2.5 text-right font-mono text-xs font-semibold whitespace-nowrap min-w-[90px] ${valMap[color]}`}>
+            {v ?? '—'}
+            {sub?.[i] && <div className="text-[10px] text-slate-500 font-normal">{sub[i]}</div>}
+          </td>
+        ))}
+        <td className={`px-3 py-2.5 text-right font-mono text-xs font-bold whitespace-nowrap min-w-[90px] border-l border-slate-700 ${valMap[color]}`}>
+          {total}
+          {totalSub && <div className="text-[10px] text-slate-500 font-normal">{totalSub}</div>}
+        </td>
+      </tr>
+    )
+  }
+
+  const chartData = rows.map(r => ({
     month: format(parseISO(r.month + '-01'), 'MMM yy'),
     revenue: Math.round(r.revenue * 100) / 100,
   }))
-
-  const selectedRow = report.rows.find(r => r.month === selectedMonth) ?? null
-  const selectedIdx = report.rows.findIndex(r => r.month === selectedMonth)
-  const prevRow = selectedIdx > 0 ? report.rows[selectedIdx - 1] : null
-  const suggestions = selectedRow ? buildInventorySuggestions(selectedRow, prevRow) : []
 
   return (
     <div className="space-y-6">
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Net Sales"    value={formatCurrency(report.totalRevenue)} />
+        <StatCard label="Total Net Sales"    value={$(report.totalRevenue)} />
         <StatCard label="Total Transactions" value={formatNumber(report.totalTransactions)} />
-        <StatCard label="Monthly Avg"        value={formatCurrency(report.avgMonthlyRevenue)} />
-        <StatCard label="Best Month"         value={report.bestMonth ? formatCurrency(report.bestMonth.revenue) : '—'} sub={report.bestMonth?.label} />
+        <StatCard label="Monthly Avg"        value={$(report.avgMonthlyRevenue)} />
+        <StatCard label="Best Month"         value={report.bestMonth ? $(report.bestMonth.revenue) : '—'} sub={report.bestMonth?.label} />
       </div>
 
       {/* Revenue chart */}
@@ -664,111 +693,194 @@ function MonthlyDetailReportView({
             <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
             <XAxis dataKey="month" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
-            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Net Sales']} />
+            <Tooltip formatter={(v: number) => [$(v), 'Net Sales']} />
             <Bar dataKey="revenue" fill="#14B8A6" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* ── Income Statement Deep Dive ── */}
+      {/* ── Income Statement (transposed) ── */}
       <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-        {/* Header + month selector */}
-        <div className="px-4 py-3 border-b border-slate-700 flex items-center gap-3">
-          <div>
-            <h3 className="font-semibold text-slate-200">Income Statement</h3>
-            <p className="text-xs text-slate-500 mt-0.5">Per-month breakdown matching your Walley's format</p>
-          </div>
-          <select
-            value={selectedMonth}
-            onChange={e => setSelectedMonth(e.target.value)}
-            className="ml-auto bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/30 cursor-pointer"
-          >
-            {report.rows.map(r => (
-              <option key={r.month} value={r.month}>{r.label}</option>
-            ))}
-          </select>
+        <div className="px-4 py-3 border-b border-slate-700">
+          <h3 className="font-semibold text-slate-200">Income Statement</h3>
+          <p className="text-xs text-slate-500 mt-0.5">All months — row labels left, columns right. Scroll horizontally.</p>
         </div>
 
-        {selectedRow && (() => {
-          const overheadAmt = overheadEnabled && selectedRow.netProfit !== null
-            ? selectedRow.netProfit * (overheadPct / 100) : null
-          const finalNet = overheadAmt !== null && selectedRow.netProfit !== null
-            ? selectedRow.netProfit - overheadAmt : null
+        <div className="overflow-x-auto">
+          <table className="border-separate border-spacing-0 text-sm">
+            {/* ── Column headers ── */}
+            <thead>
+              <tr className="bg-slate-900 border-b border-slate-700">
+                <th className="sticky left-0 z-20 bg-slate-900 px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-slate-500 border-r border-slate-700/60 min-w-[180px]">
+                  Line Item
+                </th>
+                {rows.map(r => (
+                  <th key={r.month} className="px-3 py-2.5 text-right text-[10px] font-semibold text-slate-400 whitespace-nowrap min-w-[90px]">
+                    {r.label}
+                  </th>
+                ))}
+                <th className="px-3 py-2.5 text-right text-[10px] font-bold text-slate-300 whitespace-nowrap min-w-[90px] border-l border-slate-700">
+                  TOTAL
+                </th>
+              </tr>
+            </thead>
 
-          return (
-            <div>
-              {/* ── INCOME ── */}
-              <LedgerSection label="Income" />
-              {selectedRow.hasDetailedFinancials ? (
+            <tbody>
+              {/* ── INCOME SECTION ── */}
+              <SectionRow label="Income" />
+
+              {hasDetailed ? (
                 <>
-                  <LedgerRow label="Gross Sales"       value={formatCurrency(selectedRow.grossSales)} indent />
-                  <LedgerRow label="− Returns"         value={selectedRow.returns > 0 ? `−${formatCurrency(selectedRow.returns)}` : formatCurrency(0)} indent />
-                  <LedgerRow label="− Discounts & Comps" value={selectedRow.discounts > 0 ? `−${formatCurrency(selectedRow.discounts)}` : formatCurrency(0)} indent />
+                  <DataRow
+                    label="Gross Sales"
+                    vals={rows.map(r => $(r.grossSales))}
+                    total={$(totGrossSales)}
+                    indent
+                  />
+                  <DataRow
+                    label="− Returns"
+                    vals={rows.map(r => r.returns > 0 ? `−${$(r.returns)}` : $(0))}
+                    total={totReturns > 0 ? `−${$(totReturns)}` : $(0)}
+                    indent
+                    dim
+                  />
+                  <DataRow
+                    label="− Discounts & Comps"
+                    vals={rows.map(r => r.discounts > 0 ? `−${$(r.discounts)}` : $(0))}
+                    total={totDiscounts > 0 ? `−${$(totDiscounts)}` : $(0)}
+                    indent
+                    dim
+                  />
                 </>
               ) : (
-                <LedgerRow label="Gross Sales (estimated)" value={formatCurrency(selectedRow.grossSales)} indent />
-              )}
-              <LedgerSubtotal label="Net Sales" value={formatCurrency(selectedRow.netSales)} />
-
-              {/* ── PAYMENTS ── */}
-              {selectedRow.hasDetailedFinancials && (
-                <>
-                  <LedgerSection label="Payments" />
-                  <LedgerRow label="Total Collected" value={formatCurrency(selectedRow.totalCollected)} indent />
-                  <LedgerRow label="− Square Fees"   value={selectedRow.fees > 0 ? `−${formatCurrency(selectedRow.fees)}` : formatCurrency(0)} indent />
-                  <LedgerSubtotal label="Net Revenue" value={formatCurrency(selectedRow.netRevenue)} />
-                </>
+                <DataRow
+                  label="Gross Sales"
+                  vals={rows.map(r => $(r.grossSales))}
+                  total={$(totGrossSales)}
+                  indent
+                />
               )}
 
-              {/* ── COGS & MARGIN ── */}
-              {selectedRow.cogs !== null && (
+              <SubtotalRow
+                label="NET SALES"
+                vals={rows.map(r => $(r.netSales))}
+                total={$(totNetSales)}
+                color="teal"
+              />
+
+              {/* ── PAYMENTS SECTION ── */}
+              {hasDetailed && (
                 <>
-                  <LedgerSection label="Cost of Goods" />
-                  <LedgerRow label="COGS (Food)" value={formatCurrency(selectedRow.cogs)} indent />
-                  <LedgerSubtotal
-                    label="Gross Margin"
-                    value={formatCurrency(selectedRow.grossMargin!)}
-                    sub={selectedRow.grossMarginPct !== null ? `${selectedRow.grossMarginPct.toFixed(2)}%` : undefined}
+                  <SectionRow label="Payments" />
+                  <DataRow
+                    label="Total Collected"
+                    vals={rows.map(r => $(r.totalCollected))}
+                    total={$(totCollected)}
+                    indent
+                  />
+                  <DataRow
+                    label="− Square Fees"
+                    vals={rows.map(r => r.fees > 0 ? `−${$(r.fees)}` : $(0))}
+                    total={totFees > 0 ? `−${$(totFees)}` : $(0)}
+                    indent
+                    dim
+                  />
+                  <SubtotalRow
+                    label="NET REVENUE"
+                    vals={rows.map(r => $(r.netRevenue))}
+                    total={$(totNetRevenue)}
+                    color="teal"
                   />
                 </>
               )}
 
-              {/* ── OPEX ── */}
-              {(Object.keys(selectedRow.opexByCategory).length > 0 || selectedRow.fees > 0) && (
+              {/* ── COGS & GROSS MARGIN ── */}
+              {hasCogs && (
                 <>
-                  <LedgerSection label="Operating Expenses" />
-                  {Object.entries(selectedRow.opexByCategory).map(([cat, amt]) => (
-                    <LedgerRow key={cat} label={`− ${cat}`} value={formatCurrency(amt)} indent />
+                  <SectionRow label="Cost of Goods" />
+                  <DataRow
+                    label="COGS (Food)"
+                    vals={rows.map(r => r.cogs !== null ? $(r.cogs) : null)}
+                    total={totCogs !== null ? $(totCogs) : '—'}
+                    indent
+                    dim
+                  />
+                  <SubtotalRow
+                    label="GROSS MARGIN"
+                    vals={rows.map(r => r.grossMargin !== null ? $(r.grossMargin) : null)}
+                    total={totGrossMargin !== null ? $(totGrossMargin) : '—'}
+                    sub={rows.map(r => r.grossMarginPct !== null ? `${r.grossMarginPct.toFixed(1)}%` : null)}
+                    totalSub={totGrossMarginPct !== null ? `${totGrossMarginPct.toFixed(1)}%` : undefined}
+                    color="teal"
+                  />
+                </>
+              )}
+
+              {/* ── OPEX SECTION ── */}
+              {hasOpex && (
+                <>
+                  <SectionRow label="Operating Expenses" />
+                  {allOpexCats.map(cat => (
+                    <DataRow
+                      key={cat}
+                      label={`− ${cat}`}
+                      vals={rows.map(r => r.opexByCategory[cat] ? $(r.opexByCategory[cat]) : null)}
+                      total={totOpexCats[cat] ? $(totOpexCats[cat]) : '—'}
+                      indent
+                      dim
+                    />
                   ))}
-                  {selectedRow.fees > 0 && (
-                    <LedgerRow label="− Square Expenses" value={formatCurrency(selectedRow.fees)} indent />
+                  {rows.some(r => r.fees > 0) && (
+                    <DataRow
+                      label="− Square Expenses"
+                      vals={rows.map(r => r.fees > 0 ? $(r.fees) : null)}
+                      total={totOpexSquare > 0 ? $(totOpexSquare) : '—'}
+                      indent
+                      dim
+                    />
                   )}
-                  <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900/40 border-t border-slate-700/50">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total OPEX</span>
-                    <span className="text-sm font-mono font-semibold text-slate-300">{formatCurrency(selectedRow.opexTotal)}</span>
-                  </div>
+                  {/* OPEX total row */}
+                  <tr className="border-t border-slate-700/40 bg-slate-900/30">
+                    <td className="sticky left-0 z-10 bg-slate-900/30 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-500 border-r border-slate-700/60 min-w-[180px]">
+                      Total OPEX
+                    </td>
+                    {rows.map(r => (
+                      <td key={r.month} className="px-3 py-2 text-right font-mono text-xs font-semibold text-slate-400 whitespace-nowrap min-w-[90px]">
+                        {$(r.opexTotal)}
+                      </td>
+                    ))}
+                    <td className="px-3 py-2 text-right font-mono text-xs font-semibold text-slate-300 whitespace-nowrap min-w-[90px] border-l border-slate-700">
+                      {$(totOpexTotal)}
+                    </td>
+                  </tr>
                 </>
               )}
 
               {/* ── NET PROFIT ── */}
-              {selectedRow.netProfit !== null && (
+              {totNetProfit !== null && (
                 <>
-                  <LedgerSubtotal
-                    label="Net Profit"
-                    value={formatCurrency(selectedRow.netProfit)}
-                    sub={selectedRow.netProfitPct !== null ? `${selectedRow.netProfitPct.toFixed(2)}% margin` : undefined}
+                  <SubtotalRow
+                    label="NET PROFIT"
+                    vals={rows.map(r => r.netProfit !== null ? $(r.netProfit) : null)}
+                    total={$(totNetProfit)}
+                    sub={rows.map(r => r.netProfitPct !== null ? `${r.netProfitPct.toFixed(1)}%` : null)}
+                    totalSub={totNetProfitPct !== null ? `${totNetProfitPct.toFixed(1)}%` : undefined}
                     color="emerald"
                   />
+
                   {/* ── OVERHEAD (optional) ── */}
-                  {overheadEnabled && overheadAmt !== null && (
+                  {overheadEnabled && totOverhead !== null && (
                     <>
-                      <LedgerRow
+                      <DataRow
                         label={`− ${overheadPct}% Overhead`}
-                        value={`−${formatCurrency(overheadAmt)}`}
+                        vals={rows.map(r => r.netProfit !== null ? `−${$(r.netProfit * overheadPct / 100)}` : null)}
+                        total={`−${$(totOverhead)}`}
+                        dim
                       />
-                      <LedgerSubtotal
-                        label="Net After Overhead"
-                        value={formatCurrency(finalNet!)}
+                      <SubtotalRow
+                        label="NET AFTER OVERHEAD"
+                        vals={rows.map(r => r.netProfit !== null ? $(r.netProfit * (1 - overheadPct / 100)) : null)}
+                        total={$(totFinalNet!)}
                         color="amber"
                       />
                     </>
@@ -776,115 +888,20 @@ function MonthlyDetailReportView({
                 </>
               )}
 
-              {/* Quick metrics strip */}
-              <div className="grid grid-cols-3 divide-x divide-slate-700 border-t border-slate-700 bg-slate-900/40">
-                {[
-                  { label: 'Transactions',  value: formatNumber(selectedRow.transactions) },
-                  { label: 'Avg Sale',      value: formatCurrency(selectedRow.avgTransaction) },
-                  { label: 'MoM Growth',    value: selectedRow.momGrowth == null ? '—' : `${selectedRow.momGrowth >= 0 ? '+' : ''}${selectedRow.momGrowth.toFixed(1)}%`,
-                    color: selectedRow.momGrowth == null ? 'text-slate-400' : selectedRow.momGrowth >= 0 ? 'text-emerald-400' : 'text-red-400' },
-                ].map(item => (
-                  <div key={item.label} className="px-4 py-3 text-center">
-                    <p className="text-[10px] text-slate-600 uppercase tracking-wide mb-1">{item.label}</p>
-                    <p className={`text-sm font-semibold font-mono ${(item as any).color ?? 'text-slate-200'}`}>{item.value}</p>
-                  </div>
+              {/* ── TRANSACTIONS STRIP ── */}
+              <tr className="border-t-2 border-slate-700 bg-slate-900/50">
+                <td className="sticky left-0 z-10 bg-slate-900/50 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-600 border-r border-slate-700/60 min-w-[180px]">
+                  Transactions
+                </td>
+                {rows.map(r => (
+                  <td key={r.month} className="px-3 py-2 text-right text-xs text-slate-500 whitespace-nowrap min-w-[90px]">
+                    {formatNumber(r.transactions)}
+                  </td>
                 ))}
-              </div>
-            </div>
-          )
-        })()}
-      </div>
-
-      {/* Top products for selected month */}
-      {selectedRow && selectedRow.topProducts.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-700/50">
-            <h3 className="font-semibold text-slate-200">Top Products — {selectedRow.label}</h3>
-          </div>
-          <table className="w-full text-sm">
-            <thead className="bg-slate-900 border-b border-slate-700/50">
-              <tr>
-                <th className="px-4 py-2 text-center text-xs font-semibold text-slate-500">#</th>
-                <th className="px-4 py-2 text-left   text-xs font-semibold text-slate-500">Product</th>
-                <th className="px-4 py-2 text-right  text-xs font-semibold text-slate-500">Revenue</th>
-                <th className="px-4 py-2 text-right  text-xs font-semibold text-slate-500">Units</th>
-                <th className="px-4 py-2 text-right  text-xs font-semibold text-slate-500">Avg Price</th>
+                <td className="px-3 py-2 text-right text-xs font-semibold text-slate-400 whitespace-nowrap min-w-[90px] border-l border-slate-700">
+                  {formatNumber(rows.reduce((s, r) => s + r.transactions, 0))}
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/30">
-              {selectedRow.topProducts.map((p, i) => (
-                <tr key={p.name} className="hover:bg-slate-700/30 transition-colors">
-                  <td className="px-4 py-2.5 text-center text-slate-500 text-xs">{i + 1}</td>
-                  <td className="px-4 py-2.5 font-medium text-slate-200 max-w-xs truncate">{p.name}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-300">{formatCurrency(p.totalRevenue)}</td>
-                  <td className="px-4 py-2.5 text-right text-slate-400">{formatNumber(p.totalUnitsSold)}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-500">{formatCurrency(p.avgPrice)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Inventory suggestions */}
-      {suggestions.length > 0 && (
-        <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-5">
-          <p className="text-sm font-semibold text-teal-300 mb-3">
-            Inventory Suggestions for {selectedRow ? format(parseISO(selectedRow.month + '-01'), 'MMMM') : 'Next Month'}
-          </p>
-          <ul className="space-y-2.5">
-            {suggestions.map((tip, i) => (
-              <li key={i} className="flex gap-2.5 text-sm text-slate-300">
-                <span className="mt-0.5 shrink-0 text-teal-400">→</span>
-                <span dangerouslySetInnerHTML={{ __html: escapeHtml(tip).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') }} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* All-months summary table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-700/50">
-          <h3 className="font-semibold text-slate-200">All Months</h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-900 border-b border-slate-700/50">
-              <tr>
-                <th className="px-4 py-2 text-left  text-xs font-semibold text-slate-500">Month</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">Gross Sales</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">Net Sales</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">Fees</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">COGS</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">Net Profit</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">Margin%</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-slate-500">MoM</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700/30">
-              {report.rows.map(r => (
-                <tr
-                  key={r.month}
-                  className={`hover:bg-slate-700/30 cursor-pointer transition-colors ${r.month === selectedMonth ? 'bg-teal-500/8' : ''}`}
-                  onClick={() => setSelectedMonth(r.month)}
-                >
-                  <td className="px-4 py-2.5 font-medium text-slate-100">{r.label}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-400 text-xs">{formatCurrency(r.grossSales)}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-200">{formatCurrency(r.netSales)}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-500 text-xs">{r.fees > 0 ? `−${formatCurrency(r.fees)}` : '—'}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-slate-500 text-xs">{r.cogs !== null ? formatCurrency(r.cogs) : '—'}</td>
-                  <td className={`px-4 py-2.5 text-right font-mono text-xs font-semibold ${r.netProfit === null ? 'text-slate-500' : r.netProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {r.netProfit !== null ? formatCurrency(r.netProfit) : '—'}
-                  </td>
-                  <td className={`px-4 py-2.5 text-right text-xs ${r.netProfitPct === null ? 'text-slate-500' : 'text-slate-300'}`}>
-                    {r.netProfitPct !== null ? `${r.netProfitPct.toFixed(1)}%` : '—'}
-                  </td>
-                  <td className={`px-4 py-2.5 text-right text-xs font-medium ${r.momGrowth == null ? 'text-slate-500' : r.momGrowth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {r.momGrowth == null ? '—' : `${r.momGrowth >= 0 ? '+' : ''}${r.momGrowth.toFixed(1)}%`}
-                  </td>
-                </tr>
-              ))}
             </tbody>
           </table>
         </div>
