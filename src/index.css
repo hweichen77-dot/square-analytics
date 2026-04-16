@@ -1,4 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
+
+@theme {
+  /* ── Warm amber-tinted dark neutrals (replaces cold slate-blue) ─────────── */
+  --color-slate-950: oklch(0.09 0.007 55);
+  --color-slate-900: oklch(0.12 0.008 55);
+  --color-slate-800: oklch(0.17 0.007 55);
+  --color-slate-700: oklch(0.23 0.006 55);
+  --color-slate-600: oklch(0.35 0.007 55);
+  --color-slate-500: oklch(0.47 0.008 65);
+  --color-slate-400: oklch(0.61 0.009 65);
+  --color-slate-300: oklch(0.74 0.007 65);
+  --color-slate-200: oklch(0.87 0.005 65);
+  --color-slate-100: oklch(0.93 0.004 65);
+  --color-slate-50:  oklch(0.97 0.003 65);
+
+  /* ── Electric blue accent — modern, crisp, high-contrast on dark ─────────── */
+  --color-teal-950: oklch(0.14 0.04 252);
+  --color-teal-900: oklch(0.20 0.07 252);
+  --color-teal-800: oklch(0.28 0.10 252);
+  --color-teal-700: oklch(0.40 0.14 252);
+  --color-teal-600: oklch(0.54 0.18 252);
+  --color-teal-500: oklch(0.65 0.22 252);
+  --color-teal-400: oklch(0.73 0.22 252);
+  --color-teal-300: oklch(0.82 0.16 252);
+  --color-teal-200: oklch(0.89 0.10 252);
+  --color-teal-100: oklch(0.94 0.05 252);
+  --color-teal-50:  oklch(0.97 0.02 252);
+
+  /* ── Typography ─────────────────────────────────────────────────────────── */
+  --font-sans:    'Geist', system-ui, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, 'Cascadia Code', monospace;
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+}
 
 *, *::before, *::after {
   -webkit-font-smoothing: antialiased;
@@ -17,11 +51,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: oklch(0.26 0.006 55);
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: oklch(0.33 0.007 55);
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {

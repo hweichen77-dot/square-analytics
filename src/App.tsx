@@ -32,7 +32,7 @@ const OpexView              = lazy(() => import('./views/OpexView'))
 function PageFallback() {
   return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-7 h-7 border-2 border-slate-700 border-t-teal-400 rounded-full animate-spin" />
+      <div className="w-6 h-6 border-2 border-slate-700 border-t-teal-400 rounded-full animate-spin" />
     </div>
   )
 }

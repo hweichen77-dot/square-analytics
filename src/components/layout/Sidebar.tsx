@@ -114,10 +114,10 @@ function NavItemFull({ item, badge }: { item: NavItem; badge?: number }) {
     <NavLink
       to={item.path}
       className={({ isActive }) =>
-        `flex items-center gap-2.5 px-3 py-1.5 mx-2 rounded-md text-[13px] font-medium transition-all duration-150 cursor-pointer border-l-2 ${
+        `flex items-center gap-2.5 px-3 py-1.5 mx-2 rounded-sm text-[13px] font-medium transition-all duration-150 cursor-pointer ${
           isActive
-            ? 'bg-teal-500/10 text-teal-400 border-teal-400'
-            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'
+            ? 'bg-teal-500/12 text-teal-400'
+            : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
         }`
       }
     >
@@ -139,16 +139,13 @@ export default function Sidebar() {
   return (
     <aside className="w-52 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col h-full">
       {/* Header */}
-      <div className="px-4 py-4 border-b border-slate-800">
-        <div className="flex items-center gap-2 mb-0.5">
-          <div className="w-6 h-6 bg-teal-500 rounded-md flex items-center justify-center shrink-0">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#020617" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z" />
-            </svg>
-          </div>
-          <h1 className="text-[13px] font-semibold text-slate-100 leading-tight">Walley's Analytics</h1>
-        </div>
-        <p className="text-[11px] text-slate-500 mt-1 pl-8">{txCount.toLocaleString()} transactions</p>
+      <div className="px-4 pt-5 pb-4 border-b border-slate-800">
+        <h1 className="font-display text-[14px] font-700 text-slate-100 leading-tight tracking-tight">
+          Walley's Analytics
+        </h1>
+        <p className="text-[10px] font-medium tracking-[0.08em] uppercase text-slate-500 mt-1.5">
+          {txCount.toLocaleString()} transactions
+        </p>
       </div>
 
       {/* Main nav */}
@@ -156,7 +153,7 @@ export default function Sidebar() {
         {NAV_SECTIONS.map((section, si) => (
           <div key={si} className={si > 0 ? 'mt-1' : ''}>
             {section.heading && (
-              <p className="px-5 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-600 select-none">
+              <p className="px-5 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-600 select-none">
                 {section.heading}
               </p>
             )}

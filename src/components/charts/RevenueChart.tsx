@@ -29,18 +29,18 @@ export function RevenueChart({ daily, weekly, monthly }: RevenueChartProps) {
   }))
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+    <div className="bg-slate-800/30 border border-slate-700/40 p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-slate-200 text-sm">Revenue</h2>
-        <div className="flex gap-1">
+        <h2 className="font-display font-600 text-slate-200 text-sm tracking-tight">Revenue</h2>
+        <div className="flex gap-0.5">
           {GRANULARITIES.map(g => (
             <button
               key={g}
               onClick={() => setGranularity(g)}
-              className={`px-2.5 py-1 text-xs rounded-md font-medium transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-medium transition-colors duration-150 cursor-pointer ${
                 granularity === g
-                  ? 'bg-teal-500 text-slate-950'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700'
+                  ? 'bg-teal-500/15 text-teal-400'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700/50'
               }`}
             >
               {g}
@@ -52,20 +52,20 @@ export function RevenueChart({ daily, weekly, monthly }: RevenueChartProps) {
         <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="#14B8A6" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#14B8A6" stopOpacity={0} />
+              <stop offset="5%"  stopColor="oklch(0.73 0.22 252)" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="oklch(0.73 0.22 252)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-          <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} interval="preserveStartEnd" axisLine={{ stroke: '#1E293B' }} tickLine={false} />
-          <YAxis tickFormatter={shortCurrency} tick={{ fontSize: 11, fill: '#64748B' }} width={48} axisLine={false} tickLine={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.23 0.006 55)" />
+          <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'oklch(0.47 0.008 65)' }} interval="preserveStartEnd" axisLine={{ stroke: 'oklch(0.23 0.006 55)' }} tickLine={false} />
+          <YAxis tickFormatter={shortCurrency} tick={{ fontSize: 11, fill: 'oklch(0.47 0.008 65)' }} width={48} axisLine={false} tickLine={false} />
           <Tooltip
-            contentStyle={{ background: '#1E293B', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
-            labelStyle={{ color: '#94A3B8' }}
-            itemStyle={{ color: '#2DD4BF' }}
+            contentStyle={{ background: 'oklch(0.17 0.007 55)', border: '1px solid oklch(0.26 0.006 55)', borderRadius: '4px', fontSize: '12px' }}
+            labelStyle={{ color: 'oklch(0.61 0.009 65)' }}
+            itemStyle={{ color: 'oklch(0.73 0.22 252)' }}
             formatter={(v: number) => [`$${v.toFixed(2)}`, 'Revenue']}
           />
-          <Area type="monotone" dataKey="revenue" stroke="#14B8A6" fill="url(#revGradient)" strokeWidth={2} dot={false} />
+          <Area type="monotone" dataKey="revenue" stroke="oklch(0.73 0.22 252)" fill="url(#revGradient)" strokeWidth={1.5} dot={false} />
         </AreaChart>
       </ResponsiveContainer>
     </div>
