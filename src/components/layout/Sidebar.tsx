@@ -109,10 +109,11 @@ const BOTTOM_ITEMS: NavItem[] = [
   { label: 'Square Sync',      path: '/square-sync',     iconKey: 'sync' },
 ]
 
-function NavItemFull({ item, badge }: { item: NavItem; badge?: number }) {
+function NavItemFull({ item, badge, onClose }: { item: NavItem; badge?: number; onClose?: () => void }) {
   return (
     <NavLink
       to={item.path}
+      onClick={onClose}
       className={({ isActive }) =>
         `flex items-center gap-2.5 px-3 py-1.5 mx-2 rounded-sm text-[13px] font-medium transition-all duration-150 cursor-pointer ${
           isActive
@@ -132,20 +133,34 @@ function NavItemFull({ item, badge }: { item: NavItem; badge?: number }) {
   )
 }
 
-export default function Sidebar() {
+export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
   const txCount = useTransactionCount()
   const restockAlertCount = useRestockAlertCount()
 
   return (
-    <aside className="w-52 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col h-full">
+    <aside className={[
+      'w-52 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col h-full',
+      'fixed inset-y-0 left-0 z-50 transition-transform duration-200',
+      'lg:static lg:translate-x-0',
+      open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+    ].join(' ')}>
       {/* Header */}
-      <div className="px-4 pt-5 pb-4 border-b border-slate-800">
-        <h1 className="font-display text-[14px] font-700 text-slate-100 leading-tight tracking-tight">
-          Walley's Analytics
-        </h1>
-        <p className="text-[10px] font-medium tracking-[0.08em] uppercase text-slate-500 mt-1.5">
-          {txCount.toLocaleString()} transactions
-        </p>
+      <div className="px-4 pt-5 pb-4 border-b border-slate-800 flex items-start justify-between">
+        <div>
+          <h1 className="font-display text-[14px] font-700 text-slate-100 leading-tight tracking-tight">
+            Walley's Analytics
+          </h1>
+          <p className="text-[10px] font-medium tracking-[0.08em] uppercase text-slate-500 mt-1.5">
+            {txCount.toLocaleString()} transactions
+          </p>
+        </div>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden p-1 text-slate-500 hover:text-slate-300 -mt-0.5 -mr-1" aria-label="Close menu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Main nav */}
@@ -162,6 +177,7 @@ export default function Sidebar() {
                 key={item.path}
                 item={item}
                 badge={item.path === '/restock' ? restockAlertCount : undefined}
+                onClose={onClose}
               />
             ))}
           </div>
@@ -171,7 +187,7 @@ export default function Sidebar() {
       {/* Bottom items */}
       <div className="border-t border-slate-800 py-2 space-y-0.5">
         {BOTTOM_ITEMS.map(item => (
-          <NavItemFull key={item.path} item={item} />
+          <NavItemFull key={item.path} item={item} onClose={onClose} />
         ))}
       </div>
     </aside>

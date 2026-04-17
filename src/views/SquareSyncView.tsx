@@ -236,6 +236,47 @@ export default function SquareSyncView() {
       )}
 
       {isConnected && store.locationID && (
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-slate-200">Auto-Sync</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Sync automatically in the background</p>
+            </div>
+            <button
+              onClick={() => store.setCredentials({ autoSyncEnabled: !store.autoSyncEnabled })}
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+                store.autoSyncEnabled ? 'bg-teal-500' : 'bg-slate-600'
+              }`}
+              role="switch"
+              aria-checked={store.autoSyncEnabled}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform duration-200 ${
+                store.autoSyncEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`} />
+            </button>
+          </div>
+          {store.autoSyncEnabled && (
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-slate-400 shrink-0">Interval:</p>
+              {([15, 30, 60] as const).map(min => (
+                <button
+                  key={min}
+                  onClick={() => store.setCredentials({ syncIntervalMinutes: min })}
+                  className={`px-3 py-1 text-xs rounded-md border transition-colors ${
+                    store.syncIntervalMinutes === min
+                      ? 'bg-teal-500/20 border-teal-500/50 text-teal-300'
+                      : 'border-slate-600 text-slate-400 hover:border-slate-500'
+                  }`}
+                >
+                  {min}m
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {isConnected && store.locationID && (
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-200">Sync Now</h2>

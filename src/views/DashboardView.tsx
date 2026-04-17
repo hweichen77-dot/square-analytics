@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
-import { useFilteredTransactions, useOverridesMap } from '../db/useTransactions'
+import { useFilteredTransactions, useOverridesMap, useProductCostData } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import {
   computeProductStats,
@@ -17,6 +17,7 @@ import { RevenueChart } from '../components/charts/RevenueChart'
 import { CategoryBreakdownChart } from '../components/charts/CategoryBreakdownChart'
 import { TopProductsChart } from '../components/charts/TopProductsChart'
 import { formatCurrency, formatNumber } from '../utils/format'
+import { effectiveUnitCost } from '../types/models'
 import type { DateRange } from '../db/useTransactions'
 
 /** Shift a date range back by its own duration to get the preceding period. */
@@ -63,10 +64,24 @@ export default function DashboardView() {
     return { bestDay, topProduct, slowProduct, topStaff }
   }, [daily, stats, staffStats])
 
+  const costData = useProductCostData() ?? []
+
   const totalRevenue = transactions.reduce((s, t) => s + t.netSales, 0)
   const totalTransactions = transactions.length
   const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
   const uniqueProducts = stats.length
+
+  const { grossProfit, marginPct } = useMemo(() => {
+    if (!costData.length) return { grossProfit: null, marginPct: null }
+    const costMap = new Map(costData.map(c => [c.productName, effectiveUnitCost(c)]))
+    let cogs = 0
+    for (const s of stats) {
+      const unitCost = costMap.get(s.name)
+      if (unitCost != null) cogs += unitCost * s.totalUnitsSold
+    }
+    const gp = totalRevenue - cogs
+    return { grossProfit: gp, marginPct: totalRevenue > 0 ? (gp / totalRevenue) * 100 : null }
+  }, [costData, stats, totalRevenue])
 
   // Previous period totals (only shown when a specific date range is selected)
   const hasPrevPeriod = prevRange.start !== null
@@ -132,7 +147,7 @@ export default function DashboardView() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-700 text-slate-100 tracking-tight">Dashboard</h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
           label="Total Revenue"
           value={formatCurrency(totalRevenue)}
@@ -157,6 +172,20 @@ export default function DashboardView() {
           trend={productsTrend?.label}
           trendUp={productsTrend?.up}
         />
+        {grossProfit !== null && (
+          <StatCard
+            label="Gross Profit"
+            value={formatCurrency(grossProfit)}
+            sub={marginPct !== null ? `${marginPct.toFixed(1)}% margin` : undefined}
+          />
+        )}
+        {grossProfit === null && (
+          <StatCard
+            label="Gross Profit"
+            value="—"
+            sub="Add COGS in Profit Margins"
+          />
+        )}
       </div>
 
       <RevenueChart daily={daily} weekly={weekly} monthly={monthly} />

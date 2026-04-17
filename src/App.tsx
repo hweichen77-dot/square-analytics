@@ -1,7 +1,8 @@
-import { lazy, Suspense, useEffect } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import { ToastContainer } from './components/ui/ToastContainer'
+import { useAutoSync } from './hooks/useAutoSync'
 
 const DashboardView         = lazy(() => import('./views/DashboardView'))
 const InventoryView         = lazy(() => import('./views/InventoryView'))
@@ -92,12 +93,34 @@ function useDeepLinkHandler() {
 
 export default function App() {
   useDeepLinkHandler()
+  useAutoSync()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex h-screen bg-slate-950 overflow-hidden">
-      <Sidebar />
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-6">
+        <div className="max-w-7xl mx-auto p-4 lg:p-6">
+          {/* Mobile header */}
+          <div className="flex items-center gap-3 mb-4 lg:hidden">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 text-slate-400 hover:text-slate-200"
+              aria-label="Open menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
+            <span className="font-display text-sm font-semibold text-slate-200">Walley's Analytics</span>
+          </div>
           <Suspense fallback={<PageFallback />}>
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -134,3 +157,4 @@ export default function App() {
     </div>
   )
 }
+

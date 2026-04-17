@@ -12,6 +12,8 @@ interface AuthStore {
   daysBack: number
   lastSyncDate: string | null
   lastSyncCount: number
+  autoSyncEnabled: boolean
+  syncIntervalMinutes: number
 
   setCredentials: (creds: Partial<AuthStore>) => void
   clearAuth: () => void
@@ -30,6 +32,8 @@ export const useAuthStore = create<AuthStore>()(
       daysBack: 90,
       lastSyncDate: null,
       lastSyncCount: 0,
+      autoSyncEnabled: false,
+      syncIntervalMinutes: 30,
 
       setCredentials: creds => set(s => ({ ...s, ...creds })),
       clearAuth: () => set({

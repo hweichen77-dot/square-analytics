@@ -95,12 +95,15 @@ export async function runSquareSync(
     await refreshAccessToken()
   }
 
-  const { accessToken, locationID, daysBack } = useAuthStore.getState()
+  const { accessToken, locationID, daysBack, lastSyncDate } = useAuthStore.getState()
 
   onStatus({ phase: 'orders', message: 'Fetching orders…', ordersAdded: 0, productsAdded: 0 })
 
   const endDate = new Date()
-  const startDate = subDays(endDate, daysBack)
+  // Incremental: resume from last sync (minus 5 min overlap) instead of full re-fetch
+  const startDate = lastSyncDate
+    ? new Date(new Date(lastSyncDate).getTime() - 5 * 60 * 1000)
+    : subDays(endDate, daysBack)
   const orders = await fetchOrders(accessToken, locationID, startDate, endDate)
   const txRows = orders.flatMap(o => {
     const tx = orderToTransaction(o)
