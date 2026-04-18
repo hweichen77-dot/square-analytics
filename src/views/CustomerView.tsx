@@ -9,7 +9,7 @@ import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
 import type { SalesTransaction } from '../types/models'
 import { parseProductItems } from '../types/models'
-import { format, startOfDay, differenceInDays } from 'date-fns'
+import { format, startOfDay, differenceInDays, differenceInMonths } from 'date-fns'
 
 type CustomerSegment = 'Regulars' | 'Frequent' | 'Occasional' | 'One-Timers'
 type CustomerSort = 'totalSpent' | 'transactions' | 'lastVisit' | 'firstVisit'
@@ -175,6 +175,16 @@ export default function CustomerView() {
     }))
   }, [profiles])
 
+  const pareto = useMemo(() => {
+    if (profiles.length === 0) return null
+    const totalRev = profiles.reduce((s, p) => s + p.totalSpent, 0)
+    if (totalRev === 0) return null
+    const top20n = Math.max(1, Math.ceil(profiles.length * 0.2))
+    // profiles are sorted by totalSpent desc from buildProfiles
+    const top20rev = profiles.slice(0, top20n).reduce((s, p) => s + p.totalSpent, 0)
+    return { pct: (top20rev / totalRev) * 100, count: top20n, total: profiles.length }
+  }, [profiles])
+
   if (transactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import transaction data to analyze customer frequency." />
   }
@@ -222,6 +232,23 @@ export default function CustomerView() {
           </p>
         </div>
       </div>
+
+      {pareto && (
+        <div className="border border-teal-500/20 bg-teal-500/5 px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400 mb-1">Pareto Insight</p>
+            <p className="text-sm text-slate-300">
+              Top <span className="text-teal-400 font-semibold">{pareto.count}</span> customers
+              ({Math.round((pareto.count / pareto.total) * 100)}% of {pareto.total}) generate{' '}
+              <span className="text-teal-400 font-semibold">{pareto.pct.toFixed(0)}%</span> of all customer revenue
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className="text-2xl font-mono font-bold text-teal-400">{pareto.pct.toFixed(0)}%</p>
+            <p className="text-[10px] text-slate-500">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
+          </div>
+        </div>
+      )}
 
       <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-3">Customer Segments</h2>
@@ -302,7 +329,7 @@ export default function CustomerView() {
           <table className="w-full text-xs">
             <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
               <tr>
-                {['Name', 'Segment', 'Transactions', 'Total Spent', 'Avg Tx', 'First', 'Last', 'Days Since', 'Fav Product'].map(h => (
+                {['Name', 'Segment', 'Transactions', 'Total Spent', 'Avg Tx', 'Annual LTV', 'First', 'Last', 'Days Since', 'Fav Product'].map(h => (
                   <th key={h} className="px-4 py-2.5 font-semibold text-slate-500 text-left">{h}</th>
                 ))}
               </tr>
@@ -327,6 +354,12 @@ export default function CustomerView() {
                   <td className="px-4 py-2 font-mono text-slate-300">{p.transactionCount}</td>
                   <td className="px-4 py-2 font-mono text-slate-100">{formatCurrency(p.totalSpent)}</td>
                   <td className="px-4 py-2 font-mono text-slate-300">{formatCurrency(p.avgTransaction)}</td>
+                  <td className="px-4 py-2 font-mono text-teal-400/80">
+                    {(() => {
+                      const months = Math.max(1, differenceInMonths(p.lastPurchase, p.firstPurchase) + 1)
+                      return formatCurrency((p.totalSpent / months) * 12)
+                    })()}
+                  </td>
                   <td className="px-4 py-2 font-mono text-slate-400">{format(p.firstPurchase, 'M/d/yy')}</td>
                   <td className="px-4 py-2 font-mono text-slate-400">{format(p.lastPurchase, 'M/d/yy')}</td>
                   <td className="px-4 py-2 font-mono" style={{ color: p.daysSinceLastVisit > 60 ? '#dc2626' : p.daysSinceLastVisit > 30 ? '#f97316' : '#374151' }}>

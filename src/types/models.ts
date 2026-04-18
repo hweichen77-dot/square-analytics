@@ -134,6 +134,12 @@ export function effectiveUnitCost(cost: ProductCostData): number {
   return cost.unitCost
 }
 
+export interface StaffWage {
+  id?: number
+  staffName: string
+  hourlyWage: number
+}
+
 export const EVENT_TYPES = [
   'Spirit Week', 'Homecoming', 'Finals', 'Back to School',
   'Holiday', 'Sports Game', 'Custom',

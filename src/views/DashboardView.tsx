@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
-import { useFilteredTransactions, useOverridesMap, useProductCostData } from '../db/useTransactions'
+import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, getDaysInMonth, getDay } from 'date-fns'
+import { useFilteredTransactions, useOverridesMap, useProductCostData, useAllTransactions } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
+import { useGoalStore } from '../store/goalStore'
 import {
   computeProductStats,
   computeDailyRevenue,
@@ -42,6 +43,10 @@ function pctChange(current: number, previous: number): { label: string; up: bool
 export default function DashboardView() {
   const { range } = useDateRangeStore()
   const transactions = useFilteredTransactions(range)
+  const allTransactions = useAllTransactions()
+  const { weeklyGoal, monthlyGoal, setWeeklyGoal, setMonthlyGoal } = useGoalStore()
+  const [editingGoal, setEditingGoal] = useState<'weekly' | 'monthly' | null>(null)
+  const [goalInput, setGoalInput] = useState('')
   const prevRange = useMemo(() => previousPeriod(range), [range])
   const prevTransactions = useFilteredTransactions(prevRange)
   const overrides = useOverridesMap()
@@ -82,6 +87,31 @@ export default function DashboardView() {
     const gp = totalRevenue - cogs
     return { grossProfit: gp, marginPct: totalRevenue > 0 ? (gp / totalRevenue) * 100 : null }
   }, [costData, stats, totalRevenue])
+
+  const goalProgress = useMemo(() => {
+    const now = new Date()
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 })
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
+    const monthStart = startOfMonth(now)
+    const monthEnd = endOfMonth(now)
+
+    const weekRevenue = allTransactions
+      .filter(t => t.date >= weekStart && t.date <= weekEnd)
+      .reduce((s, t) => s + t.netSales, 0)
+    const monthRevenue = allTransactions
+      .filter(t => t.date >= monthStart && t.date <= monthEnd)
+      .reduce((s, t) => s + t.netSales, 0)
+
+    // Days elapsed / total — for pace projection
+    const dayOfWeek = ((getDay(now) + 6) % 7) + 1  // Mon=1..Sun=7
+    const dayOfMonth = now.getDate()
+    const daysInMonth = getDaysInMonth(now)
+
+    const weekPace = weeklyGoal != null ? (weekRevenue / dayOfWeek) * 7 : null
+    const monthPace = monthlyGoal != null ? (monthRevenue / dayOfMonth) * daysInMonth : null
+
+    return { weekRevenue, monthRevenue, weekPace, monthPace }
+  }, [allTransactions, weeklyGoal, monthlyGoal])
 
   // Previous period totals (only shown when a specific date range is selected)
   const hasPrevPeriod = prevRange.start !== null
@@ -187,6 +217,108 @@ export default function DashboardView() {
           />
         )}
       </div>
+
+      {/* Goal Progress */}
+      {(weeklyGoal != null || monthlyGoal != null || true) && (
+        <div className="border border-slate-700/50 bg-slate-800/25 px-5 py-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400">Revenue Goals</p>
+            {editingGoal ? null : (
+              <button
+                onClick={() => { setEditingGoal('weekly'); setGoalInput(weeklyGoal?.toString() ?? '') }}
+                className="text-[10px] text-slate-500 hover:text-slate-300 uppercase tracking-wide"
+              >
+                Edit
+              </button>
+            )}
+          </div>
+          {editingGoal ? (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1">
+                <label className="block text-xs text-slate-400 mb-1">Weekly Target ($)</label>
+                <input
+                  type="number"
+                  value={editingGoal === 'weekly' ? goalInput : (weeklyGoal?.toString() ?? '')}
+                  onChange={e => { setEditingGoal('weekly'); setGoalInput(e.target.value) }}
+                  onFocus={() => setEditingGoal('weekly')}
+                  placeholder="e.g. 5000"
+                  className="w-full bg-slate-900 border border-slate-600 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs text-slate-400 mb-1">Monthly Target ($)</label>
+                <input
+                  type="number"
+                  value={editingGoal === 'monthly' ? goalInput : (monthlyGoal?.toString() ?? '')}
+                  onChange={e => { setEditingGoal('monthly'); setGoalInput(e.target.value) }}
+                  onFocus={() => setEditingGoal('monthly')}
+                  placeholder="e.g. 20000"
+                  className="w-full bg-slate-900 border border-slate-600 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50"
+                />
+              </div>
+              <div className="flex items-end gap-2">
+                <button
+                  onClick={() => {
+                    const v = parseFloat(goalInput)
+                    if (editingGoal === 'weekly') setWeeklyGoal(isNaN(v) || v <= 0 ? null : v)
+                    else setMonthlyGoal(isNaN(v) || v <= 0 ? null : v)
+                    setEditingGoal(null)
+                  }}
+                  className="px-3 py-1.5 bg-teal-500 text-slate-900 text-xs font-semibold hover:bg-teal-400"
+                >
+                  Save
+                </button>
+                <button onClick={() => setEditingGoal(null)} className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(['weekly', 'monthly'] as const).map(period => {
+                const goal = period === 'weekly' ? weeklyGoal : monthlyGoal
+                const revenue = period === 'weekly' ? goalProgress.weekRevenue : goalProgress.monthRevenue
+                const pace = period === 'weekly' ? goalProgress.weekPace : goalProgress.monthPace
+                const pct = goal ? Math.min(100, (revenue / goal) * 100) : 0
+                const hit = goal != null && revenue >= goal
+                const barColor = hit ? 'bg-emerald-500' : pct >= 80 ? 'bg-amber-400' : 'bg-teal-500'
+                return (
+                  <div key={period}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs text-slate-400 capitalize">{period}</span>
+                      {goal != null ? (
+                        <span className={`text-xs font-mono font-semibold ${hit ? 'text-emerald-400' : 'text-slate-300'}`}>
+                          {formatCurrency(revenue)} / {formatCurrency(goal)}
+                          {hit && ' ✓'}
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => { setEditingGoal(period); setGoalInput('') }}
+                          className="text-xs text-slate-500 hover:text-teal-400"
+                        >
+                          + Set goal
+                        </button>
+                      )}
+                    </div>
+                    {goal != null && (
+                      <>
+                        <div className="h-1.5 bg-slate-700/60 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        {pace != null && !hit && (
+                          <p className="text-[10px] text-slate-500 mt-1">
+                            On pace for {formatCurrency(pace)} this {period === 'weekly' ? 'week' : 'month'}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       <RevenueChart daily={daily} weekly={weekly} monthly={monthly} />
 

@@ -1,6 +1,15 @@
 import { db } from './database'
 import type { SalesTransaction, CatalogueProduct, ProductCostData } from '../types/models'
 
+export async function upsertStaffWage(staffName: string, hourlyWage: number): Promise<void> {
+  const existing = await db.staffWages.where('staffName').equals(staffName).first()
+  if (existing) {
+    await db.staffWages.update(existing.id!, { hourlyWage })
+  } else {
+    await db.staffWages.add({ staffName, hourlyWage })
+  }
+}
+
 export async function upsertTransactions(transactions: Omit<SalesTransaction, 'id'>[]): Promise<number> {
   let added = 0
   await db.transaction('rw', db.salesTransactions, async () => {

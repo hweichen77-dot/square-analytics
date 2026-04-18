@@ -8,6 +8,7 @@ import type {
   ProductBundle,
   CatalogueProduct,
   OpexEntry,
+  StaffWage,
 } from '../types/models'
 import { splitItemVariation } from '../types/models'
 
@@ -20,6 +21,7 @@ class WalleysDB extends Dexie {
   productBundles!: Dexie.Table<ProductBundle, number>
   catalogueProducts!: Dexie.Table<CatalogueProduct, number>
   opexEntries!: Dexie.Table<OpexEntry, number>
+  staffWages!: Dexie.Table<StaffWage, number>
 
   constructor() {
     super('WalleysDB')
@@ -62,6 +64,19 @@ class WalleysDB extends Dexie {
       productBundles: '++id, name',
       catalogueProducts: '++id, &name, itemName, variationName, sku, category, enabled',
       opexEntries: '++id, month, category',
+    })
+
+    // Version 5: add staffWages table for Staff ROI feature.
+    this.version(5).stores({
+      salesTransactions: '++id, &transactionID, date, staffName, paymentMethod, dayOfWeek, hour',
+      categoryOverrides: '++id, &productName',
+      restockLogs: '++id, productName, date',
+      productCostData: '++id, &productName',
+      storeEvents: '++id, startDate, endDate',
+      productBundles: '++id, name',
+      catalogueProducts: '++id, &name, itemName, variationName, sku, category, enabled',
+      opexEntries: '++id, month, category',
+      staffWages: '++id, &staffName',
     })
 
     // Version 2: retroactively normalize paymentMethod for cash transactions.

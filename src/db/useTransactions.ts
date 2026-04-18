@@ -60,3 +60,7 @@ export function useProductBundles() {
 export function useCatalogueProducts() {
   return useLiveQuery(() => db.catalogueProducts.toArray(), []) ?? []
 }
+
+export function useStaffWages() {
+  return useLiveQuery(() => db.staffWages.toArray(), []) ?? []
+}

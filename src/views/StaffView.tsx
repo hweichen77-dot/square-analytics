@@ -1,19 +1,53 @@
 import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { useFilteredTransactions } from '../db/useTransactions'
+import { useFilteredTransactions, useStaffWages } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { computeStaffStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency, formatNumber } from '../utils/format'
 import { format } from 'date-fns'
+import { upsertStaffWage } from '../db/dbUtils'
+import type { SalesTransaction } from '../types/models'
+
+function estimateShiftHours(txs: SalesTransaction[]): number {
+  const byDate: Record<string, number[]> = {}
+  for (const tx of txs) {
+    const key = format(tx.date, 'yyyy-MM-dd')
+    if (!byDate[key]) byDate[key] = []
+    byDate[key].push(tx.hour)
+  }
+  let total = 0
+  for (const hours of Object.values(byDate)) {
+    const mn = Math.min(...hours)
+    const mx = Math.max(...hours)
+    total += Math.max(0.5, mx - mn + 0.5)
+  }
+  return total
+}
 
 export default function StaffView() {
   const { range } = useDateRangeStore()
   const transactions = useFilteredTransactions(range)
   const [expandedStaff, setExpandedStaff] = useState<string | null>(null)
+  const [editingWage, setEditingWage] = useState<string | null>(null)
+  const [wageInput, setWageInput] = useState('')
+  const wages = useStaffWages()
+  const wageMap = useMemo(() => new Map(wages.map(w => [w.staffName, w.hourlyWage])), [wages])
 
   const staffStats = useMemo(() => computeStaffStats(transactions), [transactions])
   const totalRevenue = useMemo(() => staffStats.reduce((s, x) => s + x.totalSales, 0), [staffStats])
+
+  const roiData = useMemo(() => {
+    return staffStats.map(s => {
+      const staffTxs = transactions.filter(t => (t.staffName.trim() || 'Unknown') === s.name)
+      const hours = estimateShiftHours(staffTxs)
+      const wage = wageMap.get(s.name) ?? null
+      const wageCost = wage != null ? wage * hours : null
+      const netROI = wageCost != null ? s.totalSales - wageCost : null
+      const revenuePerHour = hours > 0 ? s.totalSales / hours : null
+      return { ...s, hours, wage, wageCost, netROI, revenuePerHour }
+    })
+  }, [staffStats, transactions, wageMap])
 
   // Build per-staff transaction lists for the expanded view.
   const txByStaff = useMemo(() => {
@@ -67,6 +101,91 @@ export default function StaffView() {
         <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
           <p className="text-xs text-slate-500">Total Transactions</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{formatNumber(transactions.length)}</p>
+        </div>
+      </div>
+
+      {/* ROI Table */}
+      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-slate-100">Staff ROI</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Hours estimated from first → last transaction per shift. Enter wage to see net ROI.</p>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-700/50 text-left">
+                <th className="px-5 py-3 text-xs font-semibold text-slate-500">Staff</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-right">Revenue</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-right">Est. Hours</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-right">Rev/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-center">Wage/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-right">Wage Cost</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-500 text-right">Net ROI</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/30">
+              {roiData.map(s => {
+                const isEditing = editingWage === s.name
+                return (
+                  <tr key={s.name} className="hover:bg-slate-700/20">
+                    <td className="px-5 py-3 font-medium text-slate-200">{s.name}</td>
+                    <td className="px-4 py-3 font-mono text-slate-100 text-right">{formatCurrency(s.totalSales)}</td>
+                    <td className="px-4 py-3 font-mono text-slate-400 text-right">{s.hours.toFixed(1)}h</td>
+                    <td className="px-4 py-3 font-mono text-slate-300 text-right">
+                      {s.revenuePerHour != null ? formatCurrency(s.revenuePerHour) : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {isEditing ? (
+                        <form
+                          className="flex items-center gap-1 justify-center"
+                          onSubmit={async e => {
+                            e.preventDefault()
+                            const v = parseFloat(wageInput)
+                            if (!isNaN(v) && v > 0) await upsertStaffWage(s.name, v)
+                            setEditingWage(null)
+                          }}
+                        >
+                          <input
+                            autoFocus
+                            type="number"
+                            value={wageInput}
+                            onChange={e => setWageInput(e.target.value)}
+                            className="w-16 bg-slate-900 border border-teal-500/50 px-2 py-0.5 text-xs text-slate-200 font-mono text-right focus:outline-none"
+                            placeholder="0.00"
+                          />
+                          <button type="submit" className="text-xs text-teal-400 hover:text-teal-300 px-1">✓</button>
+                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-slate-500 hover:text-slate-300">✕</button>
+                        </form>
+                      ) : (
+                        <button
+                          onClick={() => { setEditingWage(s.name); setWageInput(s.wage?.toString() ?? '') }}
+                          className={`font-mono text-xs px-2 py-0.5 border border-transparent hover:border-slate-600 hover:bg-slate-700/40 rounded ${
+                            s.wage != null ? 'text-slate-300' : 'text-slate-600 hover:text-slate-400'
+                          }`}
+                        >
+                          {s.wage != null ? `$${s.wage.toFixed(2)}` : '+ Add'}
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-slate-400 text-right">
+                      {s.wageCost != null ? formatCurrency(s.wageCost) : '—'}
+                    </td>
+                    <td className="px-4 py-3 font-mono font-semibold text-right">
+                      {s.netROI != null ? (
+                        <span className={s.netROI >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                          {formatCurrency(s.netROI)}
+                        </span>
+                      ) : (
+                        <span className="text-slate-600 text-xs">enter wage</span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
