@@ -1,5 +1,6 @@
 import { parseCSVContent } from './csvParser'
 import { parseXLSXCatalogue } from './xlsxParser'
+import { parseShopifyCSV, parseEtsyCSV } from './shopifyParser'
 import { upsertTransactions, upsertCatalogueProducts, upsertProductCosts } from '../db/dbUtils'
 
 export interface ImportResult {
@@ -18,6 +19,24 @@ export async function importCSVTransactions(file: File): Promise<ImportResult> {
   if (transactions.length === 0) {
     return { added: 0, total: 0, skipped, errors: ['No valid rows found in CSV.'] }
   }
+  const added = await upsertTransactions(transactions)
+  return { added, total: transactions.length, skipped, errors: [] }
+}
+
+export async function importShopifyCSV(file: File): Promise<ImportResult> {
+  const text = await file.text()
+  const { transactions, skipped, schemaError } = parseShopifyCSV(text)
+  if (schemaError) return { added: 0, total: 0, skipped: 0, errors: [schemaError] }
+  if (transactions.length === 0) return { added: 0, total: 0, skipped, errors: ['No valid orders found in Shopify CSV.'] }
+  const added = await upsertTransactions(transactions)
+  return { added, total: transactions.length, skipped, errors: [] }
+}
+
+export async function importEtsyCSV(file: File): Promise<ImportResult> {
+  const text = await file.text()
+  const { transactions, skipped, schemaError } = parseEtsyCSV(text)
+  if (schemaError) return { added: 0, total: 0, skipped: 0, errors: [schemaError] }
+  if (transactions.length === 0) return { added: 0, total: 0, skipped, errors: ['No valid orders found in Etsy CSV.'] }
   const added = await upsertTransactions(transactions)
   return { added, total: transactions.length, skipped, errors: [] }
 }

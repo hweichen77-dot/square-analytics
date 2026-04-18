@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
-import { importCSVTransactions, importXLSXCatalogue } from '../engine/importEngine'
+import { importCSVTransactions, importXLSXCatalogue, importShopifyCSV, importEtsyCSV } from '../engine/importEngine'
 import { clearAllData } from '../db/dbUtils'
 import { useToastStore } from '../store/toastStore'
 import { formatNumber } from '../utils/format'
@@ -15,6 +15,8 @@ export default function ImportView() {
   const [confirmClear, setConfirmClear] = useState(false)
   const csvRef = useRef<HTMLInputElement>(null)
   const xlsxRef = useRef<HTMLInputElement>(null)
+  const shopifyRef = useRef<HTMLInputElement>(null)
+  const etsyRef = useRef<HTMLInputElement>(null)
 
   async function handleCSV(file: File) {
     setImporting(true)
@@ -30,6 +32,44 @@ export default function ImportView() {
       }
     } catch (e) {
       show(`CSV import failed: ${(e as Error).message}`, 'error')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  async function handleShopify(file: File) {
+    setImporting(true)
+    try {
+      const result = await importShopifyCSV(file)
+      if (result.errors.length > 0) {
+        show(result.errors[0], 'error')
+      } else if (result.added === 0) {
+        show('No new Shopify orders found (all already imported).', 'info')
+      } else {
+        const skippedNote = result.skipped > 0 ? ` · ${result.skipped} orders skipped` : ''
+        show(`Added ${result.added} of ${result.total} Shopify orders${skippedNote}`, 'success')
+      }
+    } catch (e) {
+      show(`Shopify import failed: ${(e as Error).message}`, 'error')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  async function handleEtsy(file: File) {
+    setImporting(true)
+    try {
+      const result = await importEtsyCSV(file)
+      if (result.errors.length > 0) {
+        show(result.errors[0], 'error')
+      } else if (result.added === 0) {
+        show('No new Etsy orders found (all already imported).', 'info')
+      } else {
+        const skippedNote = result.skipped > 0 ? ` · ${result.skipped} orders skipped` : ''
+        show(`Added ${result.added} of ${result.total} Etsy orders${skippedNote}`, 'success')
+      }
+    } catch (e) {
+      show(`Etsy import failed: ${(e as Error).message}`, 'error')
     } finally {
       setImporting(false)
     }
@@ -96,7 +136,43 @@ export default function ImportView() {
         <p className="font-medium text-slate-200">Drop Square CSV here or click to browse</p>
         <p className="text-sm text-slate-500 mt-1">Accepts Square transaction export (.csv)</p>
         <input ref={csvRef} type="file" accept=".csv" className="hidden"
-          onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f) }} />
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleCSV(f); e.target.value = '' }} />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🛍️</span>
+            <h2 className="font-semibold text-slate-200">Shopify Orders</h2>
+          </div>
+          <p className="text-sm text-slate-500 mb-3">Import from Shopify Admin → Orders → Export as CSV.</p>
+          <button
+            onClick={() => shopifyRef.current?.click()}
+            className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-medium hover:bg-teal-600 disabled:opacity-50"
+            disabled={importing}
+          >
+            {importing ? 'Importing…' : 'Select Shopify CSV'}
+          </button>
+          <input ref={shopifyRef} type="file" accept=".csv" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) handleShopify(f); e.target.value = '' }} />
+        </div>
+
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-lg">🧵</span>
+            <h2 className="font-semibold text-slate-200">Etsy Orders</h2>
+          </div>
+          <p className="text-sm text-slate-500 mb-3">Import from Etsy Shop Manager → Orders → Download CSV.</p>
+          <button
+            onClick={() => etsyRef.current?.click()}
+            className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-medium hover:bg-teal-600 disabled:opacity-50"
+            disabled={importing}
+          >
+            {importing ? 'Importing…' : 'Select Etsy CSV'}
+          </button>
+          <input ref={etsyRef} type="file" accept=".csv" className="hidden"
+            onChange={e => { const f = e.target.files?.[0]; if (f) handleEtsy(f); e.target.value = '' }} />
+        </div>
       </div>
 
       <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
