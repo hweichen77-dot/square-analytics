@@ -7,6 +7,7 @@ import { effectiveUnitCost } from '../types/models'
 import { formatCurrency, formatNumber } from '../utils/format'
 import { exportAccountantPDF } from '../engine/pdfExport'
 import type { AccountantReportData, AccountantProductRow } from '../engine/pdfExport'
+import { exportQuickBooksPL } from '../engine/quickbooksExport'
 import { useToastStore } from '../store/toastStore'
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer, Legend } from 'recharts'
 
@@ -144,6 +145,12 @@ export default function AccountantReportView() {
     show('PDF downloaded', 'success')
   }
 
+  function handleExportXLSX() {
+    if (transactions.length === 0) { show('No transactions in selected period', 'error'); return }
+    exportQuickBooksPL(report)
+    show('QuickBooks P&L XLSX downloaded', 'success')
+  }
+
   const hasCOGS = report.totalCOGS !== null
 
   return (
@@ -156,12 +163,20 @@ export default function AccountantReportView() {
           </p>
         </div>
         {transactions.length > 0 && (
-          <button
-            onClick={handleExport}
-            className="shrink-0 px-5 py-2.5 bg-teal-500 text-slate-950 rounded-xl text-sm font-semibold hover:bg-teal-600 transition-colors"
-          >
-            Download PDF
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={handleExportXLSX}
+              className="px-4 py-2.5 bg-slate-700 border border-slate-600 text-slate-200 rounded-xl text-sm font-semibold hover:bg-slate-600 transition-colors"
+            >
+              QuickBooks XLSX
+            </button>
+            <button
+              onClick={handleExport}
+              className="px-5 py-2.5 bg-teal-500 text-slate-950 rounded-xl text-sm font-semibold hover:bg-teal-600 transition-colors"
+            >
+              Download PDF
+            </button>
+          </div>
         )}
       </div>
 

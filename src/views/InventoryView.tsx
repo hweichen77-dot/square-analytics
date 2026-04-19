@@ -10,7 +10,31 @@ import { CategoryBadge } from '../components/ui/Badge'
 import { formatCurrency, formatNumber } from '../utils/format'
 import { useToastStore } from '../store/toastStore'
 import { splitItemVariation } from '../types/models'
+import type { SalesTransaction } from '../types/models'
 import type { ProductStats } from '../engine/analyticsEngine'
+
+function exportTransactionsCSV(transactions: SalesTransaction[]) {
+  const headers = ['Date', 'Staff', 'Item', 'Net Sales', 'Payment Method', 'Customer']
+  const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`
+  const rows = transactions.map(t => [
+    (t.date instanceof Date ? t.date : new Date(t.date)).toISOString().slice(0, 10),
+    t.staffName,
+    t.itemDescription,
+    t.netSales.toFixed(2),
+    t.paymentMethod,
+    t.customerName ?? '',
+  ])
+  const csv = [headers, ...rows].map(r => r.map(v => escape(String(v))).join(',')).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `walleys-transactions-${new Date().toISOString().slice(0, 10)}.csv`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -203,6 +227,12 @@ export default function InventoryView() {
         <span className="text-sm text-slate-500 self-center">
           {filteredGroups.length} items · {filteredGroups.reduce((s, g) => s + g.variations.length, 0)} variations
         </span>
+        <button
+          onClick={() => exportTransactionsCSV(transactions)}
+          className="ml-auto px-3 py-2 bg-slate-700 border border-slate-600 text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-600 transition-colors"
+        >
+          Export CSV
+        </button>
       </div>
 
       {/* Table */}
