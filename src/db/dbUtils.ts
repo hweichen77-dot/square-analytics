@@ -11,17 +11,14 @@ export async function upsertStaffWage(staffName: string, hourlyWage: number): Pr
 }
 
 export async function upsertTransactions(transactions: Omit<SalesTransaction, 'id'>[]): Promise<number> {
-  let added = 0
-  await db.transaction('rw', db.salesTransactions, async () => {
-    for (const tx of transactions) {
-      const existing = await db.salesTransactions.where('transactionID').equals(tx.transactionID).first()
-      if (!existing) {
-        await db.salesTransactions.add(tx)
-        added++
-      }
-    }
-  })
-  return added
+  if (transactions.length === 0) return 0
+  const ids = transactions.map(t => t.transactionID)
+  const existing = new Set(
+    (await db.salesTransactions.where('transactionID').anyOf(ids).toArray()).map(t => t.transactionID)
+  )
+  const toAdd = transactions.filter(t => !existing.has(t.transactionID))
+  if (toAdd.length > 0) await db.salesTransactions.bulkAdd(toAdd)
+  return toAdd.length
 }
 
 export async function upsertCatalogueProducts(products: Omit<CatalogueProduct, 'id'>[]): Promise<void> {

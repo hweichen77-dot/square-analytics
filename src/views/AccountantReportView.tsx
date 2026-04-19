@@ -147,8 +147,12 @@ export default function AccountantReportView() {
 
   function handleExportXLSX() {
     if (transactions.length === 0) { show('No transactions in selected period', 'error'); return }
-    exportQuickBooksPL(report)
-    show('QuickBooks P&L XLSX downloaded', 'success')
+    try {
+      exportQuickBooksPL(report)
+      show('QuickBooks P&L XLSX downloaded', 'success')
+    } catch (e) {
+      show(`XLSX export failed: ${(e as Error).message}`, 'error')
+    }
   }
 
   const hasCOGS = report.totalCOGS !== null

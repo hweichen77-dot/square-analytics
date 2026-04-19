@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFilteredTransactions, useOverridesMap, useCategoryOverrides } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
@@ -15,7 +15,9 @@ import type { ProductStats } from '../engine/analyticsEngine'
 
 function exportTransactionsCSV(transactions: SalesTransaction[]) {
   const headers = ['Date', 'Staff', 'Item', 'Net Sales', 'Payment Method', 'Customer']
-  const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`
+  // Prefix user-controlled strings starting with formula chars to prevent Excel injection
+  const sanitize = (v: string) => /^[=+\-@\t\r]/.test(v) ? `'${v}` : v
+  const escape = (v: string) => `"${sanitize(String(v)).replace(/"/g, '""')}"`
   const rows = transactions.map(t => [
     (t.date instanceof Date ? t.date : new Date(t.date)).toISOString().slice(0, 10),
     t.staffName,
@@ -256,10 +258,9 @@ export default function InventoryView() {
                 const multiVar  = group.variations.length > 1
 
                 return (
-                  <>
+                  <Fragment key={group.itemName}>
                     {/* ── Item row ── */}
                     <tr
-                      key={`item-${group.itemName}`}
                       className={`border-b border-slate-700/30 transition-colors ${
                         multiVar ? 'cursor-pointer hover:bg-slate-700/40' : 'cursor-pointer hover:bg-slate-700/30'
                       } ${isOpen ? 'bg-slate-700/20' : ''}`}
@@ -324,7 +325,7 @@ export default function InventoryView() {
                         </tr>
                       )
                     })}
-                  </>
+                  </Fragment>
                 )
               })}
             </tbody>

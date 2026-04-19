@@ -145,7 +145,7 @@ export function parseCSVContent(content: string): CSVParseResult {
         payment = explicitMethod || cardBrandVal
       }
     } else {
-      payment = explicitMethod
+      payment = explicitMethod || 'Unknown'
     }
 
     const date = parseDateTime(dateStr)
