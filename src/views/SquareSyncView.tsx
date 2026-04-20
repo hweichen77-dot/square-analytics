@@ -9,6 +9,8 @@ import { formatNumber } from '../utils/format'
 
 type ConnectionState = 'disconnected' | 'connecting' | 'connected'
 
+const OAUTH_CALLBACK_PORTS = [7329, 7330, 7331, 7332, 7333]
+
 export default function SquareSyncView() {
   const store = useAuthStore()
   const { show } = useToastStore()
@@ -152,7 +154,7 @@ export default function SquareSyncView() {
       {connState !== 'connected' && (
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-sm text-blue-300">
           <p className="font-semibold mb-1">Required: add this Redirect URI in Square Developer Dashboard</p>
-          {[7329,7330,7331,7332,7333].map(p => (
+          {OAUTH_CALLBACK_PORTS.map(p => (
             <p key={p} className="font-mono bg-slate-800 border border-blue-200 rounded px-2 py-1 text-xs select-all mb-1">
               http://localhost:{p}/square/callback
             </p>
