@@ -152,7 +152,7 @@ export default function StaffView() {
                             type="number"
                             value={wageInput}
                             onChange={e => setWageInput(e.target.value)}
-                            className="w-16 bg-slate-900 border border-teal-500/50 px-2 py-0.5 text-xs text-slate-200 font-mono text-right focus:outline-none"
+                            className="w-16 bg-slate-900 border border-teal-500/50 px-2 py-0.5 text-xs text-slate-200 font-mono text-right focus:outline-none focus-visible:border-teal-400"
                             placeholder="0.00"
                           />
                           <button type="submit" className="text-xs text-teal-400 hover:text-teal-300 px-1">✓</button>

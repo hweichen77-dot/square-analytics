@@ -45,7 +45,7 @@ class WalleysDB extends Dexie {
       productBundles: '++id, name',
       catalogueProducts: '++id, &name, itemName, variationName, sku, category, enabled',
     }).upgrade(async tx => {
-      await tx.table('catalogueProducts').toCollection().modify((p: any) => {
+      await tx.table('catalogueProducts').toCollection().modify((p: Partial<CatalogueProduct>) => {
         if (!p.itemName || !p.variationName) {
           const { itemName, variationName } = splitItemVariation(p.name ?? '')
           p.itemName = itemName
@@ -87,7 +87,7 @@ class WalleysDB extends Dexie {
       function looksLikeCashRef(v: string): boolean {
         return /[A-Za-z]/.test(v) && /[0-9]/.test(v) && !/\s/.test(v) && v.length >= 4
       }
-      await tx.table('salesTransactions').toCollection().modify((t: any) => {
+      await tx.table('salesTransactions').toCollection().modify((t: Partial<SalesTransaction>) => {
         const pm = (t.paymentMethod ?? '').trim()
         if (pm && looksLikeCashRef(pm) && !KNOWN_BRANDS.test(pm)) {
           t.paymentMethod = 'Cash'

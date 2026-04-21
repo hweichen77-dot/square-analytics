@@ -166,9 +166,9 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
       {/* Main nav */}
       <nav className="flex-1 overflow-y-auto py-2 space-y-0.5">
         {NAV_SECTIONS.map((section, si) => (
-          <div key={si} className={si > 0 ? 'mt-1' : ''}>
+          <div key={si} role={section.heading ? 'group' : undefined} aria-label={section.heading} className={si > 0 ? 'mt-1' : ''}>
             {section.heading && (
-              <p className="px-5 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-600 select-none">
+              <p aria-hidden="true" className="px-5 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-slate-600 select-none">
                 {section.heading}
               </p>
             )}

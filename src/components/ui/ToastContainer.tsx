@@ -9,10 +9,15 @@ const VARIANT_STYLES = {
 export function ToastContainer() {
   const { toasts, dismiss } = useToastStore()
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center">
+    <div
+      aria-live="polite"
+      aria-atomic="false"
+      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center"
+    >
       {toasts.map(t => (
         <div
           key={t.id}
+          role="status"
           onClick={() => dismiss(t.id)}
           className={`px-4 py-2.5 rounded-lg shadow-xl text-sm font-medium cursor-pointer min-w-52 text-center backdrop-blur-sm ${VARIANT_STYLES[t.variant]}`}
         >

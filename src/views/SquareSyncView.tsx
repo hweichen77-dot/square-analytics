@@ -39,7 +39,7 @@ export default function SquareSyncView() {
     if (store.accessToken) {
       fetchLocations(store.accessToken)
         .then(locs => setLocations(locs))
-        .catch(() => {})
+        .catch(e => show(`Failed to load locations: ${(e as Error).message}`, 'error'))
     }
   }, [store.accessToken])
 
@@ -246,7 +246,7 @@ export default function SquareSyncView() {
             </div>
             <button
               onClick={() => store.setCredentials({ autoSyncEnabled: !store.autoSyncEnabled })}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-800 ${
                 store.autoSyncEnabled ? 'bg-teal-500' : 'bg-slate-600'
               }`}
               role="switch"

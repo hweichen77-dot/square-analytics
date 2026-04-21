@@ -302,7 +302,14 @@ export default function DashboardView() {
                     </div>
                     {goal != null && (
                       <>
-                        <div className="h-1.5 bg-slate-700/60 rounded-full overflow-hidden">
+                        <div
+                          role="progressbar"
+                          aria-valuenow={Math.round(pct)}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-label={`${period === 'weekly' ? 'Weekly' : 'Monthly'} goal: ${Math.round(pct)}% complete`}
+                          className="h-1.5 bg-slate-700/60 rounded-full overflow-hidden"
+                        >
                           <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }} />
                         </div>
                         {pace != null && !hit && (
