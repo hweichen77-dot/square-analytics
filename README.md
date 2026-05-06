@@ -1,67 +1,44 @@
 # Walley's Analytics
 
-Business intelligence desktop app for small retail businesses. Connect your Square account and get instant insight into sales, inventory, profit, and customers — no spreadsheets needed.
+Sales analytics and inventory management for Walley's School Store.
 
 ## Features
 
-- **Live Square Sync** — auto-syncs transactions incrementally; no full re-import required
-- **Sales Dashboard** — daily/weekly/monthly revenue with period-over-period comparison
-- **Inventory Manager** — track stock, restock alerts, and export CSV
-- **Profit & Loss** — monthly income statement with OPEX tracking
-- **QuickBooks Export** — one-click XLSX export formatted for QuickBooks import
-- **Customer LTV** — lifetime value, Pareto (top 20% customers), and loyalty tracking
-- **Staff ROI** — per-staff revenue attribution
-- **Forecasting** — revenue and velocity projections
-- **Basket Analysis** — frequently bought together items
-- **Import** — Shopify and Etsy CSV import alongside Square data
+- Sales dashboard with revenue, transaction, and product metrics
+- Inventory tracking and restock alerts
+- Dead stock detection
+- Staff performance analysis
+- Product profit margins (requires cost data)
+- Seasonal and time-based analysis
+- Monthly income statement reports
+- Catalogue management and audit tools
+- Operating expense tracking
+- Purchase order generation
+- Accountant report export (PDF)
 
-## Requirements
+## Getting Started
 
-- macOS 11.0 (Big Sur) or later
-- Square seller account
-- Square Developer account (free) to obtain API credentials
+1. Export transactions from Square Dashboard → Reports → Sales Summary → Export CSV
+2. Open the app and go to **Import Data**
+3. Drop the CSV file onto the import area
+4. Analytics populate automatically
 
-## Installation
+## Optional: Catalogue Import
 
-1. Download the latest `.dmg` from [Releases](../../releases)
-2. Open the `.dmg` and drag **Walley's Analytics** to your Applications folder
-3. Launch the app — macOS may ask you to confirm opening an app from an unidentified developer (right-click → Open)
+Export your item library from Square Dashboard → Items → Export Library (XLSX).
+Import via Import Data → Catalogue Import (XLSX) to enable price tracking and profit analysis.
 
-## Square Setup
+## Optional: Square Live Sync
 
-Walley's Analytics uses Square OAuth. You need to create a free Square Developer app first.
+Requires a Square Developer account. See Square Sync page for setup instructions.
 
-### Step 1 — Create a Square Developer App
+## Build
 
-1. Go to [developer.squareup.com](https://developer.squareup.com) and sign in with your Square account
-2. Click **Create Application** → give it any name (e.g. "Walley's")
-3. Go to your app → **OAuth** tab
-
-### Step 2 — Add Redirect URIs
-
-Add all of the following redirect URIs (the app tries each port until one is free):
-
-```
-http://localhost:7329/square/callback
-http://localhost:7330/square/callback
-http://localhost:7331/square/callback
-http://localhost:7332/square/callback
-http://localhost:7333/square/callback
+```bash
+npm install
+npm run tauri build
 ```
 
-Save changes.
+## Version
 
-### Step 3 — Connect in Walley's Analytics
-
-1. Open Walley's Analytics → go to **Square Sync**
-2. Paste your **Application ID** (starts with `sq0idp-`) and **Application Secret**
-3. Click **Connect** — a browser window will open for Square authorization
-4. Approve access → the app connects and begins syncing your data
-
-## Data & Privacy
-
-All data is stored locally on your Mac using IndexedDB. Nothing is sent to any external server other than Square's own API for fetching your transaction data.
-
-## License
-
-Private — all rights reserved.
+v1.0.0

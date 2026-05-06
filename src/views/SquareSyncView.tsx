@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { startOAuthFlow } from '../engine/squareAuth'
 import { fetchLocations } from '../engine/squareAPIClient'
@@ -14,6 +15,7 @@ const OAUTH_CALLBACK_PORTS = [7329, 7330, 7331, 7332, 7333]
 export default function SquareSyncView() {
   const store = useAuthStore()
   const { show } = useToastStore()
+  const navigate = useNavigate()
   const [appIDInput, setAppIDInput] = useState(store.appID)
   const [appSecretInput, setAppSecretInput] = useState(store.appSecret)
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([])
@@ -120,6 +122,24 @@ export default function SquareSyncView() {
   return (
     <div className="space-y-6 max-w-xl">
       <h1 className="text-xl font-bold text-slate-100">Square Sync</h1>
+
+      {!isConnected && (
+        <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl px-4 py-3 flex items-start gap-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Square Sync is optional. You can import data via CSV on the{' '}
+            <button
+              onClick={() => navigate('/import')}
+              className="text-teal-400 hover:underline font-medium"
+            >
+              Import Data page
+            </button>{' '}
+            instead.
+          </p>
+        </div>
+      )}
 
       {/* ── Status bar ── */}
       <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${statusBar.bg}`}>

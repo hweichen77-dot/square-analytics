@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
 import { ToastContainer } from './components/ui/ToastContainer'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { useAutoSync } from './hooks/useAutoSync'
 
 const DashboardView         = lazy(() => import('./views/DashboardView'))
@@ -121,6 +122,7 @@ export default function App() {
             </button>
             <span className="font-display text-sm font-semibold text-slate-200">Walley's Analytics</span>
           </div>
+          <ErrorBoundary>
           <Suspense fallback={<PageFallback />}>
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -151,6 +153,7 @@ export default function App() {
               <Route path="/opex" element={<OpexView />} />
             </Routes>
           </Suspense>
+          </ErrorBoundary>
         </div>
       </main>
       <ToastContainer />

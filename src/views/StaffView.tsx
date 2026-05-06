@@ -216,7 +216,7 @@ export default function StaffView() {
           <h2 className="text-base font-semibold text-slate-100">Staff Breakdown</h2>
           <p className="text-xs text-slate-500 mt-0.5">Click a row to see individual transactions</p>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-slate-700/40">
           {staffStats.map((staff, idx) => {
             const avg = staff.transactionCount > 0 ? staff.totalSales / staff.transactionCount : 0
             const share = totalRevenue > 0 ? (staff.totalSales / totalRevenue) * 100 : 0
