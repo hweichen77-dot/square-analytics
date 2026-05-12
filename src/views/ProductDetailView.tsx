@@ -46,7 +46,7 @@ function formatHour(hour: number): string {
 type TxSort = 'dateDesc' | 'dateAsc' | 'qtyDesc' | 'totalDesc' | 'staff' | 'payment'
 
 export default function ProductDetailView() {
-  const { name } = useParams<{ name: string }>()
+  const { productName: name } = useParams<{ productName: string }>()
   const productName = decodeURIComponent(name ?? '')
   const transactions = useAllTransactions()
   const overrides = useOverridesMap()
