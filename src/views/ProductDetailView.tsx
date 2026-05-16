@@ -185,7 +185,7 @@ export default function ProductDetailView() {
       </div>
 
       {/* Revenue & Units Over Time */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-slate-200">Revenue & Units Over Time</h2>
           <div className="flex gap-1">
@@ -258,7 +258,7 @@ export default function ProductDetailView() {
         <h2 className="font-semibold text-slate-200">Sales Patterns</h2>
         <div className="flex gap-4 items-start">
           {/* Day of week chart */}
-          <div className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-2">
+          <div className="flex-1 bg-slate-800/30 border border-slate-700/40 p-4 space-y-2">
             <span className="text-xs font-medium text-slate-400">Sales by Day of Week</span>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dowData} margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
@@ -277,7 +277,7 @@ export default function ProductDetailView() {
           </div>
 
           {/* Pattern indicators */}
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-4 w-52 shrink-0">
+          <div className="bg-slate-800/30 border border-slate-700/40 p-4 space-y-4 w-52 shrink-0">
             <PatternIndicator icon="📅" title="Best Day"
               value={peakDayOfWeek ? dayName(peakDayOfWeek) : 'N/A'} />
             <PatternIndicator icon="🕐" title="Peak Hour"
@@ -289,7 +289,7 @@ export default function ProductDetailView() {
       </div>
 
       {/* Transaction History */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
           <h2 className="font-semibold text-slate-200">Transaction History</h2>
           <span className="text-xs text-slate-400">{txRows.length} total</span>
@@ -340,7 +340,7 @@ export default function ProductDetailView() {
 
 function KpiCard({ icon: _icon, title, value, sub }: { icon: string; title: string; value: string; sub?: string }) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-1">
+    <div className="bg-slate-800/30 border border-slate-700/40 p-3 space-y-1">
       <div className="flex items-center gap-1.5 text-xs text-slate-400">
         {title}
       </div>
@@ -352,7 +352,7 @@ function KpiCard({ icon: _icon, title, value, sub }: { icon: string; title: stri
 
 function MonthOverMonthCard({ pct }: { pct: number | null }) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-1">
+    <div className="bg-slate-800/30 border border-slate-700/40 p-3 space-y-1">
       <div className="flex items-center gap-1.5 text-xs text-slate-400">
         This vs Last Month
       </div>

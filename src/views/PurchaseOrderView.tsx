@@ -199,7 +199,7 @@ export default function PurchaseOrderView() {
       </div>
 
       {/* ── Period selector card ── */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-6">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-6">
         <h2 className="text-sm font-semibold text-slate-200 mb-1">Select time period to order for</h2>
         <p className="text-xs text-slate-400 mb-5">
           The report will recommend quantities based on sales velocity over your full transaction history,
@@ -240,19 +240,19 @@ export default function PurchaseOrderView() {
         <div className="space-y-4">
           {/* Quick stat strip */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
               <p className="text-xs text-slate-400">Products Tracked</p>
               <p className="text-2xl font-bold text-slate-100 mt-1">{totalProductCount}</p>
               <p className="text-xs text-slate-400 mt-0.5">in transaction history</p>
             </div>
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
               <p className="text-xs text-slate-400">Top Velocity Item</p>
               <p className="text-sm font-bold text-teal-400 mt-1 truncate">{velocityPreview[0]?.name ?? '—'}</p>
               <p className="text-xs text-slate-400 mt-0.5">
                 {velocityPreview[0] ? `${velocityPreview[0].weeklyVelocity.toFixed(1)} units/wk` : ''}
               </p>
             </div>
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
               <p className="text-xs text-slate-400">Projected Units ({selectedWeeks}wk)</p>
               <p className="text-2xl font-bold text-slate-100 mt-1">
                 {velocityPreview.reduce((s, p) => s + Math.ceil(p.weeklyVelocity * selectedWeeks), 0)}
@@ -262,7 +262,7 @@ export default function PurchaseOrderView() {
           </div>
 
           {/* Top items velocity preview */}
-          <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
               <div>
                 <h2 className="font-semibold text-slate-200">Velocity Preview</h2>
@@ -308,7 +308,7 @@ export default function PurchaseOrderView() {
         <>
           {/* Summary cards */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
                 <IconBox />
               </div>
@@ -318,7 +318,7 @@ export default function PurchaseOrderView() {
                 <p className="text-xs text-slate-400">{totalItemCount} total units</p>
               </div>
             </div>
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <IconDollar />
               </div>
@@ -328,7 +328,7 @@ export default function PurchaseOrderView() {
                 <p className="text-xs text-slate-400">at avg sell price</p>
               </div>
             </div>
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex items-center gap-4">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                 <IconCalendar />
               </div>
@@ -386,7 +386,7 @@ export default function PurchaseOrderView() {
           </div>
 
           {/* Main table */}
-          <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="bg-slate-900 border-b border-slate-700/50">
@@ -446,7 +446,7 @@ export default function PurchaseOrderView() {
 
           {/* Category subtotals */}
           {categorySubtotals.length > 0 && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
               <h2 className="text-sm font-semibold text-slate-200 mb-4">Category Subtotals</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {categorySubtotals.map(([cat, { qty, rev }]) => (

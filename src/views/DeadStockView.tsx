@@ -128,7 +128,7 @@ function TierSection({
   const color = tierColor(tier)
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+    <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
       <button
         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-700/50"
         onClick={() => setIsExpanded(e => !e)}
@@ -233,7 +233,7 @@ export default function DeadStockView() {
             color: '#6b7280',
           },
         ].map(c => (
-          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div key={c.label} className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400">{c.label}</p>
             <p className="text-2xl font-bold mt-1" style={{ color: c.color }}>
               {c.count !== null ? c.count : c.value}
@@ -276,7 +276,7 @@ export default function DeadStockView() {
       <TierSection tier="Slow Mover" tierItems={slowItems} />
 
       {chartData.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100">30-Day Sales by Product</h2>
           <p className="text-xs text-slate-400 mt-0.5 mb-4">Highlighting dead and dying products</p>
           <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 22)}>

@@ -412,7 +412,7 @@ export default function ProfitView() {
           { label: coveredRevenue < totalRevenue ? `Margin (${Math.round(coveredRevenue / totalRevenue * 100)}% of rev)` : 'Overall Margin', value: totalCost > 0 ? `${overallMargin.toFixed(1)}%` : '—', color: totalCost > 0 ? marginColor(overallMargin) : '#9ca3af' },
           { label: 'Costs Entered', value: `${profitRows.filter(r => r.hasCostData).length}/${rawStats.length}`, color: '#9ca3af' },
         ].map(c => (
-          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div key={c.label} className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400">{c.label}</p>
             <p className="text-xl font-bold mt-1 font-mono" style={{ color: c.color }}>{c.value}</p>
           </div>
@@ -436,7 +436,7 @@ export default function ProfitView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-700/50">
           <h2 className="text-base font-semibold text-slate-100">Product Profit Analysis</h2>
         </div>
@@ -485,7 +485,7 @@ export default function ProfitView() {
       </div>
 
       {top15Profit.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-4">Top 15 Products by Profit</h2>
           <ResponsiveContainer width="100%" height={top15Profit.length * 28 + 40}>
             <BarChart data={top15Profit} layout="vertical" margin={{ top: 4, right: 80, left: 16, bottom: 4 }}>
@@ -502,7 +502,7 @@ export default function ProfitView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {scatterData.length > 0 && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="bg-slate-800/30 border border-slate-700/40 p-5">
             <h2 className="text-base font-semibold text-slate-100 mb-4">Popularity vs. Profitability</h2>
             <ResponsiveContainer width="100%" height={300}>
               <ScatterChart margin={{ top: 4, right: 16, left: 0, bottom: 20 }}>
@@ -519,7 +519,7 @@ export default function ProfitView() {
         )}
 
         {categoryProfitData.length > 0 && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="bg-slate-800/30 border border-slate-700/40 p-5">
             <h2 className="text-base font-semibold text-slate-100 mb-4">Profit by Category</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>

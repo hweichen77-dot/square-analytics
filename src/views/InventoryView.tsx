@@ -182,19 +182,19 @@ export default function InventoryView() {
 
       {/* Summary strip — fills dead space */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
           <p className="text-xl font-bold text-teal-400">{formatCurrency(totalRevenue)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Total revenue</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
           <p className="text-xl font-bold text-slate-200">{formatNumber(totalUnits)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Units sold</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
           <p className="text-xl font-bold text-emerald-400">{growingCount}</p>
           <p className="text-xs text-slate-400 mt-0.5">Growing items</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
           {topItem ? (
             <>
               <p className="text-sm font-semibold text-slate-100 truncate">{topItem.itemName}</p>
@@ -238,7 +238,7 @@ export default function InventoryView() {
       </div>
 
       {/* Table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-900 text-slate-400 uppercase text-xs border-b border-slate-700/60">
@@ -341,7 +341,7 @@ export default function InventoryView() {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setCtxMenu(null)} />
           <div
-            className="fixed z-20 bg-slate-800 border border-slate-700 rounded-xl shadow-xl py-1 min-w-44"
+            className="fixed z-20 bg-slate-800/30 border border-slate-700/40 shadow-xl py-1 min-w-44"
             style={{ left: ctxMenu.x, top: ctxMenu.y }}
             onClick={e => e.stopPropagation()}
           >

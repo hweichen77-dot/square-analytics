@@ -198,7 +198,7 @@ export default function SquareSyncView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
         {!isConnected && connState !== 'connecting' && (
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
             <p className="text-xs font-semibold text-blue-400 mb-1">Setup required before connecting</p>
@@ -211,7 +211,7 @@ export default function SquareSyncView() {
           value={appIDInput}
           onChange={e => setAppIDInput(e.target.value)}
           placeholder="sq0idp-…"
-          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         <label className="block text-sm font-medium text-slate-300 mt-3 mb-1">Application Secret</label>
         <input
@@ -219,7 +219,7 @@ export default function SquareSyncView() {
           value={appSecretInput}
           onChange={e => setAppSecretInput(e.target.value)}
           placeholder="sq0csp-…"
-          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         {!isConnected && connState !== 'connecting' && (
           <button
@@ -243,7 +243,7 @@ export default function SquareSyncView() {
       </div>
 
       {isConnected && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
           <h2 className="font-semibold text-slate-200">Location</h2>
           {locations.length === 0 ? (
             <button
@@ -256,7 +256,7 @@ export default function SquareSyncView() {
             <select
               value={store.locationID}
               onChange={e => store.setCredentials({ locationID: e.target.value })}
-              className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30"
             >
               <option value="">Select location…</option>
               {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
@@ -266,7 +266,7 @@ export default function SquareSyncView() {
       )}
 
       {isConnected && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
           <h2 className="font-semibold text-slate-200">Sync Period</h2>
           <div className="flex items-center gap-3">
             <button onClick={() => store.setCredentials({ daysBack: Math.max(7, store.daysBack - 7) })}
@@ -279,7 +279,7 @@ export default function SquareSyncView() {
       )}
 
       {isConnected && store.locationID && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-slate-200">Auto-Sync</h2>
@@ -320,7 +320,7 @@ export default function SquareSyncView() {
       )}
 
       {isConnected && store.locationID && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-200">Sync Now</h2>
             {store.lastSyncDate && (

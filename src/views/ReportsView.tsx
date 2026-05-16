@@ -76,7 +76,7 @@ function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'rev
         <StatCard label="Best Period"      value={report.topPeriod ? formatCurrency(report.topPeriod.revenue) : '—'} sub={report.topPeriod?.label} />
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4">
         <h3 className="font-semibold text-slate-200 mb-4">Revenue over Time</h3>
         <ResponsiveContainer width="100%" height={240}>
           <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -95,7 +95,7 @@ function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'rev
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50">
           <h3 className="font-semibold text-slate-200">Period Breakdown</h3>
         </div>
@@ -143,7 +143,7 @@ function TopProductsReportView({ report }: { report: Extract<AnyReport, { type: 
         <StatCard label="Unique Products"  value={formatNumber(report.byRevenue.length)} />
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-slate-200">Top 10 Products</h3>
           <div className="flex gap-1">
@@ -169,7 +169,7 @@ function TopProductsReportView({ report }: { report: Extract<AnyReport, { type: 
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
           <h3 className="font-semibold text-slate-200">Full Rankings</h3>
           <div className="flex gap-1">
@@ -225,7 +225,7 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Payment Methods pie */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <h3 className="font-semibold text-slate-200 mb-4">Payment Methods</h3>
           <div className="flex gap-4 items-center">
             <ResponsiveContainer width={170} height={170}>
@@ -249,7 +249,7 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
         </div>
 
         {/* Day of week */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <h3 className="font-semibold text-slate-200 mb-4">Busiest Days</h3>
           <ResponsiveContainer width="100%" height={170}>
             <BarChart data={report.peakDays} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -264,7 +264,7 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
       </div>
 
       {/* Peak hours */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4">
         <h3 className="font-semibold text-slate-200 mb-4">Transactions by Hour</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={report.peakHours} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -278,7 +278,7 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
       </div>
 
       {/* Payment method table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50">
           <h3 className="font-semibold text-slate-200">Payment Method Detail</h3>
         </div>
@@ -345,21 +345,21 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
         <input
           type="text" placeholder="Search items or staff…" value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-56 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         <select value={payFilter} onChange={e => setPayFilter(e.target.value)}
-          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30">
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30">
           {paymentMethods.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
         <input
           type="number" placeholder="Min amount $" value={minAmount}
           onChange={e => setMinAmount(e.target.value)}
-          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-36 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
         />
         <span className="self-center text-sm text-slate-400 ml-auto">{formatNumber(filtered.length)} transactions</span>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="overflow-x-auto max-h-[28rem]">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
@@ -444,7 +444,7 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
 
       {/* Expanded season detail */}
       {selectedSeason && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-700/50 flex items-center gap-2">
             <span className="text-xs font-bold text-slate-400 bg-slate-700 px-2 py-1 rounded">{selectedSeason.name.slice(0,2).toUpperCase()}</span>
             <h3 className="font-semibold text-slate-200">{selectedSeason.name} — Top Products</h3>
@@ -492,7 +492,7 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
       )}
 
       {/* Monthly bar chart */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4">
         <h3 className="font-semibold text-slate-200 mb-4">Monthly Revenue</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -505,7 +505,7 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50">
           <h3 className="font-semibold text-slate-200">Month-by-Month Breakdown</h3>
         </div>
@@ -686,7 +686,7 @@ function MonthlyDetailReportView({
       </div>
 
       {/* Revenue chart */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4">
         <h3 className="font-semibold text-slate-200 mb-4">Monthly Net Sales</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -700,7 +700,7 @@ function MonthlyDetailReportView({
       </div>
 
       {/* ── Month-over-Month Growth ── */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700">
           <h3 className="font-semibold text-slate-200">Month-over-Month Growth</h3>
         </div>
@@ -740,7 +740,7 @@ function MonthlyDetailReportView({
 
       {/* ── Top Products by Month ── */}
       {rows.some(r => r.topProducts && r.topProducts.length > 0) && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-700">
             <h3 className="font-semibold text-slate-200">Top Products by Month</h3>
             <p className="text-xs text-slate-400 mt-0.5">Top 5 products per month by revenue</p>
@@ -779,7 +779,7 @@ function MonthlyDetailReportView({
       )}
 
       {/* ── Income Statement (transposed) ── */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700">
           <h3 className="font-semibold text-slate-200">Income Statement</h3>
           <p className="text-xs text-slate-400 mt-0.5">All months — row labels left, columns right. Scroll horizontally.</p>
@@ -1030,7 +1030,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <h3 className="font-semibold text-slate-200 mb-4">Cash by Day of Week</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={dayChartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -1043,7 +1043,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <h3 className="font-semibold text-slate-200 mb-4">Cash by Hour</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={hourChartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
@@ -1058,7 +1058,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
       </div>
 
       {/* Weekly cash totals */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50">
           <h3 className="font-semibold text-slate-200">Weekly Cash Totals</h3>
         </div>
@@ -1091,7 +1091,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
       </div>
 
       {/* Payment breakdown */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50">
           <h3 className="font-semibold text-slate-200">Payment Method Breakdown</h3>
         </div>
@@ -1122,13 +1122,13 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
       </div>
 
       {/* Cash transaction log */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
           <h3 className="font-semibold text-slate-200">Cash Transactions</h3>
           <input
             type="text" placeholder="Search…" value={search}
             onChange={e => setSearch(e.target.value)}
-            className="border border-slate-600 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+            className="border border-slate-600 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
           />
         </div>
         <div className="overflow-x-auto max-h-[28rem]">
@@ -1264,19 +1264,19 @@ export default function ReportsView() {
       </div>
 
       {/* ── Config bar ── */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 flex flex-wrap items-end gap-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex flex-wrap items-end gap-4">
         {/* Date range */}
         <div className="flex items-center gap-2">
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">From</label>
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-              className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+              className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
           </div>
           <span className="text-slate-400 mt-5">–</span>
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1">To</label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-              className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
+              className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30" />
           </div>
         </div>
 
@@ -1365,7 +1365,7 @@ export default function ReportsView() {
       {!generating && report && (
         <>
           {/* Export bar */}
-          <div className="flex items-center justify-between bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+          <div className="flex items-center justify-between bg-slate-800/30 border border-slate-700/40 px-4 py-3">
             <div>
               <p className="text-sm font-semibold text-slate-200">{REPORT_META[report.type].label}</p>
               <p className="text-xs text-slate-400">{dateRangeLabel}</p>

@@ -56,7 +56,7 @@ export default function ForecastView() {
     return (
       <div className="space-y-6">
         <h1 className="text-xl font-bold text-slate-100">Sales Forecast</h1>
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-5 text-sm text-amber-300">
+        <div className="bg-amber-500/10 border border-amber-500/30 p-5 text-sm text-amber-300">
           <p className="font-semibold">Not enough history to forecast</p>
           <p className="mt-1">Need at least 2 complete weeks of data. You have {forecast.weeksOfHistory} week{forecast.weeksOfHistory === 1 ? '' : 's'}.</p>
         </div>
@@ -96,7 +96,7 @@ export default function ForecastView() {
 
       {/* On-track banner */}
       {daysWithData > 0 && (
-        <div className={`rounded-xl border p-5 ${onTrack ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
+        <div className={`border p-5 ${onTrack ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}>
           <div className="flex items-start justify-between">
             <div>
               <p className={`text-sm font-semibold ${onTrack ? 'text-emerald-400' : 'text-amber-400'}`}>
@@ -129,7 +129,7 @@ export default function ForecastView() {
       )}
 
       {/* This week chart */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="font-semibold text-slate-200 mb-1">{weekLabel(thisWeek.weekStart)} — Current Week</h2>
         <p className="text-xs text-slate-400 mb-4">Solid bars = actual revenue. Striped bars = forecast for remaining days.</p>
         <ResponsiveContainer width="100%" height={220}>
@@ -145,7 +145,7 @@ export default function ForecastView() {
       </div>
 
       {/* Next week chart */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <div className="flex items-center justify-between mb-1">
           <h2 className="font-semibold text-slate-200">{weekLabel(nextWeek.weekStart)} — Forecast</h2>
           <span className="text-sm font-semibold text-teal-400">{formatCurrency(nextWeek.projectedTotal)} projected</span>
@@ -170,7 +170,7 @@ export default function ForecastView() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Forecast accuracy card */}
         {accuracyData && (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400 font-medium mb-1">Forecast Accuracy (This Week)</p>
             <p className={`text-3xl font-bold tabular-nums ${accuracyData.accuracyPct >= 90 ? 'text-emerald-400' : accuracyData.accuracyPct >= 70 ? 'text-amber-400' : 'text-red-400'}`}>
               {accuracyData.accuracyPct.toFixed(0)}%
@@ -185,7 +185,7 @@ export default function ForecastView() {
         )}
 
         {/* Next week projected */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400 font-medium mb-1">Next Week Projection</p>
           <p className="text-3xl font-bold tabular-nums text-teal-400">{formatCurrency(nextWeek.projectedTotal)}</p>
           <p className="text-xs text-slate-400 mt-1">
@@ -194,7 +194,7 @@ export default function ForecastView() {
         </div>
 
         {/* Weeks of data */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400 font-medium mb-1">History Used</p>
           <p className="text-3xl font-bold tabular-nums text-slate-200">{forecast.weeksOfHistory}</p>
           <p className="text-xs text-slate-400 mt-1">
@@ -205,7 +205,7 @@ export default function ForecastView() {
 
       {/* Top 5 products by demand */}
       {topProducts.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           <div className="px-5 py-4 border-b border-slate-700/50">
             <h2 className="font-semibold text-slate-200">Top Products by Demand</h2>
             <p className="text-xs text-slate-400 mt-0.5">Highest-velocity items — expect continued strong demand</p>

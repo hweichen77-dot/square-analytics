@@ -27,18 +27,18 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
   }))
 
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+    <div className="bg-slate-800/30 border border-slate-700/40 p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-slate-200 text-sm">Top Products</h2>
-        <div className="flex gap-1">
+        <h2 className="font-display font-semibold text-slate-200 text-sm tracking-tight">Top Products</h2>
+        <div className="flex gap-0.5">
           {(['revenue', 'units'] as const).map(m => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`px-2.5 py-1 text-xs rounded-md font-medium capitalize transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 text-xs font-medium capitalize transition-colors duration-150 cursor-pointer ${
                 mode === m
-                  ? 'bg-teal-500 text-slate-950'
-                  : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700'
+                  ? 'bg-teal-500/15 text-teal-400'
+                  : 'text-slate-400 hover:text-slate-300 hover:bg-slate-700/50'
               }`}
             >
               {m === 'revenue' ? 'By Revenue' : 'By Qty'}

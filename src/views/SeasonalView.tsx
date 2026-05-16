@@ -201,7 +201,7 @@ export default function SeasonalView() {
         </button>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-3">Store Events</h2>
         {events.length === 0 ? (
           <p className="text-sm text-slate-400">No events added yet. Click "Add Event" to get started.</p>
@@ -233,7 +233,7 @@ export default function SeasonalView() {
       </div>
 
       {chartData.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-4">Revenue Timeline</h2>
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
@@ -257,7 +257,7 @@ export default function SeasonalView() {
       )}
 
       {events.length > 0 && impacts.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-4">Event Impact Analysis</h2>
           <div className="space-y-3">
             {impacts.map(impact => {

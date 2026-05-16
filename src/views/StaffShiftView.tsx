@@ -120,25 +120,25 @@ export default function StaffShiftView() {
       <h1 className="text-xl font-bold text-slate-100">Staff Shift Analysis</h1>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Top Earner</p>
           <p className="text-lg font-bold text-slate-100 mt-1 truncate">{topStaff?.name ?? '—'}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Total Staff</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{profiles.length}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Avg Revenue/Staff</p>
           <p className="text-xl font-bold text-slate-100 mt-1 font-mono">{formatCurrency(avgRevenue)}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Coverage</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{coveragePct}%</p>
         </div>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-slate-100">Staff Leaderboard</h2>
           <div className="flex gap-1">
@@ -204,7 +204,7 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-1">Staff × Day of Week Revenue Heatmap</h2>
         <p className="text-xs text-slate-400 mb-4">Color intensity = revenue generated in that slot</p>
         <div className="overflow-x-auto">
@@ -246,7 +246,7 @@ export default function StaffShiftView() {
       </div>
 
       {selectedProfile && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-slate-100">{selectedProfile.name} — Detail View</h2>
             <button onClick={() => setSelectedStaff('')} className="text-slate-400 hover:text-slate-200 text-lg">×</button>

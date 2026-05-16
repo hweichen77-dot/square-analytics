@@ -73,26 +73,26 @@ export default function AnomalyView() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4 text-center">
           <p className="text-xl font-bold text-slate-100">{anomalies.length}</p>
           <p className="text-xs text-slate-400 mt-0.5">Total anomalies</p>
         </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 text-center">
+        <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 text-center">
           <p className="text-2xl font-bold text-emerald-400">{aboveCount}</p>
           <p className="text-xs text-emerald-400 mt-0.5">Above normal</p>
         </div>
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
+        <div className="bg-red-500/10 border border-red-500/30 p-4 text-center">
           <p className="text-2xl font-bold text-red-400">{belowCount}</p>
           <p className="text-xs text-red-400 mt-0.5">Below normal</p>
         </div>
       </div>
 
       {anomalies.length === 0 ? (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-slate-400 text-sm">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center text-slate-400 text-sm">
           No anomalous days detected. Your revenue is remarkably consistent!
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           {/* Filter tabs */}
           <div className="flex border-b border-slate-700/50">
             {(['all', 'above', 'below'] as Filter[]).map(f => (

@@ -235,7 +235,7 @@ export default function RestockView() {
           { label: 'Critical (≤5 days)', value: criticalCount, color: criticalCount > 0 ? 'text-red-400' : 'text-slate-400' },
           { label: 'Low (6–10 days)', value: lowCount, color: lowCount > 0 ? 'text-orange-400' : 'text-slate-400' },
         ].map(c => (
-          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div key={c.label} className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400">{c.label}</p>
             <p className={`text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
           </div>
@@ -243,7 +243,7 @@ export default function RestockView() {
       </div>
 
       {suggestedList.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-sm font-semibold text-orange-400 mb-3">Suggested Restock List</h2>
           <div className="space-y-2">
             {suggestedList.map(alert => (
@@ -281,7 +281,7 @@ export default function RestockView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-700/50">
           <h2 className="text-base font-semibold text-slate-100">All Products — Stock Status</h2>
         </div>

@@ -191,7 +191,7 @@ export default function ImportView() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <div className="flex items-center gap-2 mb-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             <h2 className="font-semibold text-slate-200">Shopify Orders</h2>
@@ -208,7 +208,7 @@ export default function ImportView() {
             onChange={e => { const f = e.target.files?.[0]; if (f) handleShopify(f); e.target.value = '' }} />
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <div className="flex items-center gap-2 mb-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
             <h2 className="font-semibold text-slate-200">Etsy Orders</h2>
@@ -226,7 +226,7 @@ export default function ImportView() {
         </div>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <div className="flex items-center gap-2 mb-2">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
           <h2 className="font-semibold text-slate-200">Operating Expenses (XLSX)</h2>
@@ -243,7 +243,7 @@ export default function ImportView() {
           onChange={e => { const f = e.target.files?.[0]; if (f) handleOpex(f); e.target.value = '' }} />
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="font-semibold text-slate-200 mb-3">Catalogue Import (XLSX)</h2>
         <p className="text-sm text-slate-400 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
         <button
@@ -258,7 +258,7 @@ export default function ImportView() {
       </div>
 
       {/* Data backup / restore */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="font-semibold text-slate-200 mb-1">Data Backup</h2>
         <p className="text-sm text-slate-400 mb-4">Export all your data to a backup file. Restore it after reinstalling or on a new machine.</p>
         <div className="flex flex-wrap gap-3">
