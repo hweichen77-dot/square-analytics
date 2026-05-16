@@ -228,14 +228,14 @@ export default function BundleView() {
           { label: 'Product Pairs Found', value: pairs.length },
           { label: 'Saved Bundles', value: savedBundles.length },
         ].map(c => (
-          <div key={c.label} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div key={c.label} className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400">{c.label}</p>
             <p className="text-xl font-bold text-slate-100 mt-1">{c.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-3">Product Affinity Lookup</h2>
         <select
           className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 mb-4 max-w-xs"
@@ -275,7 +275,7 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-4">Top Co-Purchase Pairs</h2>
         {pairs.length === 0 ? (
           <p className="text-sm text-slate-400">No multi-item transactions found.</p>
@@ -341,7 +341,7 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-slate-100">Saved Bundles</h2>
           <button

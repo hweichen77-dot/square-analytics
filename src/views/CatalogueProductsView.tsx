@@ -510,7 +510,7 @@ export default function CatalogueProductsView() {
           { label: 'Archived',        value: archivedVars,  color: 'text-slate-400' },
           { label: 'Total stock',     value: totalStock,    color: 'text-amber-400' },
         ].map(s => (
-          <div key={s.label} className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3">
+          <div key={s.label} className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
             <p className="text-xs text-slate-400 mt-0.5">{s.label}</p>
           </div>
@@ -550,7 +550,7 @@ export default function CatalogueProductsView() {
       </div>
 
       {/* Item groups table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-900 text-slate-400 uppercase text-xs border-b border-slate-700/60">

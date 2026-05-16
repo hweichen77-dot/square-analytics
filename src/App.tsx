@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Sidebar from './components/layout/Sidebar'
+import { DateRangePicker } from './components/layout/DateRangePicker'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { useAutoSync } from './hooks/useAutoSync'
@@ -108,20 +109,23 @@ export default function App() {
       )}
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <main className="flex-1 overflow-y-auto">
-        <div className="p-4 lg:p-6">
-          {/* Mobile header */}
-          <div className="flex items-center gap-3 mb-4 lg:hidden">
+        {/* Global header — visible on all pages */}
+        <div className="sticky top-0 z-30 bg-slate-950/90 backdrop-blur-sm border-b border-slate-800 px-4 lg:px-6 py-2.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 text-slate-400 hover:text-slate-200"
+              className="lg:hidden p-1.5 text-slate-400 hover:text-slate-200"
               aria-label="Open menu"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
               </svg>
             </button>
-            <span className="font-display text-sm font-semibold text-slate-200">Walley's Analytics</span>
+            <span className="font-display text-[13px] font-semibold text-slate-300 lg:hidden">Walley's Analytics</span>
           </div>
+          <DateRangePicker />
+        </div>
+        <div className="p-4 lg:p-6">
           <ErrorBoundary>
           <Suspense fallback={<PageFallback />}>
             <Routes>

@@ -149,19 +149,19 @@ export default function PriceOptimizationView() {
       <h1 className="text-xl font-bold text-slate-100">Price Optimization</h1>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Price Changes Detected</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{changes.length}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Revenue Improved</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">{improved}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Revenue Declined</p>
           <p className="text-2xl font-bold text-red-400 mt-1">{declined}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Products Tracked</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{productNames.length}</p>
         </div>
@@ -183,7 +183,7 @@ export default function PriceOptimizationView() {
       )}
 
       {changes.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-1">All Detected Price Changes</h2>
           <p className="text-xs text-slate-400 mb-4">
             A price change is detected when a product's per-unit price differs by more than $0.10.
@@ -224,7 +224,7 @@ export default function PriceOptimizationView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-3">Per-Product Price History</h2>
         <select
           className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-300 mb-4"
@@ -254,7 +254,7 @@ export default function PriceOptimizationView() {
       </div>
 
       {selectedProduct && currentPrice !== undefined && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-1">Price Simulator</h2>
           <p className="text-xs text-slate-400 mb-4">
             Estimate the impact of a price change using historical elasticity.

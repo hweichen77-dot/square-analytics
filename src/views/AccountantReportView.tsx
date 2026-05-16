@@ -185,7 +185,7 @@ export default function AccountantReportView() {
       </div>
 
       {/* Period selector */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-4">
         <h2 className="font-semibold text-slate-200">Report Period</h2>
         <div className="flex flex-wrap gap-2">
           {QUICK_RANGES.map(r => (
@@ -233,7 +233,7 @@ export default function AccountantReportView() {
 
       {/* No data state */}
       {transactions.length === 0 ? (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-sm text-slate-400">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center text-sm text-slate-400">
           No transactions in this period.
         </div>
       ) : (
@@ -241,7 +241,7 @@ export default function AccountantReportView() {
           {/* Two-column layout: revenue + payment breakdown */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Revenue summary */}
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
               <h2 className="font-semibold text-slate-200 mb-3">Revenue Summary</h2>
               <MetricRow label="Gross Revenue" value={formatCurrency(report.totalRevenue)} />
               <MetricRow
@@ -274,7 +274,7 @@ export default function AccountantReportView() {
             </div>
 
             {/* Payment breakdown — list + pie chart */}
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
               <h2 className="font-semibold text-slate-200 mb-3">Payment Breakdown</h2>
               {report.paymentBreakdown.length > 0 && (
                 <ResponsiveContainer width="100%" height={180}>
@@ -320,7 +320,7 @@ export default function AccountantReportView() {
 
           {/* Top products table */}
           {report.topProducts.length > 0 && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+            <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
               <div className="px-5 py-4 border-b border-slate-700/50">
                 <h2 className="font-semibold text-slate-200">Top Products by Revenue</h2>
                 <p className="text-xs text-slate-400 mt-0.5">Top 20 products in selected period</p>

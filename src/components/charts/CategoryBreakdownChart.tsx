@@ -10,8 +10,8 @@ interface CategoryBreakdownChartProps {
 
 export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
-      <h2 className="font-semibold text-slate-200 text-sm mb-4">Revenue by Category</h2>
+    <div className="bg-slate-800/30 border border-slate-700/40 p-4">
+      <h2 className="font-display font-semibold text-slate-200 text-sm mb-4 tracking-tight">Revenue by Category</h2>
       <div className="flex gap-6 items-center">
         <ResponsiveContainer width={180} height={180}>
           <PieChart>

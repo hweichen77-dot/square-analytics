@@ -90,28 +90,28 @@ export default function BasketAnalysisView() {
 
       {/* Summary */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4 text-center">
           <p className="text-xl font-bold text-slate-100">{formatNumber(result.totalTransactions)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Total orders</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4 text-center">
           <p className="text-2xl font-bold text-teal-400">{formatNumber(result.multiItemTransactions)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Multi-item orders</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4 text-center">
           <p className="text-xl font-bold text-slate-100">{formatNumber(result.pairs.length)}</p>
           <p className="text-xs text-slate-400 mt-0.5">Item pairs found</p>
         </div>
       </div>
 
       {result.pairs.length === 0 ? (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-sm text-slate-400">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center text-sm text-slate-400">
           {result.multiItemTransactions === 0
             ? 'No multi-item orders found. Basket analysis requires orders with 2+ items.'
             : 'No item pairs appear together enough times to show (min. 2 co-occurrences).'}
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           {/* Toolbar */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700/50">
             <input
@@ -119,7 +119,7 @@ export default function BasketAnalysisView() {
               placeholder="Search item…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="flex-1 text-sm border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="flex-1 text-sm border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
             />
             <div className="flex gap-1">
               {SORT_OPTIONS.map(opt => (

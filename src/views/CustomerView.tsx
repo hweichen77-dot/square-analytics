@@ -193,7 +193,7 @@ export default function CustomerView() {
     return (
       <div className="space-y-4">
         <h1 className="text-xl font-bold text-slate-100">Customer Frequency</h1>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center">
           <p className="text-4xl mb-3">🙅</p>
           <h2 className="text-lg font-semibold text-slate-100 mb-2">No Customer IDs Found</h2>
           <p className="text-sm text-slate-400 max-w-md mx-auto">
@@ -211,21 +211,21 @@ export default function CustomerView() {
       <p className="text-sm text-slate-400 -mt-4">{identifiedPct}% of transactions have customer data</p>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Identified Customers</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{profiles.length}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Repeat Customers</p>
           <p className="text-xl font-bold text-slate-100 mt-1">
             {repeatCustomers} ({profiles.length ? Math.round(repeatCustomers / profiles.length * 100) : 0}%)
           </p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Avg Lifetime Value</p>
           <p className="text-xl font-bold text-slate-100 mt-1 font-mono">{formatCurrency(avgCLV)}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Avg Transactions</p>
           <p className="text-xl font-bold text-slate-100 mt-1">
             {profiles.length ? (profiles.reduce((s, p) => s + p.transactionCount, 0) / profiles.length).toFixed(1) : '—'}
@@ -250,7 +250,7 @@ export default function CustomerView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-3">Customer Segments</h2>
         <div className="grid grid-cols-4 gap-3 mb-4">
           {segmentData.map(({ seg, count, rev }) => {
@@ -286,7 +286,7 @@ export default function CustomerView() {
       </div>
 
       {retention.length > 0 && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <h2 className="text-base font-semibold text-slate-100 mb-1">Retention Curve</h2>
           <p className="text-xs text-slate-400 mb-4">
             Of customers who first purchased in a given month, what % returned the next month.
@@ -303,7 +303,7 @@ export default function CustomerView() {
         </div>
       )}
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-700/50 flex items-center gap-4 flex-wrap">
           <h2 className="text-base font-semibold text-slate-100 flex-1">
             {selectedSegment ? `${selectedSegment} (${filteredProfiles.length})` : `All Customers (${filteredProfiles.length})`}
@@ -374,7 +374,7 @@ export default function CustomerView() {
       </div>
 
       {selectedCustomer && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold text-slate-100">{selectedCustomer.name || selectedCustomer.id}</h2>

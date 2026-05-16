@@ -243,16 +243,16 @@ export default function OpexView() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400 mb-1">{filterMonth === 'all' ? 'Total OPEX' : 'OPEX This Month'}</p>
           <p className="text-xl font-semibold font-mono text-slate-100">{formatCurrency(totalOpex)}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400 mb-1">Entries</p>
           <p className="text-xl font-semibold text-slate-100">{filtered.length}</p>
         </div>
         {byCategory.slice(0, 2).map(([cat, amt]) => (
-          <div key={cat} className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div key={cat} className="bg-slate-800/30 border border-slate-700/40 p-4">
             <p className="text-xs text-slate-400 mb-1 truncate">{cat}</p>
             <p className="text-xl font-semibold font-mono text-slate-100">{formatCurrency(amt)}</p>
           </div>
@@ -276,7 +276,7 @@ export default function OpexView() {
 
       {/* Table */}
       {filtered.length === 0 ? (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-12 text-center">
           <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center mx-auto mb-3">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -292,7 +292,7 @@ export default function OpexView() {
           </button>
         </div>
       ) : (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-900 border-b border-slate-700/50">
               <tr>

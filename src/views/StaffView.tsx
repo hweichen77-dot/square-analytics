@@ -90,22 +90,22 @@ export default function StaffView() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Staff Members</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{staffStats.length}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Total Revenue</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
           <p className="text-xs text-slate-400">Total Transactions</p>
           <p className="text-xl font-bold text-slate-100 mt-1">{formatNumber(transactions.length)}</p>
         </div>
       </div>
 
       {/* ROI Table */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold text-slate-100">Staff ROI</h2>
@@ -189,7 +189,7 @@ export default function StaffView() {
         </div>
       </div>
 
-      <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
         <h2 className="text-base font-semibold text-slate-100 mb-4">Revenue by Staff Member</h2>
         <ResponsiveContainer width="100%" height={Math.max(200, staffStats.length * 40)}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 60, left: 16, bottom: 4 }}>
@@ -211,7 +211,7 @@ export default function StaffView() {
       </div>
 
       {/* Staff breakdown with expandable transaction rows */}
-      <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-700/50">
           <h2 className="text-base font-semibold text-slate-100">Staff Breakdown</h2>
           <p className="text-xs text-slate-400 mt-0.5">Click a row to see individual transactions</p>
