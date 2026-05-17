@@ -3,8 +3,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
 import { importCSVTransactions, importXLSXCatalogue, importShopifyCSV, importEtsyCSV, importOpexXLSX } from '../engine/importEngine'
 import { clearAllData, exportAllData, restoreAllData } from '../db/dbUtils'
+import { isShopifyCSV, isEtsyCSV } from '../engine/shopifyParser'
 import { useToastStore } from '../store/toastStore'
 import { formatNumber } from '../utils/format'
+import Papa from 'papaparse'
 
 export default function ImportView() {
   const { show } = useToastStore()
@@ -116,9 +118,23 @@ export default function ImportView() {
     setDragging(false)
     const file = e.dataTransfer.files[0]
     if (!file) return
-    if (file.name.endsWith('.csv')) handleCSV(file)
-    else if (file.name.endsWith('.xlsx')) handleXLSX(file)
-    else show('Unsupported file type. Use .csv or .xlsx', 'error')
+    if (file.name.endsWith('.xlsx')) {
+      handleXLSX(file)
+    } else if (file.name.endsWith('.csv')) {
+      // Sniff headers to route to the correct parser
+      const text = await file.text()
+      const parsed = Papa.parse<Record<string, string>>(text, { header: true, preview: 1 })
+      const headers = parsed.meta.fields ?? []
+      if (isShopifyCSV(headers)) {
+        handleShopify(file)
+      } else if (isEtsyCSV(headers)) {
+        handleEtsy(file)
+      } else {
+        handleCSV(file)
+      }
+    } else {
+      show('Unsupported file type. Drop a .csv or .xlsx file.', 'error')
+    }
   }
 
   async function handleExportBackup() {
@@ -254,7 +270,7 @@ export default function ImportView() {
           {importing ? 'Importing…' : 'Select XLSX file'}
         </button>
         <input ref={xlsxRef} type="file" accept=".xlsx" className="hidden"
-          onChange={e => { const f = e.target.files?.[0]; if (f) handleXLSX(f) }} />
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleXLSX(f); e.target.value = '' }} />
       </div>
 
       {/* Data backup / restore */}

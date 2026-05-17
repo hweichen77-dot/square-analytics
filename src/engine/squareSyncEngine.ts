@@ -14,6 +14,14 @@ export interface SyncStatus {
   productsAdded: number
 }
 
+// Module-level in-flight promise shared between auto-sync and manual sync.
+// Prevents concurrent syncs that would race on lastSyncDate and duplicate fetches.
+let _syncInFlight: Promise<void> | null = null
+
+export function isSyncInFlight(): boolean {
+  return _syncInFlight !== null
+}
+
 function orderToTransaction(order: SquareOrder, employeeMap: Record<string, string> = {}): Omit<SalesTransaction, 'id'> | null {
   // Prefer closed_at (when the order was finalized) over created_at for accurate date bucketing.
   // Square's own dashboard uses closed_at for daily totals on COMPLETED orders.
@@ -114,9 +122,20 @@ function catalogueToProduct(
 export async function runSquareSync(
   onStatus: (status: SyncStatus) => void,
 ): Promise<void> {
-  // Refresh the access token if it is expired or expiring within 5 minutes.
+  if (_syncInFlight) {
+    return _syncInFlight
+  }
+  _syncInFlight = _runSyncImpl(onStatus).finally(() => { _syncInFlight = null })
+  return _syncInFlight
+}
+
+async function _runSyncImpl(
+  onStatus: (status: SyncStatus) => void,
+): Promise<void> {
+  // Preemptively refresh if expiry is known and within 5 minutes.
+  // A value of 0 means expiry is unknown — skip to avoid unnecessary refresh calls.
   const { tokenExpiresAt } = useAuthStore.getState()
-  if (tokenExpiresAt != null && tokenExpiresAt - Date.now() < 5 * 60 * 1000) {
+  if (tokenExpiresAt != null && tokenExpiresAt > 0 && tokenExpiresAt - Date.now() < 5 * 60 * 1000) {
     await refreshAccessToken()
   }
 

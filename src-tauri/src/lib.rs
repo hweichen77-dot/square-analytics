@@ -22,8 +22,12 @@ fn prepare_oauth_listener(state: tauri::State<'_, OAuthListener>) -> Result<u16,
 }
 
 /// Step 2 — wait until Square redirects to localhost and return the auth code.
+/// `expected_state` is validated against the `state=` param in the callback to prevent CSRF.
 #[tauri::command]
-async fn wait_for_oauth_code(state: tauri::State<'_, OAuthListener>) -> Result<String, String> {
+async fn wait_for_oauth_code(
+    state: tauri::State<'_, OAuthListener>,
+    expected_state: String,
+) -> Result<String, String> {
     let listener = state.0.lock().unwrap().take()
         .ok_or("No listener — call prepare_oauth_listener first")?;
 
@@ -40,23 +44,28 @@ async fn wait_for_oauth_code(state: tauri::State<'_, OAuthListener>) -> Result<S
         let first_line = raw.lines().next().unwrap_or("");
         let path = first_line.split_whitespace().nth(1).unwrap_or("");
 
-        let code = path
-            .split('?')
-            .nth(1)
-            .and_then(|qs| {
-                qs.split('&')
-                    .find(|p| p.starts_with("code="))
-                    .map(|p| url_decode(&p["code=".len()..]))
+        let qs = path.split('?').nth(1).unwrap_or("");
+        let params: std::collections::HashMap<String, String> = qs
+            .split('&')
+            .filter_map(|p| {
+                let mut parts = p.splitn(2, '=');
+                Some((url_decode(parts.next()?), url_decode(parts.next().unwrap_or(""))))
             })
-            .ok_or_else(|| {
-                let error_param = path.split('?').nth(1).and_then(|qs| {
-                    qs.split('&')
-                        .find(|p| p.starts_with("error="))
-                        .map(|p| url_decode(&p["error=".len()..]))
-                });
+            .collect();
+
+        // Validate CSRF state
+        let returned_state = params.get("state").map(String::as_str).unwrap_or("");
+        if !expected_state.is_empty() && returned_state != expected_state {
+            return Err(format!(
+                "OAuth state mismatch — possible CSRF attack. Expected '{expected_state}', got '{returned_state}'. Reconnect from within the app."
+            ));
+        }
+
+        let code = params.get("code").cloned().ok_or_else(|| {
+                let error_param = params.get("error").map(String::as_str).unwrap_or("");
                 format!(
                     "No authorization code in callback URL{}",
-                    error_param.map(|e| format!(" (Square error: {e})")).unwrap_or_default()
+                    if error_param.is_empty() { String::new() } else { format!(" (Square error: {error_param})") }
                 )
             })?;
 

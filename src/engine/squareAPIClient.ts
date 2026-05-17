@@ -18,7 +18,7 @@ async function squareRequest(
   if (isTauri()) {
     const { invoke } = await import('@tauri-apps/api/core')
     const text = await invoke<string>('proxy_square_api', {
-      access_token: token,
+      accessToken: token,
       method,
       url,
       body: body ? JSON.stringify(body) : null,

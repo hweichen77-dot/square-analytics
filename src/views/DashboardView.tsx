@@ -219,7 +219,7 @@ export default function DashboardView() {
       </div>
 
       {/* Goal Progress */}
-      {(weeklyGoal != null || monthlyGoal != null || true) && (
+      {(
         <div className="border border-slate-700/50 bg-slate-800/25 px-5 py-4 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400">Revenue Goals</p>
