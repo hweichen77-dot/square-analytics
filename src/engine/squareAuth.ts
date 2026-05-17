@@ -61,8 +61,8 @@ async function startOAuthFlowTauri(appID: string): Promise<void> {
   })
   const url = `${SQUARE_OAUTH_URL}?${params}`
 
-  // Step 2: start waiting for the callback (non-blocking from JS perspective)
-  const codePromise = invoke<string>('wait_for_oauth_code')
+  // Step 2: start waiting for the callback; pass expected state so Rust can validate CSRF
+  const codePromise = invoke<string>('wait_for_oauth_code', { expectedState: state })
 
   // Open browser
   if (openUrl) {
@@ -71,7 +71,7 @@ async function startOAuthFlowTauri(appID: string): Promise<void> {
     window.open(url, '_blank')
   }
 
-  // Step 3: wait for Rust to receive the callback
+  // Step 3: wait for Rust to receive the callback (Rust validates state, returns code)
   const code = await codePromise
 
   // Step 4: exchange code for token
@@ -131,9 +131,9 @@ async function exchangeCode(code: string, appID: string, redirectUri: string): P
     message?: string
   }>('exchange_square_code', {
     code,
-    app_id: appID,
-    app_secret: appSecret,
-    redirect_uri: redirectUri,
+    appId: appID,
+    appSecret,
+    redirectUri,
   })
 
   if (!data.access_token) {
@@ -197,9 +197,9 @@ export async function refreshAccessToken(): Promise<void> {
     // Token endpoint doesn't support CORS — must go through Rust
     const { invoke } = await import('@tauri-apps/api/core')
     data = await invoke('refresh_square_token', {
-      app_id: appID,
-      app_secret: appSecret,
-      refresh_token: refreshToken,
+      appId: appID,
+      appSecret,
+      refreshToken,
     })
   } else {
     const res = await fetch(SQUARE_TOKEN_URL, {

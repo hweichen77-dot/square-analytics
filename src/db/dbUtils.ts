@@ -1,5 +1,5 @@
 import { db } from './database'
-import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StaffWage } from '../types/models'
+import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StoreEvent, ProductBundle, StaffWage } from '../types/models'
 
 export async function upsertStaffWage(staffName: string, hourlyWage: number): Promise<void> {
   const existing = await db.staffWages.where('staffName').equals(staffName).first()
@@ -88,7 +88,8 @@ export async function exportAllData(): Promise<string> {
 }
 
 export async function restoreAllData(json: string): Promise<{ transactions: number; catalogue: number }> {
-  const backup = JSON.parse(json) as {
+  // Parse and validate structure BEFORE touching existing data
+  let backup: {
     version: number
     data: {
       transactions?: Record<string, unknown>[]
@@ -108,7 +109,15 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     }
   }
 
-  if (!backup?.data) throw new Error('Invalid backup file — missing data field.')
+  try {
+    backup = JSON.parse(json)
+  } catch {
+    throw new Error('Invalid backup file — file is not valid JSON.')
+  }
+
+  if (!backup?.data || typeof backup.data !== 'object') {
+    throw new Error('Invalid backup file — missing data field. Is this a Walley\'s Analytics backup?')
+  }
 
   const d = backup.data
   // Support both v1 and v2 key names
@@ -117,44 +126,57 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
   const costRaw = d.costData ?? d.productCostData ?? []
   const overridesRaw = d.overrides ?? d.categoryOverrides ?? []
 
-  await clearAllData()
-
-  // Strip IDs and fix Date fields
+  // Strip IDs and fix Date fields — validate dates before clearing existing data
   function stripId<T extends Record<string, unknown>>(rec: T): Omit<T, 'id'> {
     const { id: _id, ...rest } = rec
     return rest as Omit<T, 'id'>
   }
 
-  // Use unknown cast to bridge generic Record types to typed Dexie tables
-  if (txRaw.length) {
-    await db.salesTransactions.bulkAdd(txRaw.map(r => ({
-      ...stripId(r), date: new Date(r.date as string),
-    })) as unknown as SalesTransaction[])
+  function safeDate(val: unknown, field: string): Date {
+    const d = new Date(val as string)
+    if (isNaN(d.getTime())) throw new Error(`Invalid date in backup field "${field}": ${val}`)
+    return d
   }
-  if (catRaw.length) {
-    await db.catalogueProducts.bulkAdd(catRaw.map(r => ({
-      ...stripId(r), importedAt: new Date(r.importedAt as string),
-    })) as unknown as CatalogueProduct[])
-  }
-  if (costRaw.length) {
-    await db.productCostData.bulkAdd(costRaw.map(r => ({
-      ...stripId(r), lastUpdated: new Date(r.lastUpdated as string),
-    })) as unknown as ProductCostData[])
-  }
-  if (overridesRaw.length) {
-    await db.categoryOverrides.bulkAdd(overridesRaw.map(stripId) as unknown as CategoryOverride[])
-  }
-  if (d.opexEntries?.length) {
-    await db.opexEntries.bulkAdd(d.opexEntries.map(stripId) as unknown as OpexEntry[])
-  }
-  if (d.restockLogs?.length) {
-    await db.restockLogs.bulkAdd(d.restockLogs.map(r => ({
-      ...stripId(r), date: new Date(r.date as string),
-    })) as unknown as RestockLog[])
-  }
-  if (d.staffWages?.length) {
-    await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
-  }
+
+  // Pre-validate all rows with dates before any destructive operation
+  const txToAdd = txRaw.map((r, i) => {
+    try { return { ...stripId(r), date: safeDate(r.date, `transactions[${i}].date`) }
+    } catch (e) { throw new Error(`Backup validation failed: ${(e as Error).message}`) }
+  })
+  const catToAdd = catRaw.map((r, i) => {
+    try { return { ...stripId(r), importedAt: safeDate(r.importedAt, `catalogue[${i}].importedAt`) }
+    } catch { return { ...stripId(r), importedAt: new Date() } }
+  })
+  const costToAdd = costRaw.map((r, i) => {
+    try { return { ...stripId(r), lastUpdated: safeDate(r.lastUpdated, `costData[${i}].lastUpdated`) }
+    } catch { return { ...stripId(r), lastUpdated: new Date() } }
+  })
+  const restockToAdd = (d.restockLogs ?? []).map((r, i) => {
+    try { return { ...stripId(r), date: safeDate(r.date, `restockLogs[${i}].date`) }
+    } catch { return { ...stripId(r), date: new Date() } }
+  })
+  const eventsToAdd = (d.storeEvents ?? []).map(r => ({
+    ...stripId(r),
+    startDate: new Date(r.startDate as string),
+    endDate: new Date(r.endDate as string),
+  }))
+  const bundlesToAdd = (d.productBundles ?? []).map(r => ({
+    ...stripId(r),
+    createdDate: new Date((r.createdDate as string) ?? Date.now()),
+  }))
+
+  // All validation passed — now it's safe to clear and restore
+  await clearAllData()
+
+  if (txToAdd.length) await db.salesTransactions.bulkAdd(txToAdd as unknown as SalesTransaction[])
+  if (catToAdd.length) await db.catalogueProducts.bulkAdd(catToAdd as unknown as CatalogueProduct[])
+  if (costToAdd.length) await db.productCostData.bulkAdd(costToAdd as unknown as ProductCostData[])
+  if (overridesRaw.length) await db.categoryOverrides.bulkAdd(overridesRaw.map(stripId) as unknown as CategoryOverride[])
+  if (d.opexEntries?.length) await db.opexEntries.bulkAdd(d.opexEntries.map(stripId) as unknown as OpexEntry[])
+  if (restockToAdd.length) await db.restockLogs.bulkAdd(restockToAdd as unknown as RestockLog[])
+  if (eventsToAdd.length) await db.storeEvents.bulkAdd(eventsToAdd as unknown as StoreEvent[])
+  if (bundlesToAdd.length) await db.productBundles.bulkAdd(bundlesToAdd as unknown as ProductBundle[])
+  if (d.staffWages?.length) await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
 
   return { transactions: txRaw.length, catalogue: catRaw.length }
 }
