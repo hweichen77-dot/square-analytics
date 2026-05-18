@@ -68,7 +68,7 @@ export function computeBasketAnalysis(
     const [itemA, itemB] = key.split('\x00')
     const countA = itemCounts.get(itemA) ?? 1
     const countB = itemCounts.get(itemB) ?? 1
-    const support = coCount / totalTransactions
+    const support = totalTransactions > 0 ? coCount / totalTransactions : 0
     const lift = totalTransactions > 0 ? (coCount * totalTransactions) / (countA * countB) : 0
     const confidence = coCount / countA
 

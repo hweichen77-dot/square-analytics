@@ -39,11 +39,10 @@ export default function SquareSyncView() {
   // Re-load locations on mount whenever the user is already connected so the
   // dropdown shows correctly after navigating away and back.
   useEffect(() => {
-    if (store.accessToken) {
-      fetchLocations(store.accessToken)
-        .then(locs => setLocations(locs))
-        .catch(e => show(`Failed to load locations: ${(e as Error).message}`, 'error'))
-    }
+    if (!store.accessToken) return
+    fetchLocations(store.accessToken)
+      .then(locs => setLocations(locs))
+      .catch(e => show(`Failed to load locations: ${e instanceof Error ? e.message : String(e)}`, 'error'))
   }, [store.accessToken])
 
   async function handleConnect() {
@@ -65,6 +64,7 @@ export default function SquareSyncView() {
   }
 
   async function handleLoadLocations() {
+    if (!store.accessToken) return
     try {
       const locs = await fetchLocations(store.accessToken)
       setLocations(locs)

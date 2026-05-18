@@ -94,7 +94,10 @@ async fn exchange_square_code(
     app_secret: String,
     redirect_uri: String,
 ) -> Result<Value, String> {
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| format!("Failed to build HTTP client: {e}"))?;
     let body = serde_json::json!({
         "client_id":     app_id,
         "client_secret": app_secret,
@@ -126,7 +129,10 @@ async fn refresh_square_token(
     app_secret: String,
     refresh_token: String,
 ) -> Result<Value, String> {
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| format!("Failed to build HTTP client: {e}"))?;
     let body = serde_json::json!({
         "client_id":     app_id,
         "client_secret": app_secret,
@@ -159,7 +165,10 @@ async fn proxy_square_api(
     url: String,
     body: Option<String>,
 ) -> Result<String, String> {
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|e| format!("Failed to build HTTP client: {e}"))?;
 
     let mut req = match method.to_uppercase().as_str() {
         "POST" => client.post(&url),
@@ -189,23 +198,23 @@ async fn proxy_square_api(
 }
 
 fn url_decode(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
     let bytes = s.as_bytes();
+    let mut decoded: Vec<u8> = Vec::with_capacity(bytes.len());
     let mut i = 0;
     while i < bytes.len() {
         if bytes[i] == b'%' && i + 2 < bytes.len() {
             if let Ok(hex) = std::str::from_utf8(&bytes[i+1..i+3]) {
                 if let Ok(b) = u8::from_str_radix(hex, 16) {
-                    out.push(b as char);
+                    decoded.push(b);
                     i += 3;
                     continue;
                 }
             }
         }
-        out.push(if bytes[i] == b'+' { ' ' } else { bytes[i] as char });
+        decoded.push(if bytes[i] == b'+' { b' ' } else { bytes[i] });
         i += 1;
     }
-    out
+    String::from_utf8(decoded).unwrap_or_else(|e| String::from_utf8_lossy(e.as_bytes()).into_owned())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
