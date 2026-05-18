@@ -118,9 +118,16 @@ function stripLeadingAsterisk(name: string): string {
 
 export function parseProductItems(description: string): ProductItem[] {
   if (!description.trim()) return []
-  return description.split(',').flatMap(part => {
+  // Split on commas that precede a quantity prefix to avoid splitting product
+  // names that contain commas (e.g. "Cake, Small"). Falls back to comma split
+  // when no quantity markers are present.
+  const hasQtyPrefix = /\d+\s*[xX]\s+/.test(description)
+  const parts = hasQtyPrefix
+    ? description.split(/,\s*(?=\d+\s*[xX]\s+)/)
+    : description.split(',')
+  return parts.flatMap(part => {
     const trimmed = part.trim()
-    const match = trimmed.match(/^(\d+)\s*x\s+(.+)$/i)
+    const match = trimmed.match(/^(\d+)\s*[xX]\s+(.+)$/i)
     if (match) return [{ qty: parseInt(match[1], 10), name: stripLeadingAsterisk(match[2].trim()) }]
     if (trimmed) return [{ qty: 1, name: stripLeadingAsterisk(trimmed) }]
     return []
@@ -132,10 +139,36 @@ export function splitProducts(description: string): string[] {
 }
 
 export function effectiveUnitCost(cost: ProductCostData): number {
-  if (cost.casePrice > 0 && cost.unitsPerCase > 0) {
+  if ((cost.casePrice ?? 0) > 0 && (cost.unitsPerCase ?? 0) > 0) {
     return cost.casePrice / cost.unitsPerCase
   }
-  return cost.unitCost
+  return cost.unitCost ?? 0
+}
+
+/** Shared fuzzy cost lookup used by both Dashboard and ProfitView. */
+export function lookupUnitCost(name: string, costData: ProductCostData[]): number | null {
+  const byName: Record<string, ProductCostData> = {}
+  const byNameLower: Record<string, ProductCostData> = {}
+  for (const c of costData) {
+    byName[c.productName] = c
+    byNameLower[c.productName.toLowerCase().trim()] = c
+  }
+  function base(n: string) {
+    if (!n.endsWith(')')) return n
+    const idx = n.lastIndexOf('(')
+    return idx >= 0 ? n.slice(0, idx).trimEnd() || n : n
+  }
+  function strip(n: string) { return n.startsWith('*') ? n.slice(1).trim() : n }
+  const stripped = strip(name)
+  const found = byName[name]
+    ?? byName[base(name)]
+    ?? byName[stripped]
+    ?? byName[base(stripped)]
+    ?? byNameLower[name.toLowerCase().trim()]
+    ?? byNameLower[base(name).toLowerCase().trim()]
+    ?? byNameLower[stripped.toLowerCase().trim()]
+    ?? byNameLower[base(stripped).toLowerCase().trim()]
+  return found ? effectiveUnitCost(found) : null
 }
 
 export interface StaffWage {

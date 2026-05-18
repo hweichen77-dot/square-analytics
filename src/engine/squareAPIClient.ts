@@ -14,33 +14,42 @@ async function squareRequest(
   method: 'GET' | 'POST',
   url: string,
   body?: unknown,
+  _attempt = 0,
 ): Promise<unknown> {
-  if (isTauri()) {
-    const { invoke } = await import('@tauri-apps/api/core')
-    const text = await invoke<string>('proxy_square_api', {
-      accessToken: token,
-      method,
-      url,
-      body: body ? JSON.stringify(body) : null,
-    })
-    return JSON.parse(text)
-  }
+  try {
+    if (isTauri()) {
+      const { invoke } = await import('@tauri-apps/api/core')
+      const text = await invoke<string>('proxy_square_api', {
+        accessToken: token,
+        method,
+        url,
+        body: body ? JSON.stringify(body) : null,
+      })
+      return JSON.parse(text)
+    }
 
-  const headers: Record<string, string> = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'Square-Version': '2023-10-18',
+    const headers: Record<string, string> = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Square-Version': '2023-10-18',
+    }
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    })
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new Error(`Square API error ${res.status}: ${text}`)
+    }
+    return res.json()
+  } catch (err) {
+    if (_attempt < 3 && String(err).includes('429')) {
+      await new Promise(r => setTimeout(r, 1000 * 2 ** _attempt))
+      return squareRequest(token, method, url, body, _attempt + 1)
+    }
+    throw err
   }
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  })
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(`Square API error ${res.status}: ${text}`)
-  }
-  return res.json()
 }
 
 export interface SquareLocation {
