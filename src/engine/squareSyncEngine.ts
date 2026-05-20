@@ -103,7 +103,11 @@ function catalogueToProduct(
   }
 
   if (variations.length === 0) {
-    return [{ ...common, name, itemName: name, variationName: 'Regular', sku: '', price: null, squareItemID: item.id }]
+    // When a catalogue item has no variation objects, there is no variation ID to
+    // look up in the inventory counts response (which is keyed by variation ID, not
+    // item ID). Store squareItemID as empty string so the inventory lookup is a
+    // no-op rather than silently returning stale or mismatched inventory data.
+    return [{ ...common, name, itemName: name, variationName: 'Regular', sku: '', price: null, squareItemID: '' }]
   }
 
   // One product row per variation; squareItemID stores the variation ID for

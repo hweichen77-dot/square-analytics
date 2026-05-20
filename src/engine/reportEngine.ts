@@ -426,12 +426,14 @@ export function buildMonthlyDetailReport(
       netRevenue     = netSales
     }
 
+    // Product stats — computed once and reused for both COGS and top-product fields.
+    const productStats = computeProductStats(txs, overrides)
+
     // COGS: sum unit cost × units sold for each product
     let cogs: number | null = null
     if (hasCostData) {
-      const stats = computeProductStats(txs, overrides)
       cogs = 0
-      for (const p of stats) {
+      for (const p of productStats) {
         const unitCost = costMap.get(p.name)
         if (unitCost !== undefined) cogs! += unitCost * p.totalUnitsSold
       }
@@ -455,8 +457,6 @@ export function buildMonthlyDetailReport(
     const netProfitPct = netProfit !== null && netRevenue > 0
       ? (netProfit / netRevenue) * 100 : null
 
-    // Product stats (compute once if we haven't already for COGS)
-    const productStats = computeProductStats(txs, overrides)
     const top = productStats[0] ?? null
 
     let momGrowth: number | null = null
