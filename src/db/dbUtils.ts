@@ -167,21 +167,27 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     try { return { ...stripId(r), date: safeDate(r.date, `restockLogs[${i}].date`) }
     } catch { return { ...stripId(r), date: new Date() } }
   })
-  const eventsToAdd = (d.storeEvents ?? []).map(r => ({
-    ...stripId(r),
-    startDate: new Date(r.startDate as string),
-    endDate: new Date(r.endDate as string),
-  }))
+  const eventsToAdd = (d.storeEvents ?? []).map((r, i) => {
+    const start = new Date(r.startDate as string)
+    const end = new Date(r.endDate as string)
+    // Silently skip rows with invalid dates to avoid storing corrupted Date objects.
+    if (isNaN(start.getTime())) throw new Error(`Invalid startDate in storeEvents[${i}]: ${r.startDate}`)
+    if (isNaN(end.getTime())) throw new Error(`Invalid endDate in storeEvents[${i}]: ${r.endDate}`)
+    return { ...stripId(r), startDate: start, endDate: end }
+  })
   const bundlesToAdd = (d.productBundles ?? []).map(r => ({
     ...stripId(r),
-    createdDate: new Date((r.createdDate as string) ?? Date.now()),
+    // r.createdDate may be a serialized ISO string or absent; fall back to current time.
+    createdDate: r.createdDate ? new Date(r.createdDate as string) : new Date(),
   }))
 
   // All validation passed — now it's safe to clear and restore
   await clearAllData()
 
   if (txToAdd.length) await db.salesTransactions.bulkPut(txToAdd as unknown as SalesTransaction[])
-  if (catToAdd.length) await db.catalogueProducts.bulkAdd(catToAdd as unknown as CatalogueProduct[])
+  // bulkPut handles re-restores cleanly: if the user restores from backup a second time,
+  // catalogue rows with the same unique &name constraint won't throw a ConstraintError.
+  if (catToAdd.length) await db.catalogueProducts.bulkPut(catToAdd as unknown as CatalogueProduct[])
   if (costToAdd.length) await db.productCostData.bulkAdd(costToAdd as unknown as ProductCostData[])
   if (overridesRaw.length) await db.categoryOverrides.bulkAdd(overridesRaw.map(stripId) as unknown as CategoryOverride[])
   if (d.opexEntries?.length) await db.opexEntries.bulkAdd(d.opexEntries.map(stripId) as unknown as OpexEntry[])

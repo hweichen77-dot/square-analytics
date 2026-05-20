@@ -122,7 +122,7 @@ export default function AnomalyView() {
       )}
 
       <p className="text-xs text-slate-400">
-        A day is flagged as anomalous when its revenue is more than 1.5 standard deviations from the mean for that day of the week.
+        A day is flagged as anomalous when its revenue is more than 2.0 standard deviations from the mean for that day of the week.
         Strong anomalies are more than 2.5 standard deviations away.
       </p>
     </div>

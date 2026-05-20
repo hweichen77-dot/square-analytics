@@ -153,7 +153,10 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
   async function save() {
     const n = parseInt(qty, 10)
     if (!n || n <= 0) { setError(true); return }
-    await db.restockLogs.add({ productName, date: new Date(date), quantity: n, notes })
+    // Append T00:00:00 so the browser parses this as local midnight rather than
+    // UTC midnight. Without it, "2026-05-20" parses to UTC midnight, which rolls
+    // back to the previous calendar day in timezones west of UTC.
+    await db.restockLogs.add({ productName, date: new Date(date + 'T00:00:00'), quantity: n, notes })
     onClose()
   }
 
