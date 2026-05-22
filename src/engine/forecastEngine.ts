@@ -137,16 +137,14 @@ export function computeForecast(transactions: SalesTransaction[]): ForecastResul
 
   const dowBaseline = dowSums.map((sum, i) => (dowCounts[i] > 0 ? sum / dowCounts[i] : 0))
 
-  // Trend: last 4 weeks vs 4 weeks before that
+  // Trend: last 4 weeks vs prior 4 weeks. Requires ≥8 weeks for a stable baseline.
   let trendFactor = 1.0
-  if (weeksOfHistory >= 4) {
+  if (weeksOfHistory >= 8) {
     const last4Avg = historicalWeeks.slice(-4).reduce((s, w) => s + w.revenue, 0) / 4
-    const prev4 = historicalWeeks.slice(-Math.min(8, weeksOfHistory), -4)
-    if (prev4.length > 0) {
-      const prev4Avg = prev4.reduce((s, w) => s + w.revenue, 0) / prev4.length
-      if (prev4Avg > 0) {
-        trendFactor = Math.max(0.5, Math.min(2.0, last4Avg / prev4Avg))
-      }
+    const prev4 = historicalWeeks.slice(-8, -4)
+    const prev4Avg = prev4.reduce((s, w) => s + w.revenue, 0) / 4
+    if (prev4Avg > 0) {
+      trendFactor = Math.max(0.5, Math.min(2.0, last4Avg / prev4Avg))
     }
   }
 
@@ -209,7 +207,7 @@ export function computeAnomalies(transactions: SalesTransaction[]): AnomalyDay[]
   // Group daily revenues by day-of-week (JS Date.getDay(): 0=Sun…6=Sat)
   const dowEntries: { dateKey: string; revenue: number }[][] = Array.from({ length: 7 }, () => [])
   for (const [dateKey, revenue] of dailyTotals) {
-    const dow = new Date(dateKey).getDay()
+    const dow = new Date(dateKey + 'T00:00:00').getDay()
     dowEntries[dow].push({ dateKey, revenue })
   }
 
@@ -224,7 +222,7 @@ export function computeAnomalies(transactions: SalesTransaction[]): AnomalyDay[]
   const anomalies: AnomalyDay[] = []
 
   for (const [dateKey, revenue] of dailyTotals) {
-    const date = new Date(dateKey)
+    const date = new Date(dateKey + 'T00:00:00')
     const dow = date.getDay()
     const { mean, std } = dowStats[dow]
     if (std < 1 || mean < 1) continue

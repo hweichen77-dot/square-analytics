@@ -306,19 +306,17 @@ export default function ProfitView() {
     // Normalizes product names for fuzzy matching: strips size/variant suffixes
     function normalizeForLookup(n: string): string[] {
       const clean = stripStar(n).trim()
-      const lower = clean.toLowerCase()
       const base = baseName(clean)
-      const baseLower = base.toLowerCase()
-      // Also strip trailing size/variant patterns like " - Large", " - 16oz", "/L", etc.
-      const noVariant = lower.replace(/\s*[-/]\s*(sm|md|lg|xl|xxl|small|medium|large|x-?large|\d+\s*oz|\d+\s*ml)\s*$/i, '').trim()
-      const noParens  = lower.replace(/\s*\([^)]*\)\s*/g, '').trim()
-      return [clean, base, clean.toLowerCase(), baseLower, noVariant, noParens].filter(Boolean)
+      const noVariant = clean.replace(/\s*[-/]\s*(sm|md|lg|xl|xxl|small|medium|large|x-?large|\d+\s*oz|\d+\s*ml)\s*$/i, '').trim()
+      const noParens  = clean.replace(/\s*\([^)]*\)\s*/g, '').trim()
+      return [clean, base, noVariant, noParens].filter(Boolean)
     }
     function lookupCost(name: string) {
       const candidates = normalizeForLookup(name)
       for (const c of candidates) {
-        if (byName[c])      return byName[c]
-        if (byNameLower[c]) return byNameLower[c]
+        if (byName[c]) return byName[c]
+        const cl = c.toLowerCase()
+        if (byNameLower[cl]) return byNameLower[cl]
       }
       return undefined
     }

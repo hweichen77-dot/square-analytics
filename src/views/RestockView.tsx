@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { useRestockLogs, useCatalogueProducts } from '../db/useTransactions'
+import { useRestockLogs, useCatalogueProducts, useAllTransactions } from '../db/useTransactions'
 import { computeProductStats } from '../engine/analyticsEngine'
-import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
 import type { SalesTransaction, RestockLog, CatalogueProduct } from '../types/models'
@@ -204,7 +203,7 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
 }
 
 export default function RestockView() {
-  const { transactions } = useAnalytics()
+  const transactions = useAllTransactions()
   const restockLogs = useRestockLogs()
   const catalogueProducts = useCatalogueProducts()
   const [productToRestock, setProductToRestock] = useState<string | null>(null)

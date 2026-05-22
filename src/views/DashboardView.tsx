@@ -109,9 +109,10 @@ export default function DashboardView() {
   const prevRevenue = hasPrevPeriod ? prevTransactions.reduce((s, t) => s + t.netSales, 0) : 0
   const prevTxCount = hasPrevPeriod ? prevTransactions.length : 0
   const prevAvg = prevTxCount > 0 ? prevRevenue / prevTxCount : 0
-  const prevProducts = hasPrevPeriod
-    ? computeProductStats(prevTransactions, overrides).length
-    : 0
+  const prevProducts = useMemo(
+    () => hasPrevPeriod ? computeProductStats(prevTransactions, overrides).length : 0,
+    [hasPrevPeriod, prevTransactions, overrides],
+  )
 
   const revTrend      = hasPrevPeriod ? pctChange(totalRevenue, prevRevenue) : null
   const txTrend       = hasPrevPeriod ? pctChange(totalTransactions, prevTxCount) : null

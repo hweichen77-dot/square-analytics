@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAnalytics } from '../context/AnalyticsContext'
+import { useAllTransactions } from '../db/useTransactions'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
 import { parseProductItems } from '../types/models'
@@ -83,12 +84,13 @@ function buildPriceChanges(transactions: SalesTransaction[]): PriceChange[] {
 }
 
 export default function PriceOptimizationView() {
-  const { transactions, productStats } = useAnalytics()
+  const { productStats } = useAnalytics()
+  const allTransactions = useAllTransactions()
   const [selectedProduct, setSelectedProduct] = useState('')
   const [simPrice, setSimPrice] = useState('')
   const [productSearch, setProductSearch] = useState('')
 
-  const changes = useMemo(() => buildPriceChanges(transactions), [transactions])
+  const changes = useMemo(() => buildPriceChanges(allTransactions), [allTransactions])
   const productNames = useMemo(() => productStats.map(p => p.name).sort(), [productStats])
   const avgPriceByProduct = useMemo(
     () => Object.fromEntries(productStats.map(p => [p.name, p.avgPrice])),
@@ -143,7 +145,7 @@ export default function PriceOptimizationView() {
     }))
   }, [changesForSelected, selectedProduct])
 
-  if (transactions.length === 0) {
+  if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import sales data to detect price changes." />
   }
 

@@ -3,7 +3,7 @@ import {
   ComposedChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
   ResponsiveContainer,
 } from 'recharts'
-import { useStoreEvents } from '../db/useTransactions'
+import { useStoreEvents, useAllTransactions } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
@@ -155,13 +155,14 @@ function EventEditModal({
 }
 
 export default function SeasonalView() {
-  const { transactions, daily: dailyRevenue } = useAnalytics()
+  const { daily: dailyRevenue } = useAnalytics()
+  const allTransactions = useAllTransactions()
   const events = useStoreEvents()
   const [showAdd, setShowAdd] = useState(false)
   const [editingEvent, setEditingEvent] = useState<StoreEvent | null>(null)
   const impacts = useMemo(
-    () => events.map(e => computeImpact(e, transactions)),
-    [events, transactions],
+    () => events.map(e => computeImpact(e, allTransactions)),
+    [events, allTransactions],
   )
 
   const chartData = useMemo(
@@ -181,7 +182,7 @@ export default function SeasonalView() {
     if (event.id) await db.storeEvents.delete(event.id)
   }
 
-  if (transactions.length === 0) {
+  if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import sales data to see seasonal analysis." />
   }
 
