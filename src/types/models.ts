@@ -132,7 +132,7 @@ export function parseProductItems(description: string): ProductItem[] {
   // Split on commas that precede a quantity prefix to avoid splitting product
   // names that contain commas (e.g. "Cake, Small"). Falls back to comma split
   // when no quantity markers are present.
-  const hasQtyPrefix = /\d+\s*[xX]\s+/.test(description)
+  const hasQtyPrefix = /^\s*\d+\s*[xX]\s+/.test(description)
   const parts = hasQtyPrefix
     ? description.split(/,\s*(?=\d+\s*[xX]\s+)/)
     : description.split(',')

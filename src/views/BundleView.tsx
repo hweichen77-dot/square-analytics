@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useProductBundles } from '../db/useTransactions'
+import { useProductBundles, useAllTransactions } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
@@ -156,7 +156,8 @@ function BundleEditorModal({
 }
 
 export default function BundleView() {
-  const { transactions, productStats } = useAnalytics()
+  const { productStats } = useAnalytics()
+  const allTransactions = useAllTransactions()
   const savedBundles = useProductBundles()
   const [showCreate, setShowCreate] = useState(false)
   const [editingBundle, setEditingBundle] = useState<ProductBundle | null>(null)
@@ -172,13 +173,13 @@ export default function BundleView() {
   )
 
   const pairs = useMemo(
-    () => buildPairs(transactions, priceByName, categoryByName),
-    [transactions, priceByName, categoryByName],
+    () => buildPairs(allTransactions, priceByName, categoryByName),
+    [allTransactions, priceByName, categoryByName],
   )
 
   const multiItemTxCount = useMemo(
-    () => transactions.filter(tx => new Set(parseProductItems(tx.itemDescription).map(i => i.name)).size >= 2).length,
-    [transactions],
+    () => allTransactions.filter(tx => new Set(parseProductItems(tx.itemDescription).map(i => i.name)).size >= 2).length,
+    [allTransactions],
   )
 
   const affinityForSelected = useMemo(() => {
@@ -210,7 +211,7 @@ export default function BundleView() {
     if (bundle.id) await db.productBundles.delete(bundle.id)
   }
 
-  if (transactions.length === 0) {
+  if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import transaction data to see bundle opportunities." />
   }
 

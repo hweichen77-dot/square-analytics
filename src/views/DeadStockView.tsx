@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { useProductCostData } from '../db/useTransactions'
+import { useProductCostData, useAllTransactions } from '../db/useTransactions'
 import { computeProductStats } from '../engine/analyticsEngine'
-import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
 import { parseProductItems } from '../types/models'
@@ -191,7 +190,7 @@ function TierSection({
 }
 
 export default function DeadStockView() {
-  const { transactions } = useAnalytics()
+  const transactions = useAllTransactions()
   const costData = useProductCostData()
 
   const items = useMemo(

@@ -59,20 +59,22 @@ export async function upsertProductCosts(costs: Omit<ProductCostData, 'id'>[]): 
   })
 }
 
-// Removes CSV-sourced transactions that fall within date range where API data exists.
-// Fixes double-counting: Square CSV uses paymentID, API uses orderID → same sale stored twice.
+// Removes CSV-sourced transactions that are duplicates of API transactions.
+// Matches by (date truncated to day, netSales, staffName) because CSV uses paymentID
+// while API uses orderID — the same sale has different transactionIDs across sources.
 export async function removeCsvDuplicates(): Promise<number> {
   const apiTxs = await db.salesTransactions.filter(t => t.source === 'api').toArray()
   if (apiTxs.length === 0) return 0
-  const apiMin = apiTxs.reduce((m, t) => t.date < m ? t.date : m, apiTxs[0].date)
-  const apiMax = apiTxs.reduce((m, t) => t.date > m ? t.date : m, apiTxs[0].date)
-  const csvInRange = await db.salesTransactions
-    .where('date').between(apiMin, apiMax, true, true)
-    .filter(t => t.source === 'csv')
-    .toArray()
-  if (csvInRange.length === 0) return 0
-  await db.salesTransactions.bulkDelete(csvInRange.map(t => t.id!))
-  return csvInRange.length
+  const apiKeys = new Set(
+    apiTxs.map(t => `${t.date.toDateString()}|${t.netSales.toFixed(2)}|${t.staffName}`)
+  )
+  const csvTxs = await db.salesTransactions.filter(t => t.source === 'csv').toArray()
+  const toDelete = csvTxs.filter(t =>
+    apiKeys.has(`${t.date.toDateString()}|${t.netSales.toFixed(2)}|${t.staffName}`)
+  )
+  if (toDelete.length === 0) return 0
+  await db.salesTransactions.bulkDelete(toDelete.map(t => t.id!))
+  return toDelete.length
 }
 
 export async function clearAllData(): Promise<void> {
@@ -197,20 +199,35 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     createdDate: r.createdDate ? new Date(r.createdDate as string) : new Date(),
   }))
 
-  // All validation passed — now it's safe to clear and restore
-  await clearAllData()
-
-  if (txToAdd.length) await db.salesTransactions.bulkPut(txToAdd as unknown as SalesTransaction[])
-  // bulkPut handles re-restores cleanly: if the user restores from backup a second time,
-  // catalogue rows with the same unique &name constraint won't throw a ConstraintError.
-  if (catToAdd.length) await db.catalogueProducts.bulkPut(catToAdd as unknown as CatalogueProduct[])
-  if (costToAdd.length) await db.productCostData.bulkAdd(costToAdd as unknown as ProductCostData[])
-  if (overridesRaw.length) await db.categoryOverrides.bulkAdd(overridesRaw.map(stripId) as unknown as CategoryOverride[])
-  if (d.opexEntries?.length) await db.opexEntries.bulkAdd(d.opexEntries.map(stripId) as unknown as OpexEntry[])
-  if (restockToAdd.length) await db.restockLogs.bulkAdd(restockToAdd as unknown as RestockLog[])
-  if (eventsToAdd.length) await db.storeEvents.bulkAdd(eventsToAdd as unknown as StoreEvent[])
-  if (bundlesToAdd.length) await db.productBundles.bulkAdd(bundlesToAdd as unknown as ProductBundle[])
-  if (d.staffWages?.length) await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
+  // All validation passed — clear and restore atomically so a mid-restore failure
+  // never leaves the DB in a partially-written state.
+  await db.transaction('rw', [
+    db.salesTransactions, db.catalogueProducts, db.productCostData, db.categoryOverrides,
+    db.opexEntries, db.restockLogs, db.storeEvents, db.productBundles, db.staffWages,
+  ], async () => {
+    await Promise.all([
+      db.salesTransactions.clear(),
+      db.catalogueProducts.clear(),
+      db.productCostData.clear(),
+      db.categoryOverrides.clear(),
+      db.opexEntries.clear(),
+      db.restockLogs.clear(),
+      db.storeEvents.clear(),
+      db.productBundles.clear(),
+      db.staffWages.clear(),
+    ])
+    if (txToAdd.length) await db.salesTransactions.bulkPut(txToAdd as unknown as SalesTransaction[])
+    // bulkPut handles re-restores cleanly: if the user restores from backup a second time,
+    // catalogue rows with the same unique &name constraint won't throw a ConstraintError.
+    if (catToAdd.length) await db.catalogueProducts.bulkPut(catToAdd as unknown as CatalogueProduct[])
+    if (costToAdd.length) await db.productCostData.bulkAdd(costToAdd as unknown as ProductCostData[])
+    if (overridesRaw.length) await db.categoryOverrides.bulkAdd(overridesRaw.map(stripId) as unknown as CategoryOverride[])
+    if (d.opexEntries?.length) await db.opexEntries.bulkAdd(d.opexEntries.map(stripId) as unknown as OpexEntry[])
+    if (restockToAdd.length) await db.restockLogs.bulkAdd(restockToAdd as unknown as RestockLog[])
+    if (eventsToAdd.length) await db.storeEvents.bulkAdd(eventsToAdd as unknown as StoreEvent[])
+    if (bundlesToAdd.length) await db.productBundles.bulkAdd(bundlesToAdd as unknown as ProductBundle[])
+    if (d.staffWages?.length) await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
+  })
 
   return { transactions: txRaw.length, catalogue: catRaw.length }
 }

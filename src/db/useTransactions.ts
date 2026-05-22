@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from './database'
 import type { SalesTransaction } from '../types/models'
@@ -32,9 +33,11 @@ export function useCategoryOverrides() {
 
 export function useOverridesMap(): Record<string, string> {
   const overrides = useCategoryOverrides()
-  const map: Record<string, string> = {}
-  for (const o of overrides) map[o.productName] = o.category
-  return map
+  return useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const o of overrides) map[o.productName] = o.category
+    return map
+  }, [overrides])
 }
 
 export function useTransactionCount(): number {
