@@ -49,7 +49,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "Walley's Analytics ${{ github.ref_name }}"
+          releaseName: "Square Analytics ${{ github.ref_name }}"
           releaseBody: |
             Desktop app release for macOS (Apple Silicon + Intel) and Windows.
             See the Assets below to download the installer for your platform.
