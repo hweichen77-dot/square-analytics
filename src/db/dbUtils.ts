@@ -1,5 +1,5 @@
 import { db } from './database'
-import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StoreEvent, ProductBundle, StaffWage } from '../types/models'
+import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StoreEvent, ProductBundle, StaffWage, StoredRefund, StoredShift } from '../types/models'
 
 export async function upsertStaffWage(staffName: string, hourlyWage: number): Promise<void> {
   const existing = await db.staffWages.where('staffName').equals(staffName).first()
@@ -8,6 +8,41 @@ export async function upsertStaffWage(staffName: string, hourlyWage: number): Pr
   } else {
     await db.staffWages.add({ staffName, hourlyWage })
   }
+}
+
+// Inserts refunds keyed by refundId, skipping ones already stored. Returns count added.
+export async function upsertRefunds(refunds: Omit<StoredRefund, 'id'>[]): Promise<number> {
+  if (refunds.length === 0) return 0
+  const ids = refunds.map(r => r.refundId)
+  const existing = new Set(
+    (await db.refunds.where('refundId').anyOf(ids).toArray()).map(r => r.refundId)
+  )
+  const toAdd = refunds.filter(r => !existing.has(r.refundId))
+  if (toAdd.length === 0) return 0
+  let added = 0
+  for (const r of toAdd) {
+    try { await db.refunds.add(r); added++ } catch { /* duplicate — skip */ }
+  }
+  return added
+}
+
+// Upserts shifts keyed by shiftId — updates existing rows (an open shift may
+// later gain an endAt) and inserts new ones. Returns count added.
+export async function upsertShifts(shifts: Omit<StoredShift, 'id'>[]): Promise<number> {
+  if (shifts.length === 0) return 0
+  let added = 0
+  await db.transaction('rw', db.shifts, async () => {
+    for (const s of shifts) {
+      const existing = await db.shifts.where('shiftId').equals(s.shiftId).first()
+      if (existing) {
+        await db.shifts.update(existing.id!, s)
+      } else {
+        await db.shifts.add(s)
+        added++
+      }
+    }
+  })
+  return added
 }
 
 export async function upsertTransactions(transactions: Omit<SalesTransaction, 'id'>[]): Promise<number> {

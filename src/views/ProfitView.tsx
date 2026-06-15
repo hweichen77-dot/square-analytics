@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
   ScatterChart, Scatter, PieChart, Pie, Legend,
 } from 'recharts'
-import { useProductCostData, useCatalogueProducts } from '../db/useTransactions'
+import { useProductCostData, useCatalogueProducts, useRefunds } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
@@ -278,6 +278,7 @@ export default function ProfitView() {
   const { transactions, productStats: cachedStats, totalRevenue } = useAnalytics()
   const costData = useProductCostData()
   const catalogueProducts = useCatalogueProducts()
+  const refunds = useRefunds()
   const [showCostSheet, setShowCostSheet] = useState(false)
   const [sortKey, setSortKey] = useState<keyof ProfitRow>('totalProfit')
   const [sortDesc, setSortDesc] = useState(true)
@@ -374,6 +375,24 @@ export default function ProfitView() {
     [transactions],
   )
   const hasProcessingFees = totalProcessingFees > 0
+  // Refunds from the Refunds API (cents), scoped to the date span of the visible
+  // transactions so they line up with the revenue shown.
+  const totalRefunds = useMemo(() => {
+    if (refunds.length === 0 || transactions.length === 0) return 0
+    let min = Infinity, max = -Infinity
+    for (const t of transactions) {
+      const ms = t.date.getTime()
+      if (ms < min) min = ms
+      if (ms > max) max = ms
+    }
+    return refunds
+      .filter(r => {
+        const ms = r.createdAt.getTime()
+        return ms >= min && ms <= max
+      })
+      .reduce((s, r) => s + r.amount, 0) / 100
+  }, [refunds, transactions])
+  const hasRefunds = totalRefunds > 0
   const moneyLosers = useMemo(() => profitRows.filter(r => r.marginPercent !== null && r.marginPercent <= 0), [profitRows])
 
   const top15Profit = useMemo(
@@ -434,21 +453,29 @@ export default function ProfitView() {
         ))}
       </div>
 
-      {hasProcessingFees && (
+      {(hasProcessingFees || hasRefunds) && (
         <div className="bg-slate-800/30 border border-slate-700/40 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-3">Revenue Breakdown (with Payment Fees)</h2>
+          <h2 className="text-sm font-semibold text-slate-200 mb-3">Revenue Breakdown</h2>
           <div className="space-y-2 text-sm font-mono">
             <div className="flex justify-between text-slate-100">
               <span>Gross Revenue</span>
               <span>{formatCurrency(totalRevenue)}</span>
             </div>
-            <div className="flex justify-between text-amber-400">
-              <span>Processing Fees</span>
-              <span>- {formatCurrency(totalProcessingFees)}</span>
-            </div>
+            {hasRefunds && (
+              <div className="flex justify-between text-amber-400">
+                <span>Refunds</span>
+                <span>- {formatCurrency(totalRefunds)}</span>
+              </div>
+            )}
+            {hasProcessingFees && (
+              <div className="flex justify-between text-amber-400">
+                <span>Processing Fees</span>
+                <span>- {formatCurrency(totalProcessingFees)}</span>
+              </div>
+            )}
             <div className="border-t border-slate-700/50 pt-2 flex justify-between font-bold text-teal-400">
-              <span>Net Revenue (after fees)</span>
-              <span>{formatCurrency(totalRevenue - totalProcessingFees)}</span>
+              <span>Net Revenue</span>
+              <span>{formatCurrency(totalRevenue - totalProcessingFees - totalRefunds)}</span>
             </div>
           </div>
         </div>

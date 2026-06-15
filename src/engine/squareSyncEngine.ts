@@ -1,9 +1,9 @@
 import { subDays } from 'date-fns'
 import { useAuthStore } from '../store/authStore'
 import { refreshAccessToken } from './squareAuth'
-import { fetchOrders, fetchCatalogue, fetchInventory, fetchTeamMembers, fetchCustomersByIds, fetchPayments } from './squareAPIClient'
+import { fetchOrders, fetchCatalogue, fetchInventory, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts } from './squareAPIClient'
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
-import { upsertTransactions, upsertCatalogueProducts } from '../db/dbUtils'
+import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts } from '../db/dbUtils'
 import type { SalesTransaction, CatalogueProduct, TransactionLineItem } from '../types/models'
 import { parseProductItems, splitItemVariation } from '../types/models'
 
@@ -224,6 +224,49 @@ async function _runSyncImpl(
     }
   } catch {
     // Payments API is optional — sync continues without fee/source-type data if it fails
+  }
+
+  // Fetch refunds for the same window and store them. Best-effort — sync continues on failure.
+  try {
+    const refunds = await fetchRefunds(
+      accessToken,
+      locationID,
+      startDate.toISOString(),
+      endDate.toISOString(),
+    )
+    await upsertRefunds(refunds.map(r => ({
+      refundId: r.id,
+      paymentId: r.paymentId,
+      amount: r.amountMoney.amount,
+      currency: r.amountMoney.currency,
+      status: r.status,
+      createdAt: r.createdAt ? new Date(r.createdAt) : new Date(),
+      reason: r.reason,
+    })))
+  } catch {
+    // Refunds API is optional — sync continues without refund data if it fails
+  }
+
+  // Fetch labor shifts for the same window and store them with resolved staff names.
+  // Best-effort — sync continues on failure (Labor API requires a paid plan / permissions).
+  try {
+    const shifts = await fetchShifts(
+      accessToken,
+      locationID,
+      startDate.toISOString(),
+      endDate.toISOString(),
+    )
+    await upsertShifts(shifts.map(s => ({
+      shiftId: s.id,
+      teamMemberId: s.teamMemberId,
+      staffName: s.teamMemberId ? (employeeMap[s.teamMemberId] ?? '') : '',
+      startAt: new Date(s.startAt),
+      endAt: s.endAt ? new Date(s.endAt) : undefined,
+      locationId: s.locationId,
+      hourlyWage: s.wage?.hourlyRate?.amount != null ? s.wage.hourlyRate.amount / 100 : undefined,
+    })))
+  } catch {
+    // Labor/Shifts API is optional — sync continues without shift data if it fails
   }
 
   const ordersAdded = await upsertTransactions(txRows)

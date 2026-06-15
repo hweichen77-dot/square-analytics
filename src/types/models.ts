@@ -36,6 +36,34 @@ export interface SalesTransaction {
   cardLastFour?: string    // last 4 digits of card
 }
 
+// Refund record from Square Refunds API (one row per refund). amount stored in
+// cents (matching Square's money model). staffName/teamMemberId left out — refunds
+// are aggregated against transactions by paymentId/createdAt date.
+export interface StoredRefund {
+  id?: number
+  refundId: string        // Square refund id (unique)
+  paymentId?: string
+  amount: number          // cents (positive value of the refund)
+  currency: string
+  status: string
+  createdAt: Date
+  reason?: string
+}
+
+// Shift record from Square Labor/Shifts API. staffName is resolved from the
+// team member map during sync so StaffView can match by display name. Hours are
+// derived from startAt/endAt at read time (endAt may be null for open shifts).
+export interface StoredShift {
+  id?: number
+  shiftId: string         // Square shift id (unique)
+  teamMemberId?: string
+  staffName: string       // resolved display name (may be '' if unresolved)
+  startAt: Date
+  endAt?: Date
+  locationId?: string
+  hourlyWage?: number     // dollars, from shift wage if present
+}
+
 export const OPEX_CATEGORIES = [
   'Store Equipment',
   'Marketing',

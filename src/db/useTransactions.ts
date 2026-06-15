@@ -64,6 +64,14 @@ export function useCatalogueProducts() {
   return useLiveQuery(() => db.catalogueProducts.toArray(), []) ?? []
 }
 
+export function useRefunds() {
+  return useLiveQuery(() => db.refunds.toArray(), []) ?? []
+}
+
+export function useShifts() {
+  return useLiveQuery(() => db.shifts.toArray(), []) ?? []
+}
+
 export function useStaffWages() {
   return useLiveQuery(() => db.staffWages.toArray(), []) ?? []
 }
