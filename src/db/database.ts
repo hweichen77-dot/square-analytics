@@ -9,6 +9,8 @@ import type {
   CatalogueProduct,
   OpexEntry,
   StaffWage,
+  StoredRefund,
+  StoredShift,
 } from '../types/models'
 import { splitItemVariation } from '../types/models'
 
@@ -22,6 +24,8 @@ class WalleysDB extends Dexie {
   catalogueProducts!: Dexie.Table<CatalogueProduct, number>
   opexEntries!: Dexie.Table<OpexEntry, number>
   staffWages!: Dexie.Table<StaffWage, number>
+  refunds!: Dexie.Table<StoredRefund, number>
+  shifts!: Dexie.Table<StoredShift, number>
 
   constructor() {
     super('WalleysDB')
@@ -118,6 +122,21 @@ class WalleysDB extends Dexie {
       staffWages: '++id, &staffName',
     }).upgrade(_tx => {
       // No data migration needed — new fields are optional and default to undefined
+    })
+
+    // Version 7: add refunds + shifts tables for Square Refunds and Labor/Shifts APIs.
+    this.version(7).stores({
+      salesTransactions: '++id, &transactionID, date, staffName, paymentMethod, dayOfWeek, hour',
+      categoryOverrides: '++id, &productName',
+      restockLogs: '++id, productName, date',
+      productCostData: '++id, &productName',
+      storeEvents: '++id, startDate, endDate',
+      productBundles: '++id, name',
+      catalogueProducts: '++id, &name, itemName, variationName, sku, category, enabled',
+      opexEntries: '++id, month, category',
+      staffWages: '++id, &staffName',
+      refunds: '++id, &refundId, paymentId, createdAt',
+      shifts: '++id, &shiftId, teamMemberId, staffName, startAt',
     })
   }
 }

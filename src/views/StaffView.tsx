@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { useStaffWages } from '../db/useTransactions'
+import { useStaffWages, useShifts } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency, formatNumber } from '../utils/format'
 import { format } from 'date-fns'
 import { upsertStaffWage } from '../db/dbUtils'
-import type { SalesTransaction } from '../types/models'
+import type { SalesTransaction, StoredShift } from '../types/models'
 
 function estimateShiftHours(txs: SalesTransaction[]): number {
   const byDate: Record<string, number[]> = {}
@@ -24,26 +24,59 @@ function estimateShiftHours(txs: SalesTransaction[]): number {
   return total
 }
 
+// Sum real shift hours from completed shifts (those with an endAt). Open shifts
+// (no endAt) are skipped since their duration is unknown.
+function realShiftHours(shifts: StoredShift[]): number {
+  let total = 0
+  for (const s of shifts) {
+    if (!s.endAt) continue
+    const ms = s.endAt.getTime() - s.startAt.getTime()
+    if (ms > 0) total += ms / 3_600_000
+  }
+  return total
+}
+
 export default function StaffView() {
   const { transactions, staffStats } = useAnalytics()
   const [expandedStaff, setExpandedStaff] = useState<string | null>(null)
   const [editingWage, setEditingWage] = useState<string | null>(null)
   const [wageInput, setWageInput] = useState('')
   const wages = useStaffWages()
+  const shifts = useShifts()
   const wageMap = useMemo(() => new Map(wages.map(w => [w.staffName, w.hourlyWage])), [wages])
+  // Group completed shifts by resolved staff name for real-hours lookup.
+  const shiftsByStaff = useMemo(() => {
+    const map: Record<string, StoredShift[]> = {}
+    for (const s of shifts) {
+      const name = (s.staffName ?? '').trim()
+      if (!name) continue
+      if (!map[name]) map[name] = []
+      map[name].push(s)
+    }
+    return map
+  }, [shifts])
   const totalRevenue = useMemo(() => staffStats.reduce((s, x) => s + x.totalSales, 0), [staffStats])
+  // True when at least one staff member has real shift data driving their hours.
+  const hasAnyRealHours = useMemo(
+    () => staffStats.some(s => (shiftsByStaff[s.name] ?? []).some(sh => sh.endAt)),
+    [staffStats, shiftsByStaff],
+  )
 
   const roiData = useMemo(() => {
     return staffStats.map(s => {
       const staffTxs = transactions.filter(t => (t.staffName.trim() || 'Unknown') === s.name)
-      const hours = estimateShiftHours(staffTxs)
+      // Prefer real shift hours from the Labor API; fall back to the tx-based estimate.
+      const staffShifts = shiftsByStaff[s.name] ?? []
+      const real = realShiftHours(staffShifts)
+      const usingReal = real > 0
+      const hours = usingReal ? real : estimateShiftHours(staffTxs)
       const wage = wageMap.get(s.name) ?? null
       const wageCost = wage != null ? wage * hours : null
       const netROI = wageCost != null ? s.totalSales - wageCost : null
       const revenuePerHour = hours > 0 ? s.totalSales / hours : null
-      return { ...s, hours, wage, wageCost, netROI, revenuePerHour }
+      return { ...s, hours, estimatedHours: !usingReal, wage, wageCost, netROI, revenuePerHour }
     })
-  }, [staffStats, transactions, wageMap])
+  }, [staffStats, transactions, wageMap, shiftsByStaff])
 
   // Build per-staff transaction lists for the expanded view.
   const txByStaff = useMemo(() => {
@@ -150,7 +183,11 @@ export default function StaffView() {
         <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold text-slate-100">Staff ROI</h2>
-            <p className="text-xs text-slate-200 mt-0.5">Hours estimated from first → last transaction per shift. Enter wage to see net ROI.</p>
+            <p className="text-xs text-slate-200 mt-0.5">
+              {hasAnyRealHours
+                ? 'Hours from Square shift data where available; estimated from transactions otherwise. Enter wage to see net ROI.'
+                : 'Hours estimated from first → last transaction per shift. Enter wage to see net ROI.'}
+            </p>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -159,7 +196,7 @@ export default function StaffView() {
               <tr className="border-b border-slate-700/50 text-left">
                 <th className="px-5 py-3 text-xs font-semibold text-slate-200">Staff</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Revenue</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Est. Hours</th>
+                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Hours</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Rev/hr</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-center">Wage/hr</th>
                 <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Wage Cost</th>
@@ -173,7 +210,10 @@ export default function StaffView() {
                   <tr key={s.name} className="hover:bg-slate-700/20">
                     <td className="px-5 py-3 font-medium text-slate-200">{s.name}</td>
                     <td className="px-4 py-3 font-mono text-slate-100 text-right">{formatCurrency(s.totalSales)}</td>
-                    <td className="px-4 py-3 font-mono text-slate-200 text-right">{s.hours.toFixed(1)}h</td>
+                    <td className="px-4 py-3 font-mono text-slate-200 text-right">
+                      {s.hours.toFixed(1)}h
+                      {s.estimatedHours && <span className="ml-1 text-[10px] text-slate-400 font-sans">est.</span>}
+                    </td>
                     <td className="px-4 py-3 font-mono text-slate-100 text-right">
                       {s.revenuePerHour != null ? formatCurrency(s.revenuePerHour) : '—'}
                     </td>

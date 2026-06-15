@@ -296,6 +296,129 @@ export async function fetchPayments(
   return payments
 }
 
+export interface SquareRefund {
+  id: string
+  paymentId?: string
+  amountMoney: { amount: number; currency: string }
+  status: string
+  createdAt: string
+  reason?: string
+}
+
+// Refunds API: POST /v2/refunds/search filtered by location + created_at window.
+// Paginates via cursor, mirroring fetchOrders. Square-Version header is added by
+// squareRequest for all calls.
+export async function fetchRefunds(
+  accessToken: string,
+  locationId: string,
+  beginTime: string,
+  endTime: string,
+): Promise<SquareRefund[]> {
+  const refunds: SquareRefund[] = []
+  let cursor: string | undefined
+
+  do {
+    const body: Record<string, unknown> = {
+      query: {
+        filter: {
+          location_ids: [locationId],
+          created_at: { start_at: beginTime, end_at: endTime },
+        },
+      },
+      limit: 100,
+    }
+    if (cursor) body.cursor = cursor
+
+    const data = await squareRequest(accessToken, 'POST', `${BASE}/refunds/search`, body) as {
+      refunds?: Array<{
+        id: string
+        payment_id?: string
+        amount_money?: { amount: number; currency: string }
+        status?: string
+        created_at?: string
+        reason?: string
+      }>
+      cursor?: string
+    }
+    for (const r of data.refunds ?? []) {
+      refunds.push({
+        id: r.id,
+        paymentId: r.payment_id,
+        amountMoney: r.amount_money ?? { amount: 0, currency: 'USD' },
+        status: r.status ?? '',
+        createdAt: r.created_at ?? '',
+        reason: r.reason,
+      })
+    }
+    cursor = data.cursor
+  } while (cursor)
+
+  return refunds
+}
+
+export interface SquareShift {
+  id: string
+  teamMemberId?: string
+  startAt: string
+  endAt?: string
+  locationId?: string
+  wage?: { hourlyRate?: { amount: number; currency: string }; title?: string }
+}
+
+// Labor/Shifts API: POST /v2/labor/shifts/search filtered by location + start window.
+// Paginates via cursor. Returns normalized SquareShift records.
+export async function fetchShifts(
+  accessToken: string,
+  locationId: string,
+  beginTime: string,
+  endTime: string,
+): Promise<SquareShift[]> {
+  const shifts: SquareShift[] = []
+  let cursor: string | undefined
+
+  do {
+    const body: Record<string, unknown> = {
+      query: {
+        filter: {
+          location_ids: [locationId],
+          start: { start_at: beginTime, end_at: endTime },
+        },
+      },
+      limit: 200,
+    }
+    if (cursor) body.cursor = cursor
+
+    const data = await squareRequest(accessToken, 'POST', `${BASE}/labor/shifts/search`, body) as {
+      shifts?: Array<{
+        id: string
+        // Newer API uses team_member_id; older responses used employee_id
+        team_member_id?: string
+        employee_id?: string
+        start_at?: string
+        end_at?: string
+        location_id?: string
+        wage?: { hourly_rate?: { amount: number; currency: string }; title?: string }
+      }>
+      cursor?: string
+    }
+    for (const s of data.shifts ?? []) {
+      shifts.push({
+        id: s.id,
+        teamMemberId: s.team_member_id ?? s.employee_id,
+        startAt: s.start_at ?? '',
+        endAt: s.end_at,
+        locationId: s.location_id,
+        wage: s.wage
+          ? { hourlyRate: s.wage.hourly_rate, title: s.wage.title }
+          : undefined,
+      })
+    }
+    cursor = data.cursor
+  } while (cursor)
+
+  return shifts
+}
+
 export async function fetchInventory(token: string, locationID: string): Promise<SquareInventoryCount[]> {
   const counts: SquareInventoryCount[] = []
   let cursor: string | undefined

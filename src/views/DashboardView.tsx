@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, getDaysInMonth, getDay } from 'date-fns'
-import { useFilteredTransactions, useProductCostData, useAllTransactions } from '../db/useTransactions'
+import { useFilteredTransactions, useProductCostData, useAllTransactions, useRefunds } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { useGoalStore } from '../store/goalStore'
 import {
@@ -64,6 +64,21 @@ export default function DashboardView() {
 
   const allTransactions = useAllTransactions()
   const costData = useProductCostData() ?? []
+  const refunds = useRefunds()
+
+  // Total refunds (Refunds API, cents) within the active date range. When no range
+  // is set, count all stored refunds so the figure matches "all-time" revenue.
+  const totalRefunds = useMemo(() => {
+    const inRange = refunds.filter(r => {
+      const ms = r.createdAt.getTime()
+      if (range.start && ms < range.start.getTime()) return false
+      if (range.end && ms > range.end.getTime()) return false
+      return true
+    })
+    return inRange.reduce((s, r) => s + r.amount, 0) / 100
+  }, [refunds, range])
+  const hasRefunds = totalRefunds > 0
+  const netRevenue = totalRevenue - totalRefunds
 
   const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
   const uniqueProducts = stats.length
@@ -169,6 +184,7 @@ export default function DashboardView() {
           value={formatCurrency(totalRevenue)}
           trend={revTrend?.label}
           trendUp={revTrend?.up}
+          sub={hasRefunds ? `${formatCurrency(netRevenue)} net of refunds` : undefined}
         />
         <StatCard
           label="Transactions"
@@ -353,6 +369,13 @@ export default function DashboardView() {
                   {insights.topStaff.name} — {formatCurrency(insights.topStaff.totalSales)} across{' '}
                   {formatNumber(insights.topStaff.transactionCount)} transactions
                 </span>
+              </li>
+            )}
+            {hasRefunds && (
+              <li className="text-slate-100">
+                Refunds:{' '}
+                <span className="text-amber-400">- {formatCurrency(totalRefunds)}</span>
+                {' '}— net revenue {formatCurrency(netRevenue)}
               </li>
             )}
           </ul>
