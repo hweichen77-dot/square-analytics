@@ -398,7 +398,12 @@ export function buildMonthlyDetailReport(
   const sorted = Array.from(monthMap.entries()).sort(([a], [b]) => a.localeCompare(b))
 
   const rows: MonthlyDetailRow[] = sorted.map(([month, txs], idx) => {
-    const hasDetailedFinancials = txs.some(t => t.grossSales !== undefined)
+    // Only use the detailed-financials branch when EVERY row carries the fields.
+    // With `some`, one Square row (grossSales set) flipped a whole month of
+    // mixed CSV+API data into the detailed branch, where CSV rows summed 0 gross
+    // while their netSales still counted → "Gross < Net" nonsense. Mixed months
+    // now fall to the net-based branch, which handles refunds correctly.
+    const hasDetailedFinancials = txs.length > 0 && txs.every(t => t.grossSales !== undefined)
 
     let grossSales: number
     let returns: number

@@ -37,13 +37,27 @@ export const MERCH_KEYWORDS = [
   'bracelet', 'wristband', 'pin', 'button', 'magnet', 'poster', 'flag',
 ]
 
+// Whole-word match so short keywords don't match inside unrelated words
+// ("tea" ⊄ "steak", "bar" ⊄ "Barq's", "mac" ⊄ "macaron", "pin" ⊄ "spinach").
+const kwCache = new Map<string, RegExp>()
+function hasKeyword(lower: string, keywords: string[]): boolean {
+  return keywords.some(k => {
+    let re = kwCache.get(k)
+    if (!re) {
+      re = new RegExp('\\b' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')
+      kwCache.set(k, re)
+    }
+    return re.test(lower)
+  })
+}
+
 export function classifyProduct(name: string, overrides: Record<string, string> = {}): string {
   if (overrides[name]) return overrides[name]
   const lower = name.toLowerCase()
-  if (ICE_CREAM_KEYWORDS.some(k => lower.includes(k))) return 'Ice Cream'
-  if (RAMEN_KEYWORDS.some(k => lower.includes(k))) return 'Ramen/Hot Food'
-  if (DRINKS_KEYWORDS.some(k => lower.includes(k))) return 'Drinks'
-  if (FOOD_KEYWORDS.some(k => lower.includes(k))) return 'Food'
-  if (MERCH_KEYWORDS.some(k => lower.includes(k))) return 'Merch'
+  if (hasKeyword(lower, ICE_CREAM_KEYWORDS)) return 'Ice Cream'
+  if (hasKeyword(lower, RAMEN_KEYWORDS)) return 'Ramen/Hot Food'
+  if (hasKeyword(lower, DRINKS_KEYWORDS)) return 'Drinks'
+  if (hasKeyword(lower, FOOD_KEYWORDS)) return 'Food'
+  if (hasKeyword(lower, MERCH_KEYWORDS)) return 'Merch'
   return 'Other'
 }

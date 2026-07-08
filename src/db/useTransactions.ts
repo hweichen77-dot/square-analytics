@@ -8,12 +8,28 @@ export interface DateRange {
   end: Date | null
 }
 
+// Central data-integrity guard. One malformed row (invalid Date from a bad
+// import/sync, or a non-finite netSales) otherwise crashes every date-bucketing
+// analytics function ("Invalid time value") or poisons all totals with NaN.
+// Fixing it here protects all 40+ engine functions at once.
+function sanitizeTransactions(txns: SalesTransaction[]): SalesTransaction[] {
+  const out: SalesTransaction[] = []
+  for (const t of txns) {
+    const d = t.date instanceof Date ? t.date : new Date(t.date as unknown as string)
+    if (Number.isNaN(d.getTime())) continue // no valid timestamp → can't place on a timeline
+    const netSales = Number.isFinite(t.netSales) ? t.netSales : 0
+    out.push(d === t.date && netSales === t.netSales ? t : { ...t, date: d, netSales })
+  }
+  return out
+}
+
 export function useAllTransactions(): SalesTransaction[] {
-  return useLiveQuery(() => db.salesTransactions.toArray(), []) ?? []
+  const raw = useLiveQuery(() => db.salesTransactions.toArray(), []) ?? []
+  return useMemo(() => sanitizeTransactions(raw), [raw])
 }
 
 export function useFilteredTransactions(range: DateRange): SalesTransaction[] {
-  return useLiveQuery(async () => {
+  const raw = useLiveQuery(async () => {
     if (!range.start && !range.end) return db.salesTransactions.toArray()
     let coll = db.salesTransactions.orderBy('date')
     if (range.start && range.end) {
@@ -25,6 +41,7 @@ export function useFilteredTransactions(range: DateRange): SalesTransaction[] {
     }
     return coll.toArray()
   }, [range.start?.getTime(), range.end?.getTime()]) ?? []
+  return useMemo(() => sanitizeTransactions(raw), [raw])
 }
 
 export function useCategoryOverrides() {

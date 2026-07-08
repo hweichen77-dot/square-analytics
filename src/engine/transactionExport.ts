@@ -2,7 +2,12 @@ import { format } from 'date-fns'
 import type { SalesTransaction } from '../types/models'
 
 function csvCell(value: string | number): string {
-  return `"${String(value).replace(/"/g, '""')}"`
+  let s = String(value)
+  // Neutralize CSV/Excel formula injection: a cell starting with = + - @ (or a
+  // control char) is evaluated as a formula when opened in Excel/Sheets. A
+  // product/staff name like =HYPERLINK(...) would otherwise execute.
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+  return `"${s.replace(/"/g, '""')}"`
 }
 
 function totalQty(tx: SalesTransaction): number {

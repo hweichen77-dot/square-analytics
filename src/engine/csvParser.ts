@@ -28,8 +28,19 @@ function parseDateTime(value: string): Date | null {
 
 function parseCurrency(value: string): number {
   if (!value) return 0
-  const cleaned = value.replace(/[$,]/g, '').trim()
-  return parseFloat(cleaned) || 0
+  let s = String(value).trim()
+  if (!s) return 0
+  // Accounting negatives: "(45.00)" means -45.00. Without this, refund rows
+  // silently parsed to 0 and vanished from returns/net-revenue.
+  let negative = false
+  if (/^\(.*\)$/.test(s)) { negative = true; s = s.slice(1, -1) }
+  s = s.replace(/[$£€,\s]/g, '').replace(/USD|CAD|EUR|GBP/gi, '').replace(/−/g, '-')
+  const n = parseFloat(s)
+  if (!Number.isFinite(n)) {
+    if (value.trim()) console.warn(`[csvParser] unparseable money value: "${value}" → 0`)
+    return 0
+  }
+  return negative ? -Math.abs(n) : n
 }
 
 function generateFallbackID(row: Record<string, string>, index: number): string {
