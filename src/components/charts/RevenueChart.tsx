@@ -76,8 +76,8 @@ export function RevenueChart({ daily, weekly, monthly, prevDaily, prevWeekly, pr
         <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="oklch(0.73 0.22 252)" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="oklch(0.73 0.22 252)" stopOpacity={0} />
+              <stop offset="5%"  stopColor="oklch(0.80 0.13 80)" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="oklch(0.80 0.13 80)" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.23 0.006 55)" />
@@ -103,7 +103,7 @@ export function RevenueChart({ daily, weekly, monthly, prevDaily, prevWeekly, pr
               strokeOpacity={0.5}
             />
           )}
-          <Area type="monotone" dataKey="revenue" stroke="oklch(0.73 0.22 252)" fill="url(#revGradient)" strokeWidth={1.5} dot={false} />
+          <Area type="monotone" dataKey="revenue" stroke="oklch(0.80 0.13 80)" fill="url(#revGradient)" strokeWidth={1.5} dot={false} />
         </AreaChart>
       </ResponsiveContainer>
     </div>

@@ -8,7 +8,7 @@ const CAT_COLORS: Record<string, string> = {
   'Drinks':         '#F59E0B',
   'Ice Cream':      '#34D399',
   'Ramen/Hot Food': '#F87171',
-  'Merch':          '#818CF8',
+  'Merch':          '#9A3412',
   'Other':          '#57534e',
 }
 

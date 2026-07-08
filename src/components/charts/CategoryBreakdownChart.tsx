@@ -2,7 +2,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import type { CategoryRevenue } from '../../engine/analyticsEngine'
 import { formatCurrency, formatPercent } from '../../utils/format'
 
-const COLORS = ['#F59E0B', '#F59E0B', '#818CF8', '#EF4444', '#34D399', '#60A5FA', '#F472B6', '#A78BFA']
+const COLORS = ['#F59E0B', '#D97706', '#B45309', '#65A30D', '#EF4444', '#CA8A04', '#9A3412', '#A8A29E']
 
 interface CategoryBreakdownChartProps {
   data: CategoryRevenue[]
