@@ -21,6 +21,8 @@ export default function SquareSyncView() {
   const navigate = useNavigate()
   const [appIDInput, setAppIDInput] = useState(store.appID)
   const [appSecretInput, setAppSecretInput] = useState(store.appSecret)
+  const [tokenInput, setTokenInput] = useState('')
+  const [showOAuth, setShowOAuth] = useState(false)
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([])
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [syncing, setSyncing] = useState(false)
@@ -85,6 +87,29 @@ export default function SquareSyncView() {
 
   function handleCancelConnect() {
     setConnState('disconnected')
+  }
+
+  // Direct access-token connect — the reliable path for your own store. A
+  // production access token from the Square dashboard needs no OAuth redirect,
+  // no client secret, and no dashboard URL registration. We validate it by
+  // fetching locations (routed through Rust, so no browser CORS issue).
+  async function handleTokenConnect() {
+    const token = tokenInput.trim()
+    if (!token) { show('Paste your Square access token first', 'error'); return }
+    setConnState('connecting')
+    try {
+      const locs = await fetchLocations(token)
+      store.setCredentials({ accessToken: token })
+      setLocations(locs)
+      if (locs.length === 1) store.setCredentials({ locationID: locs[0].id })
+      setConnState('connected')
+      setTokenInput('')
+      show(`Connected · ${locs.length} location${locs.length === 1 ? '' : 's'} found`, 'success')
+    } catch (e) {
+      setConnState('disconnected')
+      const msg = e instanceof Error ? e.message : String(e)
+      show(`Token rejected: ${msg}. Make sure it's a production access token with read scopes.`, 'error')
+    }
   }
 
   async function handleLoadLocations() {
@@ -208,61 +233,83 @@ export default function SquareSyncView() {
         )}
       </div>
 
-      {connState !== 'connected' && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-sm text-blue-300">
-          <p className="font-semibold mb-1">Required: add this Redirect URI in Square Developer Dashboard</p>
-          {OAUTH_CALLBACK_PORTS.map(p => (
-            <p key={p} className="font-mono bg-slate-800 border border-blue-200 rounded px-2 py-1 text-xs select-all mb-1">
-              http://localhost:{p}/square/callback
+      {!isConnected && (
+        <div className="border border-slate-700/50 rounded-xl p-5 space-y-4">
+          <div>
+            <h2 className="font-semibold text-slate-100">Connect with an access token</h2>
+            <p className="text-sm text-slate-400 mt-1 leading-relaxed">
+              The reliable way to connect your own store. In Square, go to{' '}
+              <span className="text-slate-200">Developer Dashboard → your app → Credentials</span>, copy the{' '}
+              <span className="text-slate-200">Production Access Token</span>, and paste it below. No redirect setup needed.
             </p>
-          ))}
-          <p className="text-xs text-blue-300 mt-2">Go to developer.squareup.com → your app → OAuth → Redirect URLs → add all URLs above. The app tries each port until one is free.</p>
+          </div>
+          <input
+            type="password"
+            value={tokenInput}
+            onChange={e => setTokenInput(e.target.value)}
+            placeholder="EAAA… (production access token)"
+            className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-800/60 text-sm font-mono text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+            onKeyDown={e => { if (e.key === 'Enter') handleTokenConnect() }}
+          />
+          {connState === 'connecting' ? (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-slate-300">Verifying token…</span>
+              <button onClick={handleCancelConnect} className="text-xs text-slate-400 hover:text-slate-200 underline">Cancel</button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleTokenConnect}
+                className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-semibold hover:bg-teal-400"
+              >
+                Connect
+              </button>
+              <button
+                onClick={() => setShowOAuth(v => !v)}
+                className="text-xs text-slate-400 hover:text-slate-200 underline"
+              >
+                {showOAuth ? 'Hide OAuth option' : 'Use OAuth instead'}
+              </button>
+            </div>
+          )}
+
+          {showOAuth && connState !== 'connecting' && (
+            <div className="border-t border-slate-700/50 pt-4 space-y-3">
+              <p className="text-xs text-slate-400 leading-relaxed">
+                OAuth requires registering these redirect URIs in your Square app
+                (Developer Dashboard → OAuth → Redirect URLs):
+              </p>
+              <div className="space-y-1">
+                {OAUTH_CALLBACK_PORTS.map(p => (
+                  <p key={p} className="font-mono bg-slate-800 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 select-all">
+                    http://localhost:{p}/square/callback
+                  </p>
+                ))}
+              </div>
+              <input
+                type="text"
+                value={appIDInput}
+                onChange={e => setAppIDInput(e.target.value)}
+                placeholder="Application ID · sq0idp-…"
+                className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-800/60 text-sm font-mono text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              />
+              <input
+                type="password"
+                value={appSecretInput}
+                onChange={e => setAppSecretInput(e.target.value)}
+                placeholder="Application Secret · sq0csp-…"
+                className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-800/60 text-sm font-mono text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              />
+              <button
+                onClick={handleConnect}
+                className="px-4 py-2 border border-slate-600 text-slate-200 rounded-lg text-sm font-medium hover:bg-slate-800"
+              >
+                Connect via OAuth
+              </button>
+            </div>
+          )}
         </div>
       )}
-
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
-        {!isConnected && connState !== 'connecting' && (
-          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 mb-4">
-            <p className="text-xs font-semibold text-blue-400 mb-1">Setup required before connecting</p>
-            <p className="text-xs text-slate-200">In your <span className="text-blue-300">Square Developer Portal</span>, add <span className="font-mono text-teal-400">http://localhost:7329/square/callback</span> as an OAuth redirect URI. Without this, the connection will fail.</p>
-          </div>
-        )}
-        <h2 className="font-semibold text-slate-200">Square Application ID</h2>
-        <input
-          type="text"
-          value={appIDInput}
-          onChange={e => setAppIDInput(e.target.value)}
-          placeholder="sq0idp-…"
-          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-        />
-        <label className="block text-sm font-medium text-slate-100 mt-3 mb-1">Application Secret</label>
-        <input
-          type="password"
-          value={appSecretInput}
-          onChange={e => setAppSecretInput(e.target.value)}
-          placeholder="sq0csp-…"
-          className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/30"
-        />
-        {!isConnected && connState !== 'connecting' && (
-          <button
-            onClick={handleConnect}
-            className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-medium hover:bg-teal-600"
-          >
-            Connect Square Account
-          </button>
-        )}
-        {connState === 'connecting' && (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-amber-400 font-medium">Waiting for Square authorisation…</span>
-            <button
-              onClick={handleCancelConnect}
-              className="px-3 py-1.5 text-sm border border-slate-600 rounded-lg text-slate-200 hover:bg-slate-700/50"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
 
       {isConnected && (
         <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-3">
