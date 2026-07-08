@@ -135,8 +135,8 @@ export default function CatalogueCheckerView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-stone-100">Catalogue Checker</h1>
-          <p className="text-sm text-stone-200 mt-0.5">
+          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Catalogue Checker</h1>
+          <p className="text-sm text-stone-400 mt-0.5">
             Audits {catalogue.length} variations across your catalogue for errors and data quality issues.
           </p>
         </div>
@@ -160,21 +160,21 @@ export default function CatalogueCheckerView() {
           <button
             key={sev}
             onClick={() => handleFilterClick(sev)}
-            className={`rounded-xl border p-4 text-left transition-all cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
+            className={`border p-4 text-left transition-all cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
           >
             <p className={`text-3xl font-bold tabular-nums ${color}`}>{count}</p>
-            <p className="text-xs text-stone-200 mt-1 font-medium">{label}</p>
+            <p className="text-xs text-stone-400 mt-1 font-medium">{label}</p>
           </button>
         ))}
       </div>
 
-      <div className="bg-stone-800/60 border border-stone-700 rounded-xl px-4 py-3 text-sm text-stone-200 flex items-center gap-2">
+      <div className="bg-stone-800/60 border border-stone-700 px-4 py-3 text-sm text-stone-400 flex items-center gap-2">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" className="shrink-0">
           <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
         </svg>
         <span>
-          <span className="text-stone-200 font-medium">Tax rules: </span>
-          <span className="text-amber-400">Merch items must be taxable.</span> Food and beverage items (ramen, drinks, snacks) are non-taxable. Items with incorrect tax status will be flagged.
+          <span className="text-stone-300 font-medium">Tax rules: </span>
+          <span className="text-amber-400">Merch, ramen, and carbonated drinks are taxable.</span> All other food and beverages (water, juice, tea, snacks, ice cream) are non-taxable. Items with incorrect tax status will be flagged.
         </span>
       </div>
 
@@ -185,8 +185,8 @@ export default function CatalogueCheckerView() {
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
-          <p className="font-semibold text-stone-200 text-lg">Catalogue looks clean!</p>
-          <p className="text-sm text-stone-200 mt-1">No errors, warnings, or issues found.</p>
+          <p className="font-semibold text-stone-100 text-lg">Catalogue looks clean!</p>
+          <p className="text-sm text-stone-400 mt-1">No errors, warnings, or issues found.</p>
         </div>
       )}
 
@@ -194,7 +194,7 @@ export default function CatalogueCheckerView() {
         <div className="space-y-2">
           {filter !== 'all' && (
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-stone-200">Showing {filter}s only · {visibleIssues.length} issues across {itemGroups.length} items</p>
+              <p className="text-xs text-stone-400">Showing {filter}s only · {visibleIssues.length} issues across {itemGroups.length} items</p>
               <button onClick={() => setFilter('all')} className="text-xs text-amber-400 hover:underline cursor-pointer">Show all</button>
             </div>
           )}
@@ -245,12 +245,12 @@ export default function CatalogueCheckerView() {
                                 {issue.issue}
                               </span>
                               {/\(.+\)$/.test(issue.productName) && (
-                                <span className="text-[11px] text-stone-200">
+                                <span className="text-[11px] text-stone-400">
                                   {splitItemVariation(issue.productName).variationName} variation
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-stone-200 mt-1 leading-relaxed">{issue.detail}</p>
+                            <p className="text-xs text-stone-400 mt-1 leading-relaxed">{issue.detail}</p>
                           </div>
                           <div className="shrink-0 pt-0.5">
                             {canFix ? (
@@ -261,7 +261,7 @@ export default function CatalogueCheckerView() {
                                 Auto-fix
                               </button>
                             ) : (
-                              <span className="text-[10px] text-stone-200 px-2">Manual</span>
+                              <span className="text-[10px] text-stone-400 px-2">Manual</span>
                             )}
                           </div>
                         </div>
@@ -276,7 +276,7 @@ export default function CatalogueCheckerView() {
       )}
 
       {visibleIssues.length === 0 && issues.length > 0 && (
-        <div className="text-center py-10 text-stone-200 text-sm">
+        <div className="text-center py-10 text-stone-400 text-sm">
           No {filter}s found.{' '}
           <button onClick={() => setFilter('all')} className="text-amber-400 hover:underline cursor-pointer">Show all issues</button>
         </div>

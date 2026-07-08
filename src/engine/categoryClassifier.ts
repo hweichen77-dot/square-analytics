@@ -37,8 +37,6 @@ export const MERCH_KEYWORDS = [
   'bracelet', 'wristband', 'pin', 'button', 'magnet', 'poster', 'flag',
 ]
 
-// Whole-word match so short keywords don't match inside unrelated words
-// ("tea" ⊄ "steak", "bar" ⊄ "Barq's", "mac" ⊄ "macaron", "pin" ⊄ "spinach").
 const kwCache = new Map<string, RegExp>()
 function hasKeyword(lower: string, keywords: string[]): boolean {
   return keywords.some(k => {

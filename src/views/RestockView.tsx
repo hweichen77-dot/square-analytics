@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useRestockLogs, useCatalogueProducts, useAllTransactions } from '../db/useTransactions'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
+import { StatCard } from '../components/ui/StatCard'
 import { db } from '../db/database'
 import type { SalesTransaction, RestockLog, CatalogueProduct } from '../types/models'
 import { startOfDay } from 'date-fns'
@@ -158,9 +159,9 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold text-stone-100">Log Restock</h2>
-            <p className="text-sm text-stone-200">{productName}</p>
+            <p className="text-sm text-stone-400">{productName}</p>
           </div>
-          <button onClick={onClose} className="text-stone-200 hover:text-stone-200 text-xl leading-none">×</button>
+          <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl leading-none">×</button>
         </div>
 
         <div className="space-y-4">
@@ -185,7 +186,7 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-stone-200 hover:text-stone-200">Cancel</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm text-stone-400 hover:text-stone-100">Cancel</button>
           <button onClick={save} className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600">
             Save Restock
           </button>
@@ -220,20 +221,33 @@ export default function RestockView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Restock Alerts & Forecasting</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Restock Alerts & Forecasting</h1>
 
-      <div className="grid grid-cols-4 gap-4">
-        {[
-          { label: 'Total Products', value: alerts.length, color: 'text-stone-100' },
-          { label: 'Out of Stock', value: outOfStockCount, color: outOfStockCount > 0 ? 'text-red-400' : 'text-stone-200' },
-          { label: 'Critical (≤5 days)', value: criticalCount, color: criticalCount > 0 ? 'text-red-400' : 'text-stone-200' },
-          { label: 'Low (6–10 days)', value: lowCount, color: lowCount > 0 ? 'text-amber-400' : 'text-stone-200' },
-        ].map(c => (
-          <div key={c.label} className="bg-stone-800/30 border border-stone-700/40 p-4">
-            <p className="text-xs text-stone-200">{c.label}</p>
-            <p className={`text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-4 gap-4 cf-stagger">
+        <StatCard
+          label="Total Products"
+          value={String(alerts.length)}
+          countTo={alerts.length}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Out of Stock"
+          value={String(outOfStockCount)}
+          countTo={outOfStockCount}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Critical (≤5 days)"
+          value={String(criticalCount)}
+          countTo={criticalCount}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Low (6–10 days)"
+          value={String(lowCount)}
+          countTo={lowCount}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
       </div>
 
       {suggestedList.length > 0 && (
@@ -249,7 +263,7 @@ export default function RestockView() {
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-stone-100 text-sm">{alert.productName}</p>
-                  <p className="text-xs text-stone-200">{alert.category}</p>
+                  <p className="text-xs text-stone-400">{alert.category}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="font-semibold text-sm text-stone-100">
@@ -260,7 +274,7 @@ export default function RestockView() {
                       {alert.stockRemaining <= 0 ? 'OUT OF STOCK' : `${alert.stockRemaining} remaining`}
                     </p>
                   ) : (
-                    <p className="text-xs text-stone-200">No stock data</p>
+                    <p className="text-xs text-stone-400">No stock data</p>
                   )}
                 </div>
                 <button
@@ -280,14 +294,14 @@ export default function RestockView() {
           <h2 className="text-base font-semibold text-stone-100">All Products — Stock Status</h2>
         </div>
         {alerts.length === 0 ? (
-          <div className="p-8 text-center text-sm text-stone-200">Import CSV sales data to see restock alerts.</div>
+          <div className="p-8 text-center text-sm text-stone-400">Import CSV sales data to see restock alerts.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-stone-900 border-b border-stone-700/50 text-left">
                   {['Product', 'Category', 'Weekly Vel.', 'Est. Stock', 'Days Left', 'Proj. Stockout', 'Last Restocked', 'Status', 'Action'].map(h => (
-                    <th key={h} className="px-4 py-2.5 font-semibold text-stone-200">{h}</th>
+                    <th key={h} className="px-4 py-2.5 font-semibold text-stone-400">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -297,7 +311,7 @@ export default function RestockView() {
                     <td className="px-4 py-2.5">
                       <div className="font-medium text-stone-100">{alert.productName}</div>
                     </td>
-                    <td className="px-4 py-2.5 text-stone-200">{alert.category}</td>
+                    <td className="px-4 py-2.5 text-stone-400">{alert.category}</td>
                     <td className="px-4 py-2.5 font-mono text-stone-100">{alert.weeklyVelocity.toFixed(1)}/wk</td>
                     <td className="px-4 py-2.5 font-mono font-semibold" style={{ color: urgencyColor(alert.urgency) }}>
                       {alert.stockRemaining !== null
@@ -309,10 +323,10 @@ export default function RestockView() {
                         : alert.daysUntilStockout !== null ? Math.round(alert.daysUntilStockout)
                         : '—'}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-stone-200">
+                    <td className="px-4 py-2.5 font-mono text-stone-400">
                       {alert.projectedStockoutDate ? format(alert.projectedStockoutDate, 'MMM d') : '—'}
                     </td>
-                    <td className="px-4 py-2.5 text-stone-200">
+                    <td className="px-4 py-2.5 text-stone-400">
                       {alert.lastRestockedDate ? format(alert.lastRestockedDate, 'M/d/yy') : 'Never'}
                     </td>
                     <td className="px-4 py-2.5">

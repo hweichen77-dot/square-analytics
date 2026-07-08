@@ -6,7 +6,10 @@ import {
 import { useFilteredTransactions } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { EmptyState } from '../components/ui/EmptyState'
+import { StatCard } from '../components/ui/StatCard'
 import { formatCurrency } from '../utils/format'
+import { chart } from '../lib/chartTheme'
+const TT = { contentStyle: { background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }, labelStyle: { color: chart.tooltipText }, itemStyle: { color: chart.tooltipText } }
 import type { SalesTransaction } from '../types/models'
 import { parseProductItems } from '../types/models'
 import { format, startOfDay, differenceInDays, differenceInMonths } from 'date-fns'
@@ -197,11 +200,11 @@ export default function CustomerView() {
   if (identifiedCount === 0) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-bold text-stone-100">Customer Frequency</h1>
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Customer Frequency</h1>
         <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center">
           <p className="text-4xl mb-3">🙅</p>
           <h2 className="text-lg font-semibold text-stone-100 mb-2">No Customer IDs Found</h2>
-          <p className="text-sm text-stone-200 max-w-md mx-auto">
+          <p className="text-sm text-stone-300 max-w-md mx-auto">
             Customer IDs are found in Square CSV exports when customers have accounts.
             Cash and guest transactions won't have IDs.
           </p>
@@ -212,30 +215,33 @@ export default function CustomerView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Customer Frequency</h1>
-      <p className="text-sm text-stone-200 -mt-4">{identifiedPct}% of transactions have customer data</p>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Customer Frequency</h1>
+      <p className="text-sm text-stone-400 -mt-4">{identifiedPct}% of transactions have customer data</p>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Identified Customers</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{profiles.length}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Repeat Customers</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">
-            {repeatCustomers} ({profiles.length ? Math.round(repeatCustomers / profiles.length * 100) : 0}%)
-          </p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Avg Lifetime Value</p>
-          <p className="text-xl font-bold text-stone-100 mt-1 font-mono">{formatCurrency(avgCLV)}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Avg Transactions</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">
-            {profiles.length ? (profiles.reduce((s, p) => s + p.transactionCount, 0) / profiles.length).toFixed(1) : '—'}
-          </p>
-        </div>
+      <div className="grid grid-cols-4 gap-4 cf-stagger">
+        <StatCard
+          label="Identified Customers"
+          value={String(profiles.length)}
+          countTo={profiles.length}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Repeat Customers"
+          value={String(repeatCustomers)}
+          countTo={repeatCustomers}
+          format={(n) => Math.round(n).toLocaleString()}
+          sub={`${profiles.length ? Math.round(repeatCustomers / profiles.length * 100) : 0}% of customers`}
+        />
+        <StatCard
+          label="Avg Lifetime Value"
+          value={formatCurrency(avgCLV)}
+          countTo={avgCLV}
+          format={(n) => formatCurrency(n)}
+        />
+        <StatCard
+          label="Avg Transactions"
+          value={profiles.length ? (profiles.reduce((s, p) => s + p.transactionCount, 0) / profiles.length).toFixed(1) : '—'}
+        />
       </div>
 
       {pareto && (
@@ -250,7 +256,7 @@ export default function CustomerView() {
           </div>
           <div className="text-right shrink-0">
             <p className="text-2xl font-mono font-bold text-amber-400">{pareto.pct.toFixed(0)}%</p>
-            <p className="text-[10px] text-stone-200">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
+            <p className="text-[10px] text-stone-500">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
           </div>
         </div>
       )}
@@ -265,15 +271,15 @@ export default function CustomerView() {
               <button
                 key={seg}
                 onClick={() => setSelectedSegment(isSelected ? null : seg)}
-                className={`text-left p-3 rounded-xl border-2 transition-colors ${isSelected ? 'border-current' : 'border-stone-700/50 hover:border-stone-700'}`}
+                className={`text-left p-3 border-2 transition-colors ${isSelected ? 'border-current' : 'border-stone-700/50 hover:border-stone-700'}`}
                 style={{ borderColor: isSelected ? SEGMENT_COLOR[seg] : undefined, backgroundColor: isSelected ? SEGMENT_COLOR[seg] + '18' : undefined }}
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: SEGMENT_COLOR[seg] }} />
-                  <span className="text-xs text-stone-200">{seg}</span>
+                  <span className="text-xs text-stone-400">{seg}</span>
                 </div>
                 <p className="text-xl font-bold text-stone-100">{count}</p>
-                <p className="text-xs text-stone-200">{pct}% · {formatCurrency(rev)}</p>
+                <p className="text-xs text-stone-400">{pct}% · {formatCurrency(rev)}</p>
               </button>
             )
           })}
@@ -284,7 +290,7 @@ export default function CustomerView() {
               <Pie data={segmentData.filter(s => s.rev > 0)} dataKey="rev" nameKey="seg" cx="50%" cy="50%" outerRadius={55} innerRadius={30}>
                 {segmentData.map((s, i) => <Cell key={i} fill={SEGMENT_COLOR[s.seg]} />)}
               </Pie>
-              <Tooltip formatter={(v: number) => formatCurrency(v)} />
+              <Tooltip {...TT} formatter={(v: number) => formatCurrency(v)} />
             </PieChart>
           </ResponsiveContainer>
         )}
@@ -293,16 +299,16 @@ export default function CustomerView() {
       {retention.length > 0 && (
         <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <h2 className="text-base font-semibold text-stone-100 mb-1">Retention Curve</h2>
-          <p className="text-xs text-stone-200 mb-4">
+          <p className="text-xs text-stone-400 mb-4">
             Of customers who first purchased in a given month, what % returned the next month.
           </p>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={retention} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="month" label={{ value: 'Months After First Purchase', position: 'insideBottom', offset: -4, fontSize: 11 }} />
-              <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} />
-              <Line type="linear" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} />
+              <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} tick={{ fontSize: 11, fill: chart.axis }} />
+              <Tooltip {...TT} formatter={(v: number) => `${v.toFixed(1)}%`} />
+              <Line type="linear" dataKey="rate" stroke={chart.line} strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -335,7 +341,7 @@ export default function CustomerView() {
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
                 {['Name', 'Segment', 'Transactions', 'Total Spent', 'Avg Tx', 'Annual LTV', 'First', 'Last', 'Days Since', 'Fav Product'].map(h => (
-                  <th key={h} className="px-4 py-2.5 font-semibold text-stone-200 text-left">{h}</th>
+                  <th key={h} className="px-4 py-2.5 font-semibold text-stone-400 text-left">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -365,12 +371,12 @@ export default function CustomerView() {
                       return formatCurrency((p.totalSpent / months) * 12)
                     })()}
                   </td>
-                  <td className="px-4 py-2 font-mono text-stone-200">{format(p.firstPurchase, 'M/d/yy')}</td>
-                  <td className="px-4 py-2 font-mono text-stone-200">{format(p.lastPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 font-mono text-stone-400">{format(p.firstPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 font-mono text-stone-400">{format(p.lastPurchase, 'M/d/yy')}</td>
                   <td className="px-4 py-2 font-mono" style={{ color: p.daysSinceLastVisit > 60 ? '#dc2626' : p.daysSinceLastVisit > 30 ? '#f59e0b' : '#374151' }}>
                     {p.daysSinceLastVisit}
                   </td>
-                  <td className="px-4 py-2 text-stone-200 truncate max-w-32">{p.favoriteProduct}</td>
+                  <td className="px-4 py-2 text-stone-400 truncate max-w-32">{p.favoriteProduct}</td>
                 </tr>
               ))}
             </tbody>
@@ -388,7 +394,7 @@ export default function CustomerView() {
                 {selectedCustomer.segment}
               </span>
             </div>
-            <button onClick={() => setSelectedCustomer(null)} className="text-stone-200 hover:text-stone-200 text-lg">×</button>
+            <button onClick={() => setSelectedCustomer(null)} className="text-stone-400 hover:text-stone-100 text-lg">×</button>
           </div>
           <div className="grid grid-cols-4 gap-4 mb-5">
             {[
@@ -398,7 +404,7 @@ export default function CustomerView() {
               { label: 'Favorite Product', value: selectedCustomer.favoriteProduct },
             ].map(c => (
               <div key={c.label}>
-                <p className="text-xs text-stone-200">{c.label}</p>
+                <p className="text-xs text-stone-400">{c.label}</p>
                 <p className="font-semibold text-sm text-stone-100 mt-0.5">{c.value}</p>
               </div>
             ))}
@@ -408,11 +414,11 @@ export default function CustomerView() {
               <p className="text-sm font-medium text-stone-100 mb-2">Spending Over Time</p>
               <ResponsiveContainer width="100%" height={120}>
                 <BarChart data={selectedCustomer.monthlySpending} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" tick={{ fontSize: 10 }} />
-                  <YAxis tickFormatter={v => `$${v}`} tick={{ fontSize: 10 }} />
-                  <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  <Bar dataKey="amount" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: chart.axis }} />
+                  <YAxis tickFormatter={v => `$${v}`} tick={{ fontSize: 10, fill: chart.axis }} />
+                  <Tooltip {...TT} formatter={(v: number) => formatCurrency(v)} />
+                  <Bar dataKey="amount" fill={chart.bar} radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </>

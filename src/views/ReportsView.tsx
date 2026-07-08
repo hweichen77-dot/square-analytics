@@ -28,11 +28,15 @@ import type { TimeGranularity } from '../engine/analyticsEngine'
 import { exportToPDF, exportToCSV } from '../engine/pdfExport'
 import { exportTransactionsToCSV } from '../engine/transactionExport'
 import { useNavigate } from 'react-router-dom'
+import { chart } from '../lib/chartTheme'
 
-
-const PIE_COLORS = ['#F59E0B', '#f59e0b', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#f59e0b', '#84cc16']
+const PIE_COLORS = chart.categorical
+const TT = {
+  contentStyle: { background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 },
+  labelStyle: { color: chart.tooltipText },
+  itemStyle: { color: chart.tooltipText },
+}
 const REPORT_TYPES: ReportType[] = ['revenue', 'top-products', 'customer-behavior', 'transaction-log', 'seasonal', 'monthly-detail', 'cash']
-
 
 function ExportBar({ onPDF, onCSV, loading }: { onPDF: () => void; onCSV: () => void; loading: boolean }) {
   return (
@@ -57,7 +61,6 @@ function ExportBar({ onPDF, onCSV, loading }: { onPDF: () => void; onCSV: () => 
   )
 }
 
-
 function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'revenue' }> }) {
   const chartData = report.timeSeries.map(d => ({
     date: format(d.date, report.granularity === 'Monthly' ? 'MMM yy' : report.granularity === 'Weekly' ? 'MMM d' : 'M/d'),
@@ -67,10 +70,10 @@ function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'rev
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Revenue"    value={formatCurrency(report.totalRevenue)} />
-        <StatCard label="Transactions"     value={formatNumber(report.transactions)} />
-        <StatCard label="Avg Transaction"  value={formatCurrency(report.avgTransaction)} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">
+        <StatCard label="Total Revenue"    value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} />
+        <StatCard label="Transactions"     value={formatNumber(report.transactions)} countTo={report.transactions} format={(n)=>Math.round(n).toLocaleString()} />
+        <StatCard label="Avg Transaction"  value={formatCurrency(report.avgTransaction)} countTo={report.avgTransaction} format={(n)=>formatCurrency(n)} />
         <StatCard label="Best Period"      value={report.topPeriod ? formatCurrency(report.topPeriod.revenue) : '—'} sub={report.topPeriod?.label} />
       </div>
 
@@ -80,15 +83,15 @@ function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'rev
           <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="rptRevGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%"  stopColor="#F59E0B" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                <stop offset="5%"  stopColor={chart.bar} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={chart.bar} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
-            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
-            <Area type="monotone" dataKey="revenue" stroke="#F59E0B" fill="url(#rptRevGrad)" strokeWidth={2} dot={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: chart.axis }} interval="preserveStartEnd" />
+            <YAxis tick={{ fontSize: 11, fill: chart.axis }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
+            <Tooltip {...TT} formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
+            <Area type="monotone" dataKey="revenue" stroke={chart.line} fill="url(#rptRevGrad)" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -101,10 +104,10 @@ function RevenueReportView({ report }: { report: Extract<AnyReport, { type: 'rev
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-stone-200">Period</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Revenue</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Transactions</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Avg Transaction</th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-stone-400">Period</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Revenue</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Transactions</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Avg Transaction</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -135,10 +138,10 @@ function TopProductsReportView({ report }: { report: Extract<AnyReport, { type: 
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Total Revenue"    value={formatCurrency(report.totalRevenue)} />
-        <StatCard label="Total Units Sold" value={formatNumber(report.totalUnits)} />
-        <StatCard label="Unique Products"  value={formatNumber(report.byRevenue.length)} />
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard label="Total Revenue"    value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} />
+        <StatCard label="Total Units Sold" value={formatNumber(report.totalUnits)} countTo={report.totalUnits} format={(n)=>Math.round(n).toLocaleString()} />
+        <StatCard label="Unique Products"  value={formatNumber(report.byRevenue.length)} countTo={report.byRevenue.length} format={(n)=>Math.round(n).toLocaleString()} />
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-4">
@@ -156,12 +159,12 @@ function TopProductsReportView({ report }: { report: Extract<AnyReport, { type: 
         <ResponsiveContainer width="100%" height={chartData.length * 30 + 20}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 80, left: 8, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-            <XAxis type="number" tick={{ fontSize: 10 }}
+            <XAxis type="number" tick={{ fontSize: 10, fill: chart.axis }}
               tickFormatter={v => tab === 'revenue' ? `$${(v / 1000).toFixed(0)}k` : String(v)} />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={140} />
-            <Tooltip formatter={(v: number) => tab === 'revenue' ? formatCurrency(v) : formatNumber(v)} />
-            <Bar dataKey="value" fill="#F59E0B" radius={[0, 3, 3, 0]}
-              label={{ position: 'right', fontSize: 9, fill: '#64748B',
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: chart.axis }} width={140} />
+            <Tooltip {...TT} formatter={(v: number) => tab === 'revenue' ? formatCurrency(v) : formatNumber(v)} />
+            <Bar dataKey="value" fill={chart.bar} radius={[0, 3, 3, 0]}
+              label={{ position: 'right', fontSize: 9, fill: chart.axis,
                 formatter: (v: number) => tab === 'revenue' ? formatCurrency(v) : formatNumber(v) }} />
           </BarChart>
         </ResponsiveContainer>
@@ -183,12 +186,12 @@ function TopProductsReportView({ report }: { report: Extract<AnyReport, { type: 
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-3 py-2 text-center text-xs font-semibold text-stone-200">#</th>
-                <th className="px-3 py-2 text-left   text-xs font-semibold text-stone-200">Product</th>
-                <th className="px-3 py-2 text-left   text-xs font-semibold text-stone-200">Category</th>
-                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-200">Revenue</th>
-                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-200">Units</th>
-                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-200">Avg Price</th>
+                <th className="px-3 py-2 text-center text-xs font-semibold text-stone-400">#</th>
+                <th className="px-3 py-2 text-left   text-xs font-semibold text-stone-400">Product</th>
+                <th className="px-3 py-2 text-left   text-xs font-semibold text-stone-400">Category</th>
+                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-400">Revenue</th>
+                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-400">Units</th>
+                <th className="px-3 py-2 text-right  text-xs font-semibold text-stone-400">Avg Price</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -215,10 +218,10 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Total Transactions" value={formatNumber(report.totalTransactions)} />
-        <StatCard label="Total Revenue"      value={formatCurrency(report.totalRevenue)} />
-        <StatCard label="Avg Transaction"    value={formatCurrency(report.avgTransactionValue)} />
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard label="Total Transactions" value={formatNumber(report.totalTransactions)} countTo={report.totalTransactions} format={(n)=>Math.round(n).toLocaleString()} />
+        <StatCard label="Total Revenue"      value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} />
+        <StatCard label="Avg Transaction"    value={formatCurrency(report.avgTransactionValue)} countTo={report.avgTransactionValue} format={(n)=>formatCurrency(n)} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -230,7 +233,7 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
                 <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={48} outerRadius={78}>
                   {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => [formatNumber(v), 'Transactions']} />
+                <Tooltip {...TT} formatter={(v: number) => [formatNumber(v), 'Transactions']} />
               </PieChart>
             </ResponsiveContainer>
             <div className="flex-1 space-y-2 min-w-0">
@@ -249,11 +252,11 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
           <h3 className="font-semibold text-stone-200 mb-4">Busiest Days</h3>
           <ResponsiveContainer width="100%" height={170}>
             <BarChart data={report.peakDays} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} width={36} />
-              <Tooltip formatter={(v: number) => [formatNumber(v), 'Transactions']} />
-              <Bar dataKey="count" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: chart.axis }} />
+              <YAxis tick={{ fontSize: 11, fill: chart.axis }} width={36} />
+              <Tooltip {...TT} formatter={(v: number) => [formatNumber(v), 'Transactions']} />
+              <Bar dataKey="count" fill={chart.bar} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -263,11 +266,11 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
         <h3 className="font-semibold text-stone-200 mb-4">Transactions by Hour</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={report.peakHours} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-            <XAxis dataKey="label" tick={{ fontSize: 9 }} interval={1} />
-            <YAxis tick={{ fontSize: 11 }} width={36} />
-            <Tooltip formatter={(v: number) => [formatNumber(v), 'Transactions']} />
-            <Bar dataKey="count" fill="#f59e0b" radius={[2, 2, 0, 0]} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="label" tick={{ fontSize: 9, fill: chart.axis }} interval={1} />
+            <YAxis tick={{ fontSize: 11, fill: chart.axis }} width={36} />
+            <Tooltip {...TT} formatter={(v: number) => [formatNumber(v), 'Transactions']} />
+            <Bar dataKey="count" fill={chart.bar} radius={[2, 2, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -279,11 +282,11 @@ function CustomerBehaviorReportView({ report }: { report: Extract<AnyReport, { t
         <table className="w-full text-sm">
           <thead className="bg-stone-900 border-b border-stone-700/50">
             <tr>
-              <th className="px-4 py-2 text-left   text-xs font-semibold text-stone-200">Method</th>
-              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Transactions</th>
-              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Share</th>
-              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Revenue</th>
-              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Avg Transaction</th>
+              <th className="px-4 py-2 text-left   text-xs font-semibold text-stone-400">Method</th>
+              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Transactions</th>
+              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Share</th>
+              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Revenue</th>
+              <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Avg Transaction</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-700/40">
@@ -328,10 +331,10 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Transactions"    value={formatNumber(report.count)} sub={filtered.length !== report.count ? `${formatNumber(filtered.length)} shown` : undefined} />
-        <StatCard label="Total Revenue"   value={formatCurrency(report.totalRevenue)} />
-        <StatCard label="Avg Transaction" value={formatCurrency(report.count > 0 ? report.totalRevenue / report.count : 0)} />
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard label="Transactions"    value={formatNumber(report.count)} countTo={report.count} format={(n)=>Math.round(n).toLocaleString()} sub={filtered.length !== report.count ? `${formatNumber(filtered.length)} shown` : undefined} />
+        <StatCard label="Total Revenue"   value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} />
+        <StatCard label="Avg Transaction" value={formatCurrency(report.count > 0 ? report.totalRevenue / report.count : 0)} countTo={report.count > 0 ? report.totalRevenue / report.count : 0} format={(n)=>formatCurrency(n)} />
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -349,7 +352,7 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
           onChange={e => setMinAmount(e.target.value)}
           className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
         />
-        <span className="self-center text-sm text-stone-200 ml-auto">{formatNumber(filtered.length)} transactions</span>
+        <span className="self-center text-sm text-stone-400 ml-auto">{formatNumber(filtered.length)} transactions</span>
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
@@ -357,11 +360,11 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-200">Date & Time</th>
-                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-200">Items</th>
-                <th className="px-4 py-2.5 text-right  text-xs font-semibold text-stone-200">Amount</th>
-                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-200">Payment</th>
-                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-200">Staff</th>
+                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-400">Date & Time</th>
+                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-400">Items</th>
+                <th className="px-4 py-2.5 text-right  text-xs font-semibold text-stone-400">Amount</th>
+                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-400">Payment</th>
+                <th className="px-4 py-2.5 text-left   text-xs font-semibold text-stone-400">Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -377,7 +380,7 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
             </tbody>
           </table>
           {filtered.length > 500 && (
-            <p className="text-center text-xs text-stone-200 py-3">
+            <p className="text-center text-xs text-stone-400 py-3">
               Showing first 500 of {formatNumber(filtered.length)} — export CSV for full list
             </p>
           )}
@@ -405,11 +408,11 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Revenue" value={formatCurrency(report.totalRevenue)} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">
+        <StatCard label="Total Revenue" value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} />
         <StatCard label="Best Season"   value={report.bestSeason ?? '—'} sub={report.seasons.find(s => s.name === report.bestSeason) ? formatCurrency(report.seasons.find(s => s.name === report.bestSeason)!.revenue) : undefined} />
         <StatCard label="Best Month"    value={report.bestMonth ? formatCurrency(report.bestMonth.revenue) : '—'} sub={report.bestMonth?.month} />
-        <StatCard label="Monthly Avg"   value={formatCurrency(avgMonthly)} />
+        <StatCard label="Monthly Avg"   value={formatCurrency(avgMonthly)} countTo={avgMonthly} format={(n)=>formatCurrency(n)} />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -419,7 +422,7 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
             <button
               key={s.name}
               onClick={() => setActiveSeason(isActive ? null : s.name)}
-              className={`text-left p-4 rounded-xl border transition-all ${isActive ? 'ring-2 ring-offset-stone-900 ring-offset-1' : 'hover:bg-stone-700/50'}`}
+              className={`text-left p-4 border transition-all ${isActive ? 'ring-2 ring-offset-stone-900 ring-offset-1' : 'hover:bg-stone-700/50'}`}
               style={{ borderColor: SEASON_COLORS[s.name], background: isActive ? `${SEASON_COLORS[s.name]}10` : undefined, ['--tw-ring-color' as any]: SEASON_COLORS[s.name] }}
             >
               <div className="w-8 h-8 rounded-lg bg-stone-700 flex items-center justify-center text-xs font-bold text-stone-100 mb-2">
@@ -427,8 +430,8 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
               </div>
               <p className="font-semibold text-stone-200 text-sm">{s.name}</p>
               <p className="font-mono text-stone-100 mt-1">{formatCurrency(s.revenue)}</p>
-              <p className="text-xs text-stone-200 mt-0.5">{s.revenueShare.toFixed(1)}% of total · {formatNumber(s.transactions)} txns</p>
-              {s.topProducts[0] && <p className="text-xs text-stone-200 mt-1 truncate">Top: {s.topProducts[0].name}</p>}
+              <p className="text-xs text-stone-400 mt-0.5">{s.revenueShare.toFixed(1)}% of total · {formatNumber(s.transactions)} txns</p>
+              {s.topProducts[0] && <p className="text-xs text-stone-400 mt-1 truncate">Top: {s.topProducts[0].name}</p>}
             </button>
           )
         })}
@@ -439,17 +442,17 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
           <div className="px-4 py-3 border-b border-stone-700/50 flex items-center gap-2">
             <span className="text-xs font-bold text-stone-200 bg-stone-700 px-2 py-1 rounded">{selectedSeason.name.slice(0,2).toUpperCase()}</span>
             <h3 className="font-semibold text-stone-200">{selectedSeason.name} — Top Products</h3>
-            <span className="text-xs text-stone-200 ml-auto">{selectedSeason.months.join(', ')}</span>
+            <span className="text-xs text-stone-400 ml-auto">{selectedSeason.months.join(', ')}</span>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-stone-700/50">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-stone-900 border-b border-stone-700/50">
                   <tr>
-                    <th className="px-4 py-2 text-center text-xs font-semibold text-stone-200">#</th>
-                    <th className="px-4 py-2 text-left   text-xs font-semibold text-stone-200">Product</th>
-                    <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Revenue</th>
-                    <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-200">Units</th>
+                    <th className="px-4 py-2 text-center text-xs font-semibold text-stone-400">#</th>
+                    <th className="px-4 py-2 text-left   text-xs font-semibold text-stone-400">Product</th>
+                    <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Revenue</th>
+                    <th className="px-4 py-2 text-right  text-xs font-semibold text-stone-400">Units</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-700/40">
@@ -465,13 +468,13 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
               </table>
             </div>
             <div className="p-4">
-              <p className="text-xs font-semibold text-stone-200 uppercase mb-3">Monthly Breakdown</p>
+              <p className="text-xs font-semibold text-stone-400 uppercase mb-3">Monthly Breakdown</p>
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={selectedSeason.monthBreakdown} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-                  <XAxis dataKey="label" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={44} />
-                  <Tooltip formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+                  <XAxis dataKey="label" tick={{ fontSize: 10, fill: chart.axis }} />
+                  <YAxis tick={{ fontSize: 10, fill: chart.axis }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={44} />
+                  <Tooltip {...TT} formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
                   <Bar dataKey="revenue" fill={SEASON_COLORS[selectedSeason.name]} radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -484,11 +487,11 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
         <h3 className="font-semibold text-stone-200 mb-4">Monthly Revenue</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
-            <Tooltip formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
-            <Bar dataKey="revenue" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: chart.axis }} />
+            <YAxis tick={{ fontSize: 11, fill: chart.axis }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
+            <Tooltip {...TT} formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
+            <Bar dataKey="revenue" fill={chart.bar} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -501,11 +504,11 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
           <table className="w-full text-sm">
             <thead className="bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-200">Month</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Revenue</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Transactions</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Avg Transaction</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">vs Avg</th>
+                <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-400">Month</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Revenue</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Transactions</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Avg Transaction</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">vs Avg</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -584,7 +587,7 @@ function MonthlyDetailReportView({
   const SectionRow = ({ label }: { label: string }) => (
     <tr className="bg-stone-900/70">
       <td className="sticky left-0 z-10 bg-stone-900/70 px-3 py-1.5 border-r border-stone-700/60">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-200">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">{label}</span>
       </td>
       {rows.map(r => <td key={r.month} className="px-3 py-1.5" />)}
       <td className="px-3 py-1.5 border-l border-stone-700" />
@@ -640,12 +643,12 @@ function MonthlyDetailReportView({
         {vals.map((v, i) => (
           <td key={i} className={`px-3 py-2.5 text-right font-mono text-xs font-semibold whitespace-nowrap min-w-[90px] ${valMap[color]}`}>
             {v ?? '—'}
-            {sub?.[i] && <div className="text-[10px] text-stone-200 font-normal">{sub[i]}</div>}
+            {sub?.[i] && <div className="text-[10px] text-stone-400 font-normal">{sub[i]}</div>}
           </td>
         ))}
         <td className={`px-3 py-2.5 text-right font-mono text-xs font-bold whitespace-nowrap min-w-[90px] border-l border-stone-700 ${valMap[color]}`}>
           {total}
-          {totalSub && <div className="text-[10px] text-stone-200 font-normal">{totalSub}</div>}
+          {totalSub && <div className="text-[10px] text-stone-400 font-normal">{totalSub}</div>}
         </td>
       </tr>
     )
@@ -658,9 +661,9 @@ function MonthlyDetailReportView({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">
         <StatCard label="Total Net Sales"    value={$(report.totalRevenue)} />
-        <StatCard label="Total Transactions" value={formatNumber(report.totalTransactions)} />
+        <StatCard label="Total Transactions" value={formatNumber(report.totalTransactions)} countTo={report.totalTransactions} format={(n)=>Math.round(n).toLocaleString()} />
         <StatCard label="Monthly Avg"        value={$(report.avgMonthlyRevenue)} />
         <StatCard label="Best Month"         value={report.bestMonth ? $(report.bestMonth.revenue) : '—'} sub={report.bestMonth?.label} />
       </div>
@@ -669,11 +672,11 @@ function MonthlyDetailReportView({
         <h3 className="font-semibold text-stone-200 mb-4">Monthly Net Sales</h3>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
-            <Tooltip formatter={(v: number) => [$(v), 'Net Sales']} />
-            <Bar dataKey="revenue" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: chart.axis }} />
+            <YAxis tick={{ fontSize: 11, fill: chart.axis }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={48} />
+            <Tooltip {...TT} formatter={(v: number) => [$(v), 'Net Sales']} />
+            <Bar dataKey="revenue" fill={chart.bar} radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -686,10 +689,10 @@ function MonthlyDetailReportView({
           <table className="w-full text-sm">
             <thead className="bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-semibold text-stone-200">Month</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Net Sales</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">vs Prior Month</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Growth %</th>
+                <th className="px-4 py-2 text-left text-xs font-semibold text-stone-400">Month</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Net Sales</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">vs Prior Month</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Growth %</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -720,17 +723,17 @@ function MonthlyDetailReportView({
         <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
           <div className="px-4 py-3 border-b border-stone-700">
             <h3 className="font-semibold text-stone-200">Top Products by Month</h3>
-            <p className="text-xs text-stone-200 mt-0.5">Top 5 products per month by revenue</p>
+            <p className="text-xs text-stone-400 mt-0.5">Top 5 products per month by revenue</p>
           </div>
           <div className="overflow-x-auto max-h-96">
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-stone-200">Month</th>
-                  <th className="px-4 py-2 text-center text-xs font-semibold text-stone-200">Rank</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-stone-200">Product</th>
-                  <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Revenue</th>
-                  <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Units</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-stone-400">Month</th>
+                  <th className="px-4 py-2 text-center text-xs font-semibold text-stone-400">Rank</th>
+                  <th className="px-4 py-2 text-left text-xs font-semibold text-stone-400">Product</th>
+                  <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Revenue</th>
+                  <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Units</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-700/40">
@@ -758,18 +761,18 @@ function MonthlyDetailReportView({
       <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-stone-700">
           <h3 className="font-semibold text-stone-200">Income Statement</h3>
-          <p className="text-xs text-stone-200 mt-0.5">All months — row labels left, columns right. Scroll horizontally.</p>
+          <p className="text-xs text-stone-500 mt-0.5">All months — row labels left, columns right. Scroll horizontally.</p>
         </div>
 
         <div className="overflow-x-auto">
           <table className="border-separate border-spacing-0 text-sm">
             <thead>
               <tr className="bg-stone-900 border-b border-stone-700">
-                <th className="sticky left-0 z-20 bg-stone-900 px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-stone-200 border-r border-stone-700/60 min-w-[180px]">
+                <th className="sticky left-0 z-20 bg-stone-900 px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest text-stone-400 border-r border-stone-700/60 min-w-[180px]">
                   Line Item
                 </th>
                 {rows.map(r => (
-                  <th key={r.month} className="px-3 py-2.5 text-right text-[10px] font-semibold text-stone-200 whitespace-nowrap min-w-[90px]">
+                  <th key={r.month} className="px-3 py-2.5 text-right text-[10px] font-semibold text-stone-400 whitespace-nowrap min-w-[90px]">
                     {r.label}
                   </th>
                 ))}
@@ -890,7 +893,7 @@ function MonthlyDetailReportView({
                     />
                   )}
                   <tr className="border-t border-stone-700/40 bg-stone-900/30">
-                    <td className="sticky left-0 z-10 bg-stone-900/30 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-stone-200 border-r border-stone-700/60 min-w-[180px]">
+                    <td className="sticky left-0 z-10 bg-stone-900/30 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-stone-400 border-r border-stone-700/60 min-w-[180px]">
                       Total OPEX
                     </td>
                     {rows.map(r => (
@@ -936,7 +939,7 @@ function MonthlyDetailReportView({
               )}
 
               <tr className="border-t-2 border-stone-700 bg-stone-900/50">
-                <td className="sticky left-0 z-10 bg-stone-900/50 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-stone-200 border-r border-stone-700/60 min-w-[180px]">
+                <td className="sticky left-0 z-10 bg-stone-900/50 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-stone-400 border-r border-stone-700/60 min-w-[180px]">
                   Transactions
                 </td>
                 {rows.map(r => (
@@ -973,7 +976,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
   return (
     <div className="space-y-6">
       {report.cashTransactions === 0 && report.totalTransactions > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+        <div className="bg-amber-500/10 border border-amber-500/30 p-4">
           <p className="font-semibold text-amber-300 mb-1">No cash transactions detected</p>
           <p className="text-sm text-amber-400 mb-3">
             Your data has {report.totalTransactions} transactions but none were recognized as cash.
@@ -989,11 +992,11 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           </div>
         </div>
       )}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Cash Revenue"      value={formatCurrency(report.cashRevenue)} sub={`${report.cashRevenuePct.toFixed(1)}% of total`} />
-        <StatCard label="Cash Transactions" value={formatNumber(report.cashTransactions)} sub={`${report.cashPct.toFixed(1)}% of total`} />
-        <StatCard label="Avg Cash Sale"     value={formatCurrency(report.avgCashTransaction)} />
-        <StatCard label="Total Revenue"     value={formatCurrency(report.totalRevenue)} sub={`${formatNumber(report.totalTransactions)} transactions`} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">
+        <StatCard label="Cash Revenue"      value={formatCurrency(report.cashRevenue)} countTo={report.cashRevenue} format={(n)=>formatCurrency(n)} sub={`${report.cashRevenuePct.toFixed(1)}% of total`} />
+        <StatCard label="Cash Transactions" value={formatNumber(report.cashTransactions)} countTo={report.cashTransactions} format={(n)=>Math.round(n).toLocaleString()} sub={`${report.cashPct.toFixed(1)}% of total`} />
+        <StatCard label="Avg Cash Sale"     value={formatCurrency(report.avgCashTransaction)} countTo={report.avgCashTransaction} format={(n)=>formatCurrency(n)} />
+        <StatCard label="Total Revenue"     value={formatCurrency(report.totalRevenue)} countTo={report.totalRevenue} format={(n)=>formatCurrency(n)} sub={`${formatNumber(report.totalTransactions)} transactions`} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1001,11 +1004,11 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           <h3 className="font-semibold text-stone-200 mb-4">Cash by Day of Week</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={dayChartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-              <XAxis dataKey="day" tick={{ fontSize: 11 }} />
-              <YAxis tick={{ fontSize: 11 }} width={36} />
-              <Tooltip formatter={(v: number) => [formatNumber(v), 'Cash Transactions']} />
-              <Bar dataKey="count" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+              <XAxis dataKey="day" tick={{ fontSize: 11, fill: chart.axis }} />
+              <YAxis tick={{ fontSize: 11, fill: chart.axis }} width={36} />
+              <Tooltip {...TT} formatter={(v: number) => [formatNumber(v), 'Cash Transactions']} />
+              <Bar dataKey="count" fill={chart.bar} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1014,11 +1017,11 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           <h3 className="font-semibold text-stone-200 mb-4">Cash by Hour</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={hourChartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-              <XAxis dataKey="hour" tick={{ fontSize: 9 }} />
-              <YAxis tick={{ fontSize: 11 }} width={36} />
-              <Tooltip formatter={(v: number) => [formatNumber(v), 'Cash Transactions']} />
-              <Bar dataKey="count" fill="#f59e0b" radius={[2, 2, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+              <XAxis dataKey="hour" tick={{ fontSize: 9, fill: chart.axis }} />
+              <YAxis tick={{ fontSize: 11, fill: chart.axis }} width={36} />
+              <Tooltip {...TT} formatter={(v: number) => [formatNumber(v), 'Cash Transactions']} />
+              <Bar dataKey="count" fill={chart.bar} radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -1032,11 +1035,11 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-200">Week</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Cash Revenue</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Cash Txns</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Total Revenue</th>
-                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Cash %</th>
+                <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-400">Week</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Cash Revenue</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Cash Txns</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Total Revenue</th>
+                <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Cash %</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -1063,10 +1066,10 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
         <table className="w-full text-sm">
           <thead className="bg-stone-900 border-b border-stone-700/50">
             <tr>
-              <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-200">Method</th>
-              <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Transactions</th>
-              <th className="px-4 py-2 text-right text-xs font-semibold text-stone-200">Revenue</th>
-              <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-200">Type</th>
+              <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-400">Method</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Transactions</th>
+              <th className="px-4 py-2 text-right text-xs font-semibold text-stone-400">Revenue</th>
+              <th className="px-4 py-2 text-left  text-xs font-semibold text-stone-400">Type</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-700/40">
@@ -1099,10 +1102,10 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-200">Date & Time</th>
-                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-200">Items</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-200">Amount</th>
-                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-200">Staff</th>
+                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-400">Date & Time</th>
+                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-400">Items</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-400">Amount</th>
+                <th className="px-4 py-2.5 text-left  text-xs font-semibold text-stone-400">Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -1117,7 +1120,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
             </tbody>
           </table>
           {filtered.length > 500 && (
-            <p className="text-center text-xs text-stone-200 py-3">
+            <p className="text-center text-xs text-stone-400 py-3">
               Showing first 500 of {formatNumber(filtered.length)} — export CSV for full list
             </p>
           )}
@@ -1126,7 +1129,6 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
     </div>
   )
 }
-
 
 export default function ReportsView() {
   const navigate = useNavigate()
@@ -1196,7 +1198,7 @@ export default function ReportsView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Reports</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Reports</h1>
 
       <div className="grid grid-cols-4 gap-3">
         {REPORT_TYPES.map(type => {
@@ -1206,7 +1208,7 @@ export default function ReportsView() {
             <button
               key={type}
               onClick={() => { setSelectedType(type); setReport(null) }}
-              className={`text-left p-4 rounded-xl border transition-all ${
+              className={`text-left p-4 border transition-all ${
                 active
                   ? 'border-amber-400 bg-amber-500/10 ring-1 ring-amber-400'
                   : 'border-stone-700 bg-stone-800 hover:border-amber-500/30 hover:bg-stone-700/50'
@@ -1218,7 +1220,7 @@ export default function ReportsView() {
               <p className={`text-sm font-semibold leading-tight ${active ? 'text-amber-400' : 'text-stone-200'}`}>
                 {meta.label}
               </p>
-              <p className="text-xs text-stone-200 mt-1 leading-snug line-clamp-2">{meta.description}</p>
+              <p className="text-xs text-stone-400 mt-1 leading-snug line-clamp-2">{meta.description}</p>
             </button>
           )
         })}
@@ -1227,13 +1229,13 @@ export default function ReportsView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex flex-wrap items-end gap-4">
         <div className="flex items-center gap-2">
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">From</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">From</label>
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
               className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30" />
           </div>
-          <span className="text-stone-200 mt-5">–</span>
+          <span className="text-stone-400 mt-5">–</span>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">To</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">To</label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
               className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30" />
           </div>
@@ -1241,7 +1243,7 @@ export default function ReportsView() {
 
         {selectedType === 'revenue' && (
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Granularity</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Granularity</label>
             <div className="flex gap-1">
               {(['Daily', 'Weekly', 'Monthly'] as TimeGranularity[]).map(g => (
                 <button key={g} onClick={() => setGranularity(g)}
@@ -1257,7 +1259,7 @@ export default function ReportsView() {
 
         {selectedType === 'top-products' && (
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Show top</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Show top</label>
             <select value={topN} onChange={e => setTopN(Number(e.target.value))}
               className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30">
               {[10, 20, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
@@ -1293,7 +1295,7 @@ export default function ReportsView() {
         )}
 
         <div className="flex items-center gap-2 ml-auto">
-          <span className="text-xs text-stone-200">{formatNumber(filtered.length)} transactions in range</span>
+          <span className="text-xs text-stone-400">{formatNumber(filtered.length)} transactions in range</span>
           <button
             onClick={() => exportTransactionsToCSV(filtered)}
             disabled={filtered.length === 0}
@@ -1316,7 +1318,7 @@ export default function ReportsView() {
       </div>
 
       {generating && (
-        <div className="flex items-center justify-center py-20 text-stone-200">
+        <div className="flex items-center justify-center py-20 text-stone-400">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
             <span className="text-sm">Building report…</span>
@@ -1329,7 +1331,7 @@ export default function ReportsView() {
           <div className="flex items-center justify-between bg-stone-800/30 border border-stone-700/40 px-4 py-3">
             <div>
               <p className="text-sm font-semibold text-stone-200">{REPORT_META[report.type].label}</p>
-              <p className="text-xs text-stone-200">{dateRangeLabel}</p>
+              <p className="text-xs text-stone-400">{dateRangeLabel}</p>
             </div>
             <ExportBar
               loading={false}
@@ -1349,11 +1351,11 @@ export default function ReportsView() {
       )}
 
       {!generating && !report && (
-        <div className="text-center py-16 text-stone-200">
+        <div className="text-center py-16 text-stone-400">
           <div className="w-12 h-12 rounded-xl bg-stone-800 border border-stone-700 flex items-center justify-center mx-auto mb-3">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#57534e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </div>
-          <p className="text-sm font-medium text-stone-200">Select a report type, set your date range, and click Generate.</p>
+          <p className="text-sm font-medium text-stone-400">Select a report type, set your date range, and click Generate.</p>
         </div>
       )}
     </div>

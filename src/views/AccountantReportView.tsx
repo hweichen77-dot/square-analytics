@@ -10,8 +10,9 @@ import type { AccountantReportData, AccountantProductRow } from '../engine/pdfEx
 import { exportQuickBooksPL } from '../engine/quickbooksExport'
 import { useToastStore } from '../store/toastStore'
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { chart } from '../lib/chartTheme'
 
-const PIE_COLORS = ['#F59E0B', '#6366F1', '#F59E0B', '#EF4444', '#F59E0B', '#10B981', '#F59E0B']
+const PIE_COLORS = chart.categorical
 
 type QuickRange = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'custom'
 
@@ -49,7 +50,7 @@ function MetricRow({ label, value, sub, highlight }: { label: string; value: str
       <span className={`text-sm ${highlight ? 'text-stone-100' : 'text-stone-200'}`}>{label}</span>
       <div className="text-right">
         <span className={`text-sm ${highlight ? 'text-stone-100' : 'text-stone-200'}`}>{value}</span>
-        {sub && <p className="text-xs text-stone-200">{sub}</p>}
+        {sub && <p className="text-xs text-stone-400">{sub}</p>}
       </div>
     </div>
   )
@@ -222,8 +223,8 @@ export default function AccountantReportView() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-stone-100">Accountant Report</h1>
-          <p className="text-sm text-stone-200 mt-1">
+          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Accountant Report</h1>
+          <p className="text-sm text-stone-400 mt-1">
             One-click PDF summary ready to hand to your accountant — revenue, COGS, margins, and payment breakdown.
           </p>
         </div>
@@ -231,13 +232,13 @@ export default function AccountantReportView() {
           <div className="flex gap-2 shrink-0">
             <button
               onClick={handleExportXLSX}
-              className="px-4 py-2.5 bg-stone-700 border border-stone-600 text-stone-200 rounded-xl text-sm font-semibold hover:bg-stone-600 transition-colors"
+              className="px-4 py-2.5 bg-stone-700 border border-stone-600 text-stone-200 rounded-lg text-sm font-semibold hover:bg-stone-600 transition-colors"
             >
               QuickBooks XLSX
             </button>
             <button
               onClick={handleExport}
-              className="px-5 py-2.5 bg-amber-500 text-stone-950 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors"
+              className="px-5 py-2.5 bg-amber-500 text-stone-950 rounded-lg text-sm font-semibold hover:bg-amber-600 transition-colors"
             >
               Download PDF
             </button>
@@ -266,7 +267,7 @@ export default function AccountantReportView() {
         {quick === 'custom' && (
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs text-stone-200 mb-1">Start</label>
+              <label className="block text-xs text-stone-400 mb-1">Start</label>
               <input
                 type="date"
                 value={customStart}
@@ -275,7 +276,7 @@ export default function AccountantReportView() {
               />
             </div>
             <div className="flex-1">
-              <label className="block text-xs text-stone-200 mb-1">End</label>
+              <label className="block text-xs text-stone-400 mb-1">End</label>
               <input
                 type="date"
                 value={customEnd}
@@ -286,13 +287,13 @@ export default function AccountantReportView() {
           </div>
         )}
 
-        <div className="text-xs text-stone-200">
+        <div className="text-xs text-stone-400">
           {format(dates.start, 'MMMM d, yyyy')} — {format(dates.end, 'MMMM d, yyyy')}
         </div>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-200">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-400">
           No transactions in this period.
         </div>
       ) : (
@@ -324,7 +325,7 @@ export default function AccountantReportView() {
                 </>
               )}
               {!hasCOGS && (
-                <p className="text-xs text-stone-200 mt-3">
+                <p className="text-xs text-stone-400 mt-3">
                   Import your Square catalog XLSX to include cost of goods and profit margins.
                 </p>
               )}
@@ -397,7 +398,7 @@ export default function AccountantReportView() {
               <h2 className="font-semibold text-stone-200 mb-4">Weekly Revenue Trend</h2>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={weeklyRevenue} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
                   <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#d6d3d1' }} />
                   <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#d6d3d1' }} />
                   <ReTooltip
@@ -406,7 +407,7 @@ export default function AccountantReportView() {
                     labelStyle={{ color: '#fafaf9' }}
                     itemStyle={{ color: '#fafaf9' }}
                   />
-                  <Bar dataKey="revenue" fill="#f59e0b" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="revenue" fill={chart.bar} radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -417,9 +418,9 @@ export default function AccountantReportView() {
             <div className="grid grid-cols-7 gap-2">
               {byDayOfWeek.map(d => (
                 <div key={d.day} className="text-center">
-                  <p className="text-[10px] font-semibold text-stone-200 uppercase mb-1">{d.day}</p>
+                  <p className="text-[10px] font-semibold text-stone-400 uppercase mb-1">{d.day}</p>
                   <p className="text-sm font-bold text-stone-100">{formatCurrency(d.revenue)}</p>
-                  <p className="text-[10px] text-stone-200">{d.transactions} txns</p>
+                  <p className="text-[10px] text-stone-400">{d.transactions} txns</p>
                 </div>
               ))}
             </div>
@@ -433,11 +434,11 @@ export default function AccountantReportView() {
               <table className="w-full text-xs">
                 <thead className="bg-stone-900/60">
                   <tr>
-                    <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Category</th>
-                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Products</th>
-                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Units</th>
-                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Revenue</th>
-                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">% of Total</th>
+                    <th className="px-4 py-2.5 text-left text-stone-400 font-semibold">Category</th>
+                    <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Products</th>
+                    <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Units</th>
+                    <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Revenue</th>
+                    <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">% of Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -462,27 +463,27 @@ export default function AccountantReportView() {
               <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
                 <div>
                   <h2 className="font-semibold text-stone-200">All Products</h2>
-                  <p className="text-xs text-stone-200 mt-0.5">{filteredProducts.length} of {allProducts.length} products</p>
+                  <p className="text-xs text-stone-400 mt-0.5">{filteredProducts.length} of {allProducts.length} products</p>
                 </div>
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={productSearch}
                   onChange={e => setProductSearch(e.target.value)}
-                  className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
+                  className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
                 />
               </div>
               <div className="overflow-y-auto max-h-[32rem] overflow-x-auto">
                 <table className="w-full text-xs">
                   <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
                     <tr>
-                      <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Product</th>
-                      <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Category</th>
-                      <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Units</th>
-                      <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Revenue</th>
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">COGS</th>}
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Gross Profit</th>}
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Margin %</th>}
+                      <th className="px-4 py-2.5 text-left text-stone-400 font-semibold">Product</th>
+                      <th className="px-4 py-2.5 text-left text-stone-400 font-semibold">Category</th>
+                      <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Units</th>
+                      <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Revenue</th>
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">COGS</th>}
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Gross Profit</th>}
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Margin %</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -506,7 +507,7 @@ export default function AccountantReportView() {
                       </tr>
                     ))}
                     {filteredProducts.length === 0 && (
-                      <tr><td colSpan={hasCOGS ? 7 : 4} className="px-4 py-6 text-center text-stone-200">No products match.</td></tr>
+                      <tr><td colSpan={hasCOGS ? 7 : 4} className="px-4 py-6 text-center text-stone-400">No products match.</td></tr>
                     )}
                   </tbody>
                 </table>

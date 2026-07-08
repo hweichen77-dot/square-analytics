@@ -14,12 +14,10 @@ import type {
 } from './reportEngine'
 import { REPORT_META } from './reportEngine'
 
-
 const MARGIN = 14
 const PAGE_W = 210
 const PAGE_H = 297
 const CW = PAGE_W - MARGIN * 2
-
 
 const C = {
   indigo600: [79, 70, 229] as [number, number, number],
@@ -38,7 +36,6 @@ function fill(doc: jsPDF, c: [number, number, number]) { doc.setFillColor(c[0], 
 function draw(doc: jsPDF, c: [number, number, number]) { doc.setDrawColor(c[0], c[1], c[2]) }
 function text(doc: jsPDF, c: [number, number, number]) { doc.setTextColor(c[0], c[1], c[2]) }
 
-
 function shortVal(v: number, isCurrency = true): string {
   const abs = Math.abs(v)
   const prefix = isCurrency ? '$' : ''
@@ -50,7 +47,6 @@ function shortVal(v: number, isCurrency = true): string {
 function makeDoc() {
   return new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
 }
-
 
 function drawHeader(doc: jsPDF, reportLabel: string, dateRange: string): number {
   const y = MARGIN
@@ -91,7 +87,6 @@ function addFooters(doc: jsPDF, generatedAt: string): void {
     doc.text(`Page ${i} of ${total}`, PAGE_W - MARGIN, fy, { align: 'right' })
   }
 }
-
 
 function drawKPICards(
   doc: jsPDF,
@@ -236,7 +231,6 @@ const TABLE_STYLES = {
   alternateRowStyles: { fillColor: [249, 250, 251] as [number, number, number] },
   margin: { left: MARGIN, right: MARGIN },
 }
-
 
 function buildRevenuePDF(report: RevenueReport, dateRange: string): jsPDF {
   const doc = makeDoc()
@@ -642,7 +636,6 @@ function buildCashPDF(report: CashReport, dateRange: string): jsPDF {
   return doc
 }
 
-
 export function exportToPDF(report: AnyReport, dateRange: string): void {
   let doc: jsPDF
   if      (report.type === 'revenue')           doc = buildRevenuePDF(report, dateRange)
@@ -655,7 +648,6 @@ export function exportToPDF(report: AnyReport, dateRange: string): void {
 
   doc.save(`walleys-${report.type}-${format(new Date(), 'yyyy-MM-dd')}.pdf`)
 }
-
 
 export interface AccountantPaymentRow {
   method: string

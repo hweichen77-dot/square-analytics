@@ -1,8 +1,9 @@
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import type { CategoryRevenue } from '../../engine/analyticsEngine'
 import { formatCurrency, formatPercent } from '../../utils/format'
+import { chart } from '../../lib/chartTheme'
 
-const COLORS = ['#F59E0B', '#D97706', '#B45309', '#65A30D', '#EF4444', '#CA8A04', '#9A3412', '#A8A29E']
+const COLORS = chart.categorical
 
 interface CategoryBreakdownChartProps {
   data: CategoryRevenue[]
@@ -19,9 +20,9 @@ export function CategoryBreakdownChart({ data }: CategoryBreakdownChartProps) {
               {data.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
             </Pie>
             <Tooltip
-              contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: '8px', fontSize: '12px' }}
-              labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
-              itemStyle={{ color: '#fafaf9' }}
+              contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: '8px', fontSize: '12px' }}
+              labelStyle={{ color: chart.tooltipText, fontWeight: 600 }}
+              itemStyle={{ color: chart.tooltipText }}
               formatter={(v: number) => [formatCurrency(v), '']}
             />
           </PieChart>

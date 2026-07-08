@@ -8,6 +8,7 @@ import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
 import { formatCurrency } from '../utils/format'
+import { chart } from '../lib/chartTheme'
 import type { StoreEvent, SalesTransaction } from '../types/models'
 import { EVENT_TYPES, eventColor } from '../types/models'
 import { format, startOfDay } from 'date-fns'
@@ -106,16 +107,16 @@ function EventEditModal({
       <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-96 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{event ? 'Edit Event' : 'Add Event'}</h2>
-          <button onClick={onClose} className="text-stone-200 hover:text-stone-200 text-xl">×</button>
+          <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl">×</button>
         </div>
         <div className="space-y-3">
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Event Name</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Event Name</label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Spirit Week 2025" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Type</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Type</label>
             <select className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={type} onChange={e => setType(e.target.value)}>
               {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -123,24 +124,24 @@ function EventEditModal({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-stone-200 mb-1">Start Date</label>
+              <label className="block text-xs font-medium text-stone-400 mb-1">Start Date</label>
               <input type="date" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
                 value={start} onChange={e => setStart(e.target.value)} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-stone-200 mb-1">End Date</label>
+              <label className="block text-xs font-medium text-stone-400 mb-1">End Date</label>
               <input type="date" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
                 value={end} onChange={e => setEnd(e.target.value)} />
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Notes (optional)</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Notes (optional)</label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
         <div className="flex justify-end gap-3 mt-5">
-          <button onClick={onClose} className="text-sm text-stone-200 hover:text-stone-300">Cancel</button>
+          <button onClick={onClose} className="text-sm text-stone-400 hover:text-stone-100">Cancel</button>
           <button
             disabled={!name.trim()}
             onClick={() => { onSave(name, type, new Date(start), new Date(end), notes); onClose() }}
@@ -189,7 +190,7 @@ export default function SeasonalView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-100">Seasonal & Events</h1>
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Seasonal & Events</h1>
         <button
           onClick={() => setShowAdd(true)}
           className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
@@ -201,7 +202,7 @@ export default function SeasonalView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="text-base font-semibold text-stone-100 mb-3">Store Events</h2>
         {events.length === 0 ? (
-          <p className="text-sm text-stone-200">No events added yet. Click "Add Event" to get started.</p>
+          <p className="text-sm text-stone-400">No events added yet. Click "Add Event" to get started.</p>
         ) : (
           <div className="divide-y divide-stone-700/40">
             {events.map(event => (
@@ -215,12 +216,12 @@ export default function SeasonalView() {
                     <span className="font-medium text-sm text-stone-100">{event.name}</span>
                     <EventTypeBadge type={event.eventType} />
                   </div>
-                  <p className="text-xs text-stone-200 mt-0.5">
+                  <p className="text-xs text-stone-400 mt-0.5">
                     {format(event.startDate, 'MMM d')} – {format(event.endDate, 'MMM d, yyyy')}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => setEditingEvent(event)} className="text-xs text-stone-200 hover:text-stone-200">Edit</button>
+                  <button onClick={() => setEditingEvent(event)} className="text-xs text-stone-400 hover:text-stone-100">Edit</button>
                   <button onClick={() => deleteEvent(event)} className="text-xs text-red-400 hover:text-red-400">Delete</button>
                 </div>
               </div>
@@ -234,11 +235,11 @@ export default function SeasonalView() {
           <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue Timeline</h2>
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
-              <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number) => formatCurrency(v)} />
-              <Area type="monotone" dataKey="revenue" fill="#F59E0B20" stroke="#F59E0B" strokeWidth={1.5} dot={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: chart.axis }} interval="preserveStartEnd" />
+              <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: chart.axis }} />
+              <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
+              <Area type="monotone" dataKey="revenue" fill="#F59E0B20" stroke={chart.line} strokeWidth={1.5} dot={false} />
               {events.map(event => (
                 <ReferenceLine
                   key={`${event.id}-start`}
@@ -261,7 +262,7 @@ export default function SeasonalView() {
               const upliftColor = impact.upliftPct >= 0 ? '#16a34a' : '#dc2626'
               const upliftSign = impact.upliftPct >= 0 ? '+' : ''
               return (
-                <div key={impact.event.id} className="flex items-start gap-3 p-4 rounded-xl border border-stone-700/50">
+                <div key={impact.event.id} className="flex items-start gap-3 p-4 border border-stone-700/50">
                   <div
                     className="w-1 self-stretch rounded-full shrink-0"
                     style={{ backgroundColor: eventHex(impact.event.eventType) }}
@@ -270,32 +271,32 @@ export default function SeasonalView() {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold text-sm text-stone-100">{impact.event.name}</span>
                       <EventTypeBadge type={impact.event.eventType} />
-                      <span className="text-xs text-stone-200 ml-auto">
+                      <span className="text-xs text-stone-400 ml-auto">
                         {format(impact.event.startDate, 'MMM d')} – {format(impact.event.endDate, 'MMM d')}
                       </span>
                     </div>
                     <div className="flex gap-6 flex-wrap">
                       <div>
-                        <p className="text-xs text-stone-200">Total Revenue</p>
+                        <p className="text-xs text-stone-400">Total Revenue</p>
                         <p className="font-bold text-sm text-stone-100">{formatCurrency(impact.totalRevenueDuring)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-stone-200">vs Baseline</p>
+                        <p className="text-xs text-stone-400">vs Baseline</p>
                         <p className="font-bold text-sm" style={{ color: upliftColor }}>
                           {upliftSign}{impact.upliftPct.toFixed(1)}%
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-stone-200">Avg Daily During</p>
+                        <p className="text-xs text-stone-400">Avg Daily During</p>
                         <p className="font-mono text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueDuring)}/day</p>
                       </div>
                       <div>
-                        <p className="text-xs text-stone-200">Avg Daily Baseline</p>
+                        <p className="text-xs text-stone-400">Avg Daily Baseline</p>
                         <p className="font-mono text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueBefore)}/day</p>
                       </div>
                       {impact.topProducts.length > 0 && (
                         <div>
-                          <p className="text-xs text-stone-200">Top Products</p>
+                          <p className="text-xs text-stone-400">Top Products</p>
                           <p className="text-sm text-stone-100">{impact.topProducts.map(p => `${p.name} (${p.qty})`).join(', ')}</p>
                         </div>
                       )}

@@ -17,13 +17,15 @@ import {
   type ProductTransactionRow,
 } from '../engine/analyticsEngine'
 import { formatCurrency, formatNumber, dayName } from '../utils/format'
+import { chart } from '../lib/chartTheme'
+import { StatCard } from '../components/ui/StatCard'
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Drinks':        '#d99a2b',
   'Food':          '#22c55e',
-  'Ice Cream':     '#06b6d4',
+  'Ice Cream':     '#CA8A04',
   'Ramen/Hot Food':'#f59e0b',
-  'Merch':         '#a855f7',
+  'Merch':         '#9A3412',
 }
 
 function categoryColor(cat: string): string {
@@ -146,7 +148,7 @@ export default function ProductDetailView() {
 
   if (!stats) {
     return (
-      <div className="py-20 text-center text-stone-200">
+      <div className="py-20 text-center text-stone-400">
         <p>Product not found.</p>
         <button onClick={() => navigate('/inventory')} className="mt-3 text-amber-400 text-sm underline">← Back</button>
       </div>
@@ -162,7 +164,7 @@ export default function ProductDetailView() {
           <button onClick={() => navigate('/inventory')} className="text-amber-400 text-sm hover:underline">← Back</button>
         </div>
         <div className="flex items-baseline gap-3 flex-wrap">
-          <h1 className="text-3xl font-bold text-stone-100">{productName}</h1>
+          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">{productName}</h1>
           <span
             className="px-3 py-1 rounded-full text-sm font-medium"
             style={{ background: `${col}22`, color: col, border: `1px solid ${col}44` }}
@@ -171,20 +173,40 @@ export default function ProductDetailView() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <KpiCard title="Units Sold" value={formatNumber(stats.totalUnitsSold)} />
-          <KpiCard title="Total Revenue" value={formatCurrency(stats.totalRevenue)} />
-          <KpiCard title="Avg Price" value={formatCurrency(stats.avgPrice)} />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 cf-stagger">
+          <StatCard
+            label="Units Sold"
+            value={formatNumber(stats.totalUnitsSold)}
+            countTo={stats.totalUnitsSold}
+            format={(n) => Math.round(n).toLocaleString()}
+          />
+          <StatCard
+            label="Total Revenue"
+            value={formatCurrency(stats.totalRevenue)}
+            countTo={stats.totalRevenue}
+            format={(n) => formatCurrency(n)}
+          />
+          <StatCard
+            label="Avg Price"
+            value={formatCurrency(stats.avgPrice)}
+            countTo={stats.avgPrice}
+            format={(n) => formatCurrency(n)}
+          />
           {bestMonth && (
-            <KpiCard title="Best Month" value={bestMonth.label} sub={`${bestMonth.units} units`} />
+            <StatCard label="Best Month" value={bestMonth.label} sub={`${bestMonth.units} units`} />
           )}
-          <MonthOverMonthCard pct={monthOverMonth} />
+          <StatCard
+            label="This vs Last Month"
+            value={monthOverMonth !== null ? `${Math.abs(monthOverMonth).toFixed(0)}%` : 'N/A'}
+            trend={monthOverMonth !== null ? 'vs last month' : undefined}
+            trendUp={monthOverMonth !== null ? monthOverMonth >= 0 : undefined}
+          />
         </div>
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-stone-200">Revenue & Units Over Time</h2>
+          <h2 className="font-semibold text-stone-100">Revenue & Units Over Time</h2>
           <div className="flex gap-1">
             {(['Daily', 'Weekly', 'Monthly'] as const).map(g => (
               <button key={g} onClick={() => setGranularity(g)}
@@ -197,12 +219,12 @@ export default function ProductDetailView() {
 
         <div className="bg-stone-900/50 rounded-lg p-3 space-y-2">
           <div className="flex items-center gap-4">
-            <span className="text-xs font-medium text-stone-200">Revenue</span>
-            <span className="flex items-center gap-1 text-xs text-stone-200">
+            <span className="text-xs font-medium text-stone-400">Revenue</span>
+            <span className="flex items-center gap-1 text-xs text-stone-400">
               <span className="inline-block w-4 h-0.5 bg-amber-400 rounded" />Revenue
             </span>
             {maData.length > 0 && (
-              <span className="flex items-center gap-1 text-xs text-stone-200">
+              <span className="flex items-center gap-1 text-xs text-stone-400">
                 <span className="inline-block w-4 h-0.5 bg-amber-400 rounded" style={{ borderTop: '1.5px dashed' }} />3-period avg
               </span>
             )}
@@ -211,11 +233,11 @@ export default function ProductDetailView() {
             <ComposedChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                  <stop offset="5%" stopColor={chart.bar} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={chart.bar} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} interval="preserveStartEnd" />
               <YAxis tick={{ fontSize: 11, fill: '#d6d3d1' }} width={48} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
               <Tooltip
@@ -223,7 +245,7 @@ export default function ProductDetailView() {
                 labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
                 formatter={(v: number, n: string) => [n === 'revenue' ? formatCurrency(v) : n === 'ma' ? `${formatCurrency(v)} avg` : v, n === 'revenue' ? 'Revenue' : n === 'ma' ? '3-period avg' : n]}
               />
-              <Area type="linear" dataKey="revenue" stroke="#F59E0B" fill="url(#revGrad)" strokeWidth={2} dot={{ r: 3, fill: '#F59E0B', strokeWidth: 0 }} activeDot={{ r: 5 }} />
+              <Area type="linear" dataKey="revenue" stroke={chart.line} fill="url(#revGrad)" strokeWidth={2} dot={{ r: 3, fill: chart.bar, strokeWidth: 0 }} activeDot={{ r: 5 }} />
               {maData.length > 0 && (
                 <Line type="linear" dataKey="ma" stroke="#fb923c" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
               )}
@@ -232,27 +254,27 @@ export default function ProductDetailView() {
         </div>
 
         <div className="bg-stone-900/50 rounded-lg p-3 space-y-2">
-          <span className="text-xs font-medium text-stone-200">Units Sold</span>
+          <span className="text-xs font-medium text-stone-400">Units Sold</span>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} interval="preserveStartEnd" />
               <YAxis tick={{ fontSize: 11, fill: '#d6d3d1' }} width={32} />
               <Tooltip
                 contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
                 labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
               />
-              <Bar dataKey="units" fill="#F59E0B" fillOpacity={0.75} radius={[3, 3, 0, 0]} maxBarSize={32} />
+              <Bar dataKey="units" fill={chart.bar} fillOpacity={0.75} radius={[3, 3, 0, 0]} maxBarSize={32} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-semibold text-stone-200">Sales Patterns</h2>
+        <h2 className="font-semibold text-stone-100">Sales Patterns</h2>
         <div className="flex gap-4 items-start">
           <div className="flex-1 bg-stone-800/30 border border-stone-700/40 p-4 space-y-2">
-            <span className="text-xs font-medium text-stone-200">Sales by Day of Week</span>
+            <span className="text-xs font-medium text-stone-400">Sales by Day of Week</span>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dowData} margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
                 <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} />
@@ -261,7 +283,7 @@ export default function ProductDetailView() {
                 <Bar dataKey="count" maxBarSize={32} radius={[3, 3, 0, 0]}>
                   {dowData.map(entry => (
                     <Cell key={entry.dayOfWeek}
-                      fill={entry.dayOfWeek === peakDayOfWeek ? '#F59E0B' : 'rgba(20,184,166,0.35)'}
+                      fill={entry.dayOfWeek === peakDayOfWeek ? chart.bar : 'rgba(245,158,11,0.35)'}
                     />
                   ))}
                 </Bar>
@@ -282,15 +304,15 @@ export default function ProductDetailView() {
 
       <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
         <div className="px-4 py-3 border-b border-stone-700/50 flex items-center justify-between">
-          <h2 className="font-semibold text-stone-200">Transaction History</h2>
-          <span className="text-xs text-stone-200">{txRows.length} total</span>
+          <h2 className="font-semibold text-stone-100">Transaction History</h2>
+          <span className="text-xs text-stone-400">{txRows.length} total</span>
         </div>
         {txRows.length === 0 ? (
-          <div className="py-12 text-center text-stone-200 text-sm">No transactions found.</div>
+          <div className="py-12 text-center text-stone-400 text-sm">No transactions found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-900 text-stone-200 uppercase text-xs">
+              <thead className="bg-stone-900 text-stone-400 uppercase text-xs">
                 <tr>
                   <SortTh label="Date" field="dateDesc" altField="dateAsc" sort={txSort} onSort={setTxSort} />
                   <th className="px-4 py-2 text-left">Time</th>
@@ -304,13 +326,13 @@ export default function ProductDetailView() {
               <tbody className="divide-y divide-stone-700/40">
                 {displayedTx.map((tx, i) => (
                   <tr key={i} className="hover:bg-stone-700/50">
-                    <td className="px-4 py-2 text-stone-200 tabular-nums">{format(tx.date, 'MMM d, yyyy')}</td>
-                    <td className="px-4 py-2 text-stone-200 tabular-nums">{format(tx.date, 'h:mm a')}</td>
+                    <td className="px-4 py-2 text-stone-400 tabular-nums">{format(tx.date, 'MMM d, yyyy')}</td>
+                    <td className="px-4 py-2 text-stone-400 tabular-nums">{format(tx.date, 'h:mm a')}</td>
                     <td className="px-4 py-2 text-right tabular-nums">{tx.qty}</td>
                     <td className="px-4 py-2 text-right tabular-nums">{formatCurrency(tx.unitPrice)}</td>
                     <td className="px-4 py-2 text-right font-medium tabular-nums">{formatCurrency(tx.total)}</td>
-                    <td className="px-4 py-2 text-stone-200">{tx.staffName}</td>
-                    <td className="px-4 py-2 text-stone-200">{tx.paymentMethod || '—'}</td>
+                    <td className="px-4 py-2 text-stone-400">{tx.staffName}</td>
+                    <td className="px-4 py-2 text-stone-400">{tx.paymentMethod || '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -329,40 +351,11 @@ export default function ProductDetailView() {
   )
 }
 
-function KpiCard({ title, value, sub }: { title: string; value: string; sub?: string }) {
-  return (
-    <div className="bg-stone-800/30 border border-stone-700/40 p-3 space-y-1">
-      <div className="flex items-center gap-1.5 text-xs text-stone-200">
-        {title}
-      </div>
-      <div className="text-lg font-semibold text-stone-100 tabular-nums">{value}</div>
-      {sub && <div className="text-xs text-stone-200">{sub}</div>}
-    </div>
-  )
-}
-
-function MonthOverMonthCard({ pct }: { pct: number | null }) {
-  return (
-    <div className="bg-stone-800/30 border border-stone-700/40 p-3 space-y-1">
-      <div className="flex items-center gap-1.5 text-xs text-stone-200">
-        This vs Last Month
-      </div>
-      {pct !== null ? (
-        <div className={`text-lg font-semibold tabular-nums flex items-center gap-1 ${pct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-          {pct >= 0 ? '↑' : '↓'}{Math.abs(pct).toFixed(0)}%
-        </div>
-      ) : (
-        <div className="text-lg font-semibold text-stone-200">N/A</div>
-      )}
-    </div>
-  )
-}
-
 function PatternIndicator({ title, value, color = '#e7e5e4' }: { title: string; value: string; color?: string }) {
   return (
     <div className="flex items-start gap-3">
       <div>
-        <div className="text-xs text-stone-200">{title}</div>
+        <div className="text-xs text-stone-400">{title}</div>
         <div className="text-sm font-semibold" style={{ color }}>{value}</div>
       </div>
     </div>
@@ -379,7 +372,7 @@ function SortTh({ label, field, altField, sort, onSort, right }: {
   }
   return (
     <th
-      className={`px-4 py-2 ${right ? 'text-right' : 'text-left'} cursor-pointer select-none hover:text-stone-300 ${active ? 'text-amber-400' : ''}`}
+      className={`px-4 py-2 ${right ? 'text-right' : 'text-left'} cursor-pointer select-none hover:text-amber-400 ${active ? 'text-amber-400' : ''}`}
       onClick={toggle}
     >
       {label}{active ? (sort === altField ? ' ↑' : ' ↓') : ''}

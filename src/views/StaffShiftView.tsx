@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
+import { chart } from '../lib/chartTheme'
 import { useFilteredTransactions } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
+import { StatCard } from '../components/ui/StatCard'
 import type { SalesTransaction } from '../types/models'
 import { parseProductItems } from '../types/models'
 import { startOfDay } from 'date-fns'
@@ -117,25 +119,13 @@ export default function StaffShiftView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Staff Shift Analysis</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Staff Shift Analysis</h1>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Top Earner</p>
-          <p className="text-lg font-bold text-stone-100 mt-1 truncate">{topStaff?.name ?? '—'}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Total Staff</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{profiles.length}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Avg Revenue/Staff</p>
-          <p className="text-xl font-bold text-stone-100 mt-1 font-mono">{formatCurrency(avgRevenue)}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Coverage</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{coveragePct}%</p>
-        </div>
+      <div className="grid grid-cols-4 gap-4 cf-stagger">
+        <StatCard label="Top Earner" value={topStaff?.name ?? '—'} />
+        <StatCard label="Total Staff" value={String(profiles.length)} countTo={profiles.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Avg Revenue/Staff" value={formatCurrency(avgRevenue)} countTo={avgRevenue} format={(n) => formatCurrency(n)} />
+        <StatCard label="Coverage" value={`${coveragePct}%`} countTo={coveragePct} format={(n) => `${Math.round(n)}%`} />
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
@@ -146,7 +136,7 @@ export default function StaffShiftView() {
               <button
                 key={key}
                 onClick={() => setMetric(key)}
-                className={`px-3 py-1 text-xs rounded-full transition-colors ${metric === key ? 'bg-amber-500/15 text-amber-400 font-semibold' : 'text-stone-200 hover:bg-stone-700'}`}
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${metric === key ? 'bg-amber-500/15 text-amber-400 font-semibold' : 'text-stone-400 hover:bg-stone-700'}`}
               >
                 {label}
               </button>
@@ -156,14 +146,14 @@ export default function StaffShiftView() {
 
         <ResponsiveContainer width="100%" height={Math.max(150, profiles.length * 32)}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 80, left: 16, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-            <XAxis type="number" tick={{ fontSize: 11 }} />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
-            <Tooltip formatter={(v: number) => metricLabel(v)} />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chart.grid} />
+            <XAxis type="number" tick={{ fontSize: 11, fill: chart.axis }} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: chart.axis }} width={90} />
+            <Tooltip formatter={(v: number) => metricLabel(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
             <Bar dataKey={d => metricValue(d)} radius={[0, 3, 3, 0]}
-              label={{ position: 'right', formatter: (v: number) => metricLabel(v), fontSize: 10, fill: '#64748B' }}>
+              label={{ position: 'right', formatter: (v: number) => metricLabel(v), fontSize: 10, fill: chart.axis }}>
               {chartData.map((p, i) => (
-                <Cell key={i} fill={p.name === selectedStaff ? '#0d9488' : '#F59E0B60'} />
+                <Cell key={i} fill={p.name === selectedStaff ? chart.bar : '#F59E0B60'} />
               ))}
             </Bar>
           </BarChart>
@@ -174,7 +164,7 @@ export default function StaffShiftView() {
             <thead>
               <tr className="border-b border-stone-700 text-left">
                 {['Staff Member', 'Transactions', 'Total Revenue', 'Avg Transaction', 'Days Worked', 'Top Product'].map(h => (
-                  <th key={h} className="pb-2 font-semibold text-stone-200">{h}</th>
+                  <th key={h} className="pb-2 font-semibold text-stone-400">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -188,7 +178,7 @@ export default function StaffShiftView() {
                   <td className="py-2 flex items-center gap-2">
                     <span
                       className="w-2 h-2 rounded-full inline-block"
-                      style={{ backgroundColor: p.name === selectedStaff ? '#4f46e5' : '#d1d5db' }}
+                      style={{ backgroundColor: p.name === selectedStaff ? chart.bar : '#78716c' }}
                     />
                     <span className="font-medium text-stone-100">{p.name}</span>
                   </td>
@@ -206,17 +196,17 @@ export default function StaffShiftView() {
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="text-base font-semibold text-stone-100 mb-1">Staff × Day of Week Revenue Heatmap</h2>
-        <p className="text-xs text-stone-200 mb-4">Color intensity = revenue generated in that slot</p>
+        <p className="text-xs text-stone-400 mb-4">Color intensity = revenue generated in that slot</p>
         <div className="overflow-x-auto">
           <div className="inline-block">
             <div className="flex gap-1 mb-1 ml-28">
               {DAY_NAMES.map(d => (
-                <div key={d} className="text-xs text-stone-200 font-medium text-center" style={{ width: 44 }}>{d}</div>
+                <div key={d} className="text-xs text-stone-400 font-medium text-center" style={{ width: 44 }}>{d}</div>
               ))}
             </div>
             {sorted.slice(0, 10).map(p => (
               <div key={p.name} className="flex gap-1 mb-1 items-center">
-                <div className="text-xs text-stone-200 w-28 text-right pr-2 truncate">{p.name}</div>
+                <div className="text-xs text-stone-400 w-28 text-right pr-2 truncate">{p.name}</div>
                 {Array.from({ length: 7 }, (_, i) => i + 1).map(dow => {
                   const rev = p.dailyRevenue[dow] ?? 0
                   const intensity = rev / heatmapMax
@@ -229,8 +219,8 @@ export default function StaffShiftView() {
                         width: 44,
                         height: 24,
                         backgroundColor: rev > 0
-                          ? `rgba(99,102,241,${0.1 + intensity * 0.85})`
-                          : 'rgb(243 244 246)',
+                          ? `rgba(245,158,11,${0.1 + intensity * 0.85})`
+                          : 'rgb(41 37 36)',
                       }}
                     >
                       {rev > 0 && intensity > 0.4 && (
@@ -249,26 +239,26 @@ export default function StaffShiftView() {
         <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-stone-100">{selectedProfile.name} — Detail View</h2>
-            <button onClick={() => setSelectedStaff('')} className="text-stone-200 hover:text-stone-200 text-lg">×</button>
+            <button onClick={() => setSelectedStaff('')} className="text-stone-400 hover:text-stone-100 text-lg">×</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-stone-900 rounded-xl p-4">
+            <div className="bg-stone-900 p-4">
               <h3 className="text-sm font-medium text-stone-100 mb-3">Revenue by Hour of Day</h3>
               <ResponsiveContainer width="100%" height={140}>
                 <BarChart data={selectedProfile.revenueByHour} margin={{ top: 4, right: 8, left: -20, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
                   <XAxis
                     dataKey="hour"
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 10, fill: chart.axis }}
                     tickFormatter={h => h > 0 && h % 2 === 0 ? `${h > 12 ? h - 12 : h}${h < 12 ? 'a' : 'p'}` : ''}
                   />
-                  <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${v}`} />
-                  <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  <Bar dataKey="revenue" fill="#F59E0B" radius={[2, 2, 0, 0]} />
+                  <YAxis tick={{ fontSize: 10, fill: chart.axis }} tickFormatter={v => `$${v}`} />
+                  <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
+                  <Bar dataKey="revenue" fill={chart.bar} radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="bg-stone-900 rounded-xl p-4">
+            <div className="bg-stone-900 p-4">
               <h3 className="text-sm font-medium text-stone-100 mb-3">Top 5 Products Sold</h3>
               <div className="space-y-2">
                 {selectedProfile.topProducts.slice(0, 5).map(item => (

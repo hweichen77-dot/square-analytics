@@ -226,7 +226,7 @@ export default function DashboardView() {
             {editingGoal ? null : (
               <button
                 onClick={() => { setEditingGoal('weekly'); setGoalInput(weeklyGoal?.toString() ?? '') }}
-                className="text-[10px] text-stone-200 hover:text-stone-300 uppercase tracking-wide"
+                className="text-[10px] text-stone-400 hover:text-amber-400 uppercase tracking-wide"
               >
                 Edit
               </button>

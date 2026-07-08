@@ -1,5 +1,15 @@
 import type { CatalogueProduct } from '../types/models'
-import { MERCH_KEYWORDS } from './categoryClassifier'
+import { MERCH_KEYWORDS, classifyProduct } from './categoryClassifier'
+
+const CARBONATED_KEYWORDS = [
+  'soda', 'cola', 'coke', 'pepsi', 'sprite', 'fanta', 'dr pepper', 'dr. pepper',
+  'mountain dew', 'mtn dew', 'root beer', 'ginger ale', 'seltzer', 'sparkling',
+  'club soda', 'tonic', 'pop', 'crush', 'sunkist', 'squirt', "barq's", 'mug',
+  'canada dry', 'schweppes', 'pellegrino', 'bubly', 'carbonated', 'fizz',
+]
+const carbonatedRe = new RegExp(
+  '\\b(' + CARBONATED_KEYWORDS.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b',
+)
 
 export type AuditSeverity = 'error' | 'warning' | 'info'
 
@@ -20,7 +30,6 @@ export type AuditFixType =
   | 'set_quantity_zero'
   | 'set_category'
 
-
 function isMerch(product: CatalogueProduct): boolean {
   const cat = (product.category ?? '').toLowerCase()
   if (cat.includes('merch') || cat.includes('apparel') || cat.includes('clothing')) return true
@@ -28,10 +37,19 @@ function isMerch(product: CatalogueProduct): boolean {
   return MERCH_KEYWORDS.some(k => lower.includes(k))
 }
 
-function shouldBeTaxed(product: CatalogueProduct): boolean {
-  return isMerch(product)
+function isRamen(product: CatalogueProduct): boolean {
+  const cat = (product.category ?? '').toLowerCase()
+  if (cat.includes('ramen') || cat.includes('hot food')) return true
+  return classifyProduct(product.name) === 'Ramen/Hot Food'
 }
 
+function isCarbonatedDrink(product: CatalogueProduct): boolean {
+  return carbonatedRe.test(product.name.toLowerCase())
+}
+
+function shouldBeTaxed(product: CatalogueProduct): boolean {
+  return isMerch(product) || isRamen(product) || isCarbonatedDrink(product)
+}
 
 const WRONG_PREPARED_LABELS = [
   'prepared goods',
@@ -40,7 +58,6 @@ const WRONG_PREPARED_LABELS = [
 ]
 
 const CORRECT_PREPARED_LABEL = 'Prepared Food and Beverage'
-
 
 export interface AuditResult {
   issues: AuditIssue[]
@@ -77,8 +94,8 @@ export function auditCatalogue(
         id: nextId(),
         productId: id,
         productName: name,
-        issue: 'Merch not taxed',
-        detail: `"${name}" is a merch item and must be marked taxable. Category: "${p.category || 'none'}"`,
+        issue: 'Not taxed',
+        detail: `"${name}" should be taxable (merch, ramen, and carbonated drinks are taxed). Category: "${p.category || 'none'}"`,
         severity: 'error',
         fixType: 'set_taxable_true',
       })
@@ -90,7 +107,7 @@ export function auditCatalogue(
         productId: id,
         productName: name,
         issue: 'Incorrectly taxed',
-        detail: `"${name}" is marked taxable but food and beverage items are non-taxable. Category: "${p.category || 'none'}"`,
+        detail: `"${name}" is marked taxable but only merch, ramen, and carbonated drinks are taxed. Category: "${p.category || 'none'}"`,
         severity: 'error',
         fixType: 'set_taxable_false',
       })

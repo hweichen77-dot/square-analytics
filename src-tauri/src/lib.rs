@@ -2,11 +2,8 @@ use std::net::TcpListener;
 use std::sync::Mutex;
 use serde_json::Value;
 
-/// Holds the bound listener across two Tauri commands.
 struct OAuthListener(Mutex<Option<TcpListener>>);
 
-/// Step 1 — bind the first available port in 7329..7339 and stash the listener.
-/// Returns the port so the frontend can build the correct redirect URI.
 #[tauri::command]
 fn prepare_oauth_listener(state: tauri::State<'_, OAuthListener>) -> Result<u16, String> {
     for port in 7329u16..7340 {
@@ -21,8 +18,6 @@ fn prepare_oauth_listener(state: tauri::State<'_, OAuthListener>) -> Result<u16,
     Err("All ports 7329–7339 are in use. Close any other apps that may be using them.".to_string())
 }
 
-/// Step 2 — wait until Square redirects to localhost and return the auth code.
-/// `expected_state` is validated against the `state=` param in the callback to prevent CSRF.
 #[tauri::command]
 async fn wait_for_oauth_code(
     state: tauri::State<'_, OAuthListener>,
@@ -84,8 +79,6 @@ async fn wait_for_oauth_code(
     .map_err(|e| format!("Thread join error: {e}"))?
 }
 
-/// Exchange an authorization code for tokens.
-/// Goes through Rust/reqwest to bypass CORS (Square's token endpoint is server-to-server only).
 #[tauri::command]
 async fn exchange_square_code(
     code: String,
@@ -120,8 +113,6 @@ async fn exchange_square_code(
     Ok(data)
 }
 
-/// Refresh an existing access token.
-/// Goes through Rust/reqwest to bypass CORS (same server-to-server restriction as token exchange).
 #[tauri::command]
 async fn refresh_square_token(
     app_id: String,
@@ -154,9 +145,6 @@ async fn refresh_square_token(
     Ok(data)
 }
 
-/// Generic proxy for Square API calls.
-/// Routes all Square API traffic through Rust/reqwest for reliability and to avoid
-/// any webview CORS edge cases.
 #[tauri::command]
 async fn proxy_square_api(
     access_token: String,

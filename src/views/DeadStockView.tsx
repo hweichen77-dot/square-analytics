@@ -4,6 +4,7 @@ import { useProductCostData, useAllTransactions } from '../db/useTransactions'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
+import { chart } from '../lib/chartTheme'
 import { parseProductItems } from '../types/models'
 import type { SalesTransaction, ProductCostData } from '../types/models'
 import { effectiveUnitCost } from '../types/models'
@@ -134,26 +135,26 @@ function TierSection({
       >
         <div className="flex items-center gap-3">
           <span className="font-semibold" style={{ color }}>{tier}</span>
-          <span className="text-sm text-stone-200">({tierItems.length})</span>
+          <span className="text-sm text-stone-400">({tierItems.length})</span>
         </div>
-        <span className="text-xs text-stone-200">{isExpanded ? '▲' : '▼'}</span>
+        <span className="text-xs text-stone-500">{isExpanded ? '▲' : '▼'}</span>
       </button>
 
       {isExpanded && (
         <div className="border-t border-stone-700/50 overflow-x-auto">
           {tierItems.length === 0 ? (
-            <p className="text-sm text-stone-200 p-5">No products in this category.</p>
+            <p className="text-sm text-stone-400 p-5">No products in this category.</p>
           ) : (
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-stone-900 border-b border-stone-700/50 text-left">
-                  <th className="px-4 py-2 font-semibold text-stone-200">Product</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200">Last Sale</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200 text-right">Days Idle</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200 text-right">Last 30d</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200 text-right">Prior 30d</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200 text-right">Trend</th>
-                  <th className="px-4 py-2 font-semibold text-stone-200 text-right">Capital</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400">Product</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400">Last Sale</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400 text-right">Days Idle</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400 text-right">Last 30d</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400 text-right">Prior 30d</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400 text-right">Trend</th>
+                  <th className="px-4 py-2 font-semibold text-stone-400 text-right">Capital</th>
                 </tr>
               </thead>
               <tbody>
@@ -161,9 +162,9 @@ function TierSection({
                   <tr key={item.name} className="border-b border-stone-800 hover:bg-stone-700/50">
                     <td className="px-4 py-2">
                       <div className="font-medium text-stone-100">{item.name}</div>
-                      <div className="text-stone-200">{item.category}</div>
+                      <div className="text-stone-400">{item.category}</div>
                     </td>
-                    <td className="px-4 py-2 text-stone-200 font-mono">{format(item.lastSaleDate, 'MMM d, yyyy')}</td>
+                    <td className="px-4 py-2 text-stone-300 font-mono">{format(item.lastSaleDate, 'MMM d, yyyy')}</td>
                     <td
                       className="px-4 py-2 text-right font-mono font-semibold"
                       style={{ color: item.daysSinceLastSale > 30 ? '#ef4444' : '#a8a29e' }}
@@ -175,7 +176,7 @@ function TierSection({
                     <td className="px-4 py-2 text-right font-mono font-medium" style={{ color: item.trendPct >= 0 ? '#16a34a' : '#dc2626' }}>
                       {item.prior30Units > 0 ? `${item.trendPct >= 0 ? '+' : ''}${item.trendPct.toFixed(0)}%` : '—'}
                     </td>
-                    <td className="px-4 py-2 text-right font-mono text-stone-200">
+                    <td className="px-4 py-2 text-right font-mono text-stone-300">
                       {item.capitalTiedUp !== null ? formatCurrency(item.capitalTiedUp) : '—'}
                     </td>
                   </tr>
@@ -215,8 +216,8 @@ export default function DeadStockView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-stone-100">Dead Stock Detector</h1>
-        <p className="text-sm text-stone-200 mt-1">Products with no or declining sales activity</p>
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dead Stock Detector</h1>
+        <p className="text-sm text-stone-400 mt-1">Products with no or declining sales activity</p>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
@@ -232,7 +233,7 @@ export default function DeadStockView() {
           },
         ].map(c => (
           <div key={c.label} className="bg-stone-800/30 border border-stone-700/40 p-4">
-            <p className="text-xs text-stone-200">{c.label}</p>
+            <p className="text-xs text-stone-400">{c.label}</p>
             <p className="text-2xl font-bold mt-1" style={{ color: c.color }}>
               {c.count !== null ? c.count : c.value}
             </p>
@@ -241,7 +242,7 @@ export default function DeadStockView() {
       </div>
 
       {(deadItems.length > 0 || dyingItems.length > 0) && (
-        <div className="bg-stone-800/80 border border-amber-500/20 rounded-xl p-5">
+        <div className="bg-stone-800/80 border border-amber-500/20 p-5">
           <h2 className="text-sm font-semibold text-amber-400 mb-3">Recommended Actions</h2>
           <div className="space-y-2">
             {[...deadItems, ...dyingItems].slice(0, 10).map(item => (
@@ -252,7 +253,7 @@ export default function DeadStockView() {
                 />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-stone-100 text-sm">{item.name}</div>
-                  <div className="text-xs text-stone-200 mt-0.5">{item.recommendation}</div>
+                  <div className="text-xs text-stone-400 mt-0.5">{item.recommendation}</div>
                 </div>
                 <span
                   className="text-xs font-semibold px-2 py-0.5 rounded-full shrink-0"
@@ -276,18 +277,18 @@ export default function DeadStockView() {
       {chartData.length > 0 && (
         <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <h2 className="text-base font-semibold text-stone-100">30-Day Sales by Product</h2>
-          <p className="text-xs text-stone-200 mt-0.5 mb-4">Highlighting dead and dying products</p>
+          <p className="text-xs text-stone-400 mt-0.5 mb-4">Highlighting dead and dying products</p>
           <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 22)}>
             <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={120} />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chart.grid} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: chart.axis }} />
+              <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: chart.axis }} width={120} />
+              <Tooltip contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
               <Bar dataKey="last30Units" radius={[0, 3, 3, 0]}>
                 {chartData.map((item, i) => (
                   <Cell
                     key={i}
-                    fill={item.tier === 'Dead' ? '#ef4444' : item.tier === 'Dying' ? '#f59e0b' : '#F59E0Baa'}
+                    fill={item.tier === 'Dead' ? chart.negative : item.tier === 'Dying' ? chart.bar : '#F59E0Baa'}
                   />
                 ))}
               </Bar>

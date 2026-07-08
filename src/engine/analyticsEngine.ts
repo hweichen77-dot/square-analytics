@@ -120,9 +120,7 @@ export function computeProductStats(
   const statsMap = new Map<string, ProductStats>()
 
   for (const tx of transactions) {
-    // Refund rows (negative netSales) carry positive item quantities; counting
-    // them inflated units sold and corrupted avgPrice/COGS/velocity. Exclude
-    // them so product stats reflect actual sales.
+
     if (tx.netSales < 0) continue
     const items = parseProductItems(tx.itemDescription).filter(i => isAnalyticsItem(i.name))
     const revenueMap = allocateRevenue(tx)

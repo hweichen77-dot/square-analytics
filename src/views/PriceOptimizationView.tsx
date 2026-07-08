@@ -3,7 +3,9 @@ import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveCo
 import { useAnalytics } from '../context/AnalyticsContext'
 import { useAllTransactions } from '../db/useTransactions'
 import { EmptyState } from '../components/ui/EmptyState'
+import { StatCard } from '../components/ui/StatCard'
 import { formatCurrency } from '../utils/format'
+import { chart } from '../lib/chartTheme'
 import { parseProductItems } from '../types/models'
 import type { SalesTransaction } from '../types/models'
 import { format } from 'date-fns'
@@ -151,25 +153,33 @@ export default function PriceOptimizationView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Price Optimization</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Price Optimization</h1>
 
-      <div className="grid grid-cols-4 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Price Changes Detected</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{changes.length}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Revenue Improved</p>
-          <p className="text-2xl font-bold text-emerald-400 mt-1">{improved}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Revenue Declined</p>
-          <p className="text-2xl font-bold text-red-400 mt-1">{declined}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Products Tracked</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{productNames.length}</p>
-        </div>
+      <div className="grid grid-cols-4 gap-4 cf-stagger">
+        <StatCard
+          label="Price Changes Detected"
+          value={String(changes.length)}
+          countTo={changes.length}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Revenue Improved"
+          value={String(improved)}
+          countTo={improved}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Revenue Declined"
+          value={String(declined)}
+          countTo={declined}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Products Tracked"
+          value={String(productNames.length)}
+          countTo={productNames.length}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
       </div>
 
       {changes.length > 0 && (
@@ -180,7 +190,7 @@ export default function PriceOptimizationView() {
             <p className="text-sm font-medium text-stone-200">
               {improved} of {changes.length} detected price changes resulted in higher revenue
             </p>
-            <p className="text-xs text-stone-200 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               Elasticity &lt; −1 means demand is price-sensitive; &gt; −1 means relatively inelastic
             </p>
           </div>
@@ -190,7 +200,7 @@ export default function PriceOptimizationView() {
       {changes.length > 0 && (
         <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <h2 className="text-base font-semibold text-stone-100 mb-1">All Detected Price Changes</h2>
-          <p className="text-xs text-stone-200 mb-4">
+          <p className="text-xs text-stone-400 mb-4">
             A price change is detected when a product's per-unit price differs by more than $0.10.
           </p>
           <div className="overflow-x-auto">
@@ -198,7 +208,7 @@ export default function PriceOptimizationView() {
               <thead>
                 <tr className="border-b border-stone-700 text-left">
                   {['Product', 'Date', 'Old $', 'New $', 'Price Δ', 'Unit Δ (30d)', 'Revenue Δ', 'Elasticity'].map(h => (
-                    <th key={h} className="pb-2 font-semibold text-stone-200 pr-4">{h}</th>
+                    <th key={h} className="pb-2 font-semibold text-stone-400 pr-4">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -206,7 +216,7 @@ export default function PriceOptimizationView() {
                 {changes.map(c => (
                   <tr key={c.id} className="border-b border-stone-800 hover:bg-stone-700/50">
                     <td className="py-2 font-medium text-stone-100 pr-4">{c.productName}</td>
-                    <td className="py-2 font-mono text-stone-200 pr-4">{format(c.changeDate, 'MMM d, yyyy')}</td>
+                    <td className="py-2 font-mono text-stone-400 pr-4">{format(c.changeDate, 'MMM d, yyyy')}</td>
                     <td className="py-2 font-mono text-stone-100 pr-4">${c.oldPrice.toFixed(2)}</td>
                     <td className="py-2 font-mono text-stone-100 pr-4">${c.newPrice.toFixed(2)}</td>
                     <td className="py-2 font-mono pr-4" style={{ color: c.priceChangePct >= 0 ? '#dc2626' : '#16a34a' }}>
@@ -241,18 +251,18 @@ export default function PriceOptimizationView() {
         </select>
 
         {selectedProduct && changesForSelected.length === 0 && (
-          <p className="text-sm text-stone-200">No price changes detected for "{selectedProduct}".</p>
+          <p className="text-sm text-stone-400">No price changes detected for "{selectedProduct}".</p>
         )}
 
         {priceChartData.length > 0 && (
           <ResponsiveContainer width="100%" height={200}>
             <ComposedChart data={priceChartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-              <YAxis tickFormatter={v => `$${v.toFixed(0)}`} tick={{ fontSize: 11 }} />
-              <Tooltip formatter={(v: number) => formatCurrency(v)} />
-              <Line type="linear" dataKey="before" stroke="#d99a2b" dot strokeWidth={2} name="Before (30d)" />
-              <Line type="linear" dataKey="after" stroke="#16a34a" dot strokeWidth={2} name="After (30d)" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: chart.axis }} />
+              <YAxis tickFormatter={v => `$${v.toFixed(0)}`} tick={{ fontSize: 11, fill: chart.axis }} />
+              <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
+              <Line type="linear" dataKey="before" stroke={chart.line} dot strokeWidth={2} name="Before (30d)" />
+              <Line type="linear" dataKey="after" stroke={chart.positive} dot strokeWidth={2} name="After (30d)" />
             </ComposedChart>
           </ResponsiveContainer>
         )}
@@ -261,17 +271,17 @@ export default function PriceOptimizationView() {
       {selectedProduct && currentPrice !== undefined && (
         <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <h2 className="text-base font-semibold text-stone-100 mb-1">Price Simulator</h2>
-          <p className="text-xs text-stone-200 mb-4">
+          <p className="text-xs text-stone-400 mb-4">
             Estimate the impact of a price change using historical elasticity.
           </p>
           <div className="flex items-center gap-6 flex-wrap">
             <div>
-              <p className="text-xs text-stone-200">Current Price</p>
+              <p className="text-xs text-stone-400">Current Price</p>
               <p className="text-lg font-bold text-stone-100">{formatCurrency(currentPrice)}</p>
             </div>
-            <span className="text-stone-200">→</span>
+            <span className="text-stone-500">→</span>
             <div>
-              <p className="text-xs text-stone-200">New Hypothetical Price</p>
+              <p className="text-xs text-stone-400">New Hypothetical Price</p>
               <input
                 type="number"
                 className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm w-28"
@@ -284,10 +294,10 @@ export default function PriceOptimizationView() {
             {sim && (
               <>
                 <div className="border-l border-stone-700 pl-6">
-                  <p className="text-xs text-stone-200">Est. Weekly Revenue</p>
+                  <p className="text-xs text-stone-400">Est. Weekly Revenue</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm text-stone-200">{formatCurrency(sim.currentRevenue)}</span>
-                    <span className="text-stone-200 text-xs">→</span>
+                    <span className="text-sm text-stone-400">{formatCurrency(sim.currentRevenue)}</span>
+                    <span className="text-stone-500 text-xs">→</span>
                     <span
                       className="text-lg font-bold"
                       style={{ color: sim.estimatedRevenue >= sim.currentRevenue ? '#16a34a' : '#dc2626' }}
@@ -297,7 +307,7 @@ export default function PriceOptimizationView() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-stone-200">Est. Weekly Units</p>
+                  <p className="text-xs text-stone-400">Est. Weekly Units</p>
                   <p className="text-sm font-mono text-stone-100 mt-0.5">
                     {currentVelocity.toFixed(1)} → {sim.estimatedUnits.toFixed(1)}
                   </p>
@@ -305,7 +315,7 @@ export default function PriceOptimizationView() {
               </>
             )}
           </div>
-          <p className="text-xs text-stone-200 mt-3">
+          <p className="text-xs text-stone-400 mt-3">
             {changesForSelected.length === 0
               ? 'Note: Using default elasticity of −1.0 (no historical price changes for this product).'
               : `Based on elasticity of ${elasticity.toFixed(2)} from ${changesForSelected.length} detected change(s).`}
@@ -317,7 +327,7 @@ export default function PriceOptimizationView() {
         <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-base font-semibold text-stone-100">All Products</h2>
-            <p className="text-xs text-stone-200 mt-0.5">{filteredProductStats.length} of {productStats.length} products</p>
+            <p className="text-xs text-stone-400 mt-0.5">{filteredProductStats.length} of {productStats.length} products</p>
           </div>
           <input
             type="text"
@@ -331,12 +341,12 @@ export default function PriceOptimizationView() {
           <table className="w-full text-xs">
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left font-semibold text-stone-200">Product</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Avg Price</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Units Sold</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Revenue</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Weekly Velocity</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Price Changes</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-stone-400">Product</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-400">Avg Price</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-400">Units Sold</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-400">Revenue</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-400">Weekly Velocity</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-400">Price Changes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/30">
@@ -353,7 +363,7 @@ export default function PriceOptimizationView() {
                     <td className="px-4 py-2.5 text-right font-mono text-stone-100">{formatCurrency(p.avgPrice)}</td>
                     <td className="px-4 py-2.5 text-right text-stone-100">{p.totalUnitsSold.toLocaleString()}</td>
                     <td className="px-4 py-2.5 text-right font-mono text-stone-100">{formatCurrency(p.totalRevenue)}</td>
-                    <td className="px-4 py-2.5 text-right text-stone-200">{vel.toFixed(1)}/wk</td>
+                    <td className="px-4 py-2.5 text-right text-stone-400">{vel.toFixed(1)}/wk</td>
                     <td className="px-4 py-2.5 text-right">
                       {changeCount > 0
                         ? <span className="text-amber-400 font-medium">{changeCount}</span>
@@ -364,7 +374,7 @@ export default function PriceOptimizationView() {
               })}
               {filteredProductStats.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-stone-200">No products match your search.</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-stone-400">No products match your search.</td>
                 </tr>
               )}
             </tbody>

@@ -27,7 +27,6 @@ function parseCurrency(value: string): number {
   return negative ? -Math.abs(n) : n
 }
 
-
 export function isShopifyCSV(headers: string[]): boolean {
   const lower = new Set(headers.map(h => h.toLowerCase().trim()))
   return lower.has('lineitem name') || lower.has('lineitem quantity')
@@ -95,7 +94,6 @@ export function parseShopifyCSV(content: string): CSVParseResult {
 
   return { transactions, skipped, schemaError: null }
 }
-
 
 export function isEtsyCSV(headers: string[]): boolean {
   const lower = new Set(headers.map(h => h.toLowerCase().trim()))

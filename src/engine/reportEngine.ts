@@ -9,7 +9,6 @@ import {
 import type { ProductStats, DailyRevenue, MonthlyComparison, TimeGranularity } from './analyticsEngine'
 import { DAY_NAMES } from '../utils/format'
 
-
 export interface GrossProfitResult {
   grossProfit: number | null
   marginPct: number | null
@@ -79,7 +78,6 @@ export const REPORT_META: Record<ReportType, { label: string; icon: string; desc
   },
 }
 
-
 export interface RevenueReport {
   type: 'revenue'
   totalRevenue: number
@@ -113,7 +111,6 @@ export function buildRevenueReport(
   }
 }
 
-
 export interface TopProductsReport {
   type: 'top-products'
   byRevenue: ProductStats[]
@@ -138,7 +135,6 @@ export function buildTopProductsReport(
     totalUnits,
   }
 }
-
 
 export interface PaymentMethodStat {
   method: string
@@ -207,7 +203,6 @@ export function buildCustomerBehaviorReport(transactions: SalesTransaction[]): C
   }
 }
 
-
 export interface TransactionLogReport {
   type: 'transaction-log'
   transactions: SalesTransaction[]
@@ -224,7 +219,6 @@ export function buildTransactionLogReport(transactions: SalesTransaction[]): Tra
     count: sorted.length,
   }
 }
-
 
 export type SeasonName = 'Spring' | 'Summer' | 'Fall' | 'Winter'
 
@@ -328,7 +322,6 @@ export function buildSeasonalReport(
   return { type: 'seasonal', monthly, bestMonth, worstMonth, totalRevenue, seasons, bestSeason, worstSeason }
 }
 
-
 export interface MonthlyDetailRow {
   month: string
   label: string
@@ -398,11 +391,7 @@ export function buildMonthlyDetailReport(
   const sorted = Array.from(monthMap.entries()).sort(([a], [b]) => a.localeCompare(b))
 
   const rows: MonthlyDetailRow[] = sorted.map(([month, txs], idx) => {
-    // Only use the detailed-financials branch when EVERY row carries the fields.
-    // With `some`, one Square row (grossSales set) flipped a whole month of
-    // mixed CSV+API data into the detailed branch, where CSV rows summed 0 gross
-    // while their netSales still counted → "Gross < Net" nonsense. Mixed months
-    // now fall to the net-based branch, which handles refunds correctly.
+
     const hasDetailedFinancials = txs.length > 0 && txs.every(t => t.grossSales !== undefined)
 
     let grossSales: number
@@ -512,7 +501,6 @@ export function buildMonthlyDetailReport(
     worstMonth,
   }
 }
-
 
 function isCash(method: string): boolean {
   const m = method.trim()
@@ -644,7 +632,6 @@ export function buildCashReport(transactions: SalesTransaction[]): CashReport {
     transactions: [...cashTxs].sort((a, b) => b.date.getTime() - a.date.getTime()),
   }
 }
-
 
 export type AnyReport =
   | RevenueReport

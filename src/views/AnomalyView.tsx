@@ -3,6 +3,7 @@ import { useAllTransactions } from '../db/useTransactions'
 import { computeAnomalies } from '../engine/forecastEngine'
 import type { AnomalyDay } from '../engine/forecastEngine'
 import { EmptyState } from '../components/ui/EmptyState'
+import { StatCard } from '../components/ui/StatCard'
 import { formatCurrency, formatPercent } from '../utils/format'
 import { useNavigate } from 'react-router-dom'
 
@@ -22,7 +23,7 @@ function AnomalyRow({ anomaly }: { anomaly: AnomalyDay }) {
       <div className={`w-2 h-2 rounded-full shrink-0 ${isAbove ? 'bg-emerald-500' : 'bg-red-400'}`} />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-stone-200">{dayLabel}</p>
-        <p className="text-xs text-stone-200 mt-0.5">
+        <p className="text-xs text-stone-400 mt-0.5">
           Expected ~{formatCurrency(expectedRevenue)}
         </p>
       </div>
@@ -63,31 +64,37 @@ export default function AnomalyView() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-bold text-stone-100">Anomaly Alerts</h1>
-        <p className="text-sm text-stone-200 mt-1">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Anomaly Alerts</h1>
+        <p className="text-sm text-stone-400 mt-1">
           Days that were unusually above or below your typical revenue for that day of the week.
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4 text-center">
-          <p className="text-xl font-bold text-stone-100">{anomalies.length}</p>
-          <p className="text-xs text-stone-200 mt-0.5">Total anomalies</p>
-        </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-400">{aboveCount}</p>
-          <p className="text-xs text-emerald-400 mt-0.5">Above normal</p>
-        </div>
-        <div className="bg-red-500/10 border border-red-500/30 p-4 text-center">
-          <p className="text-2xl font-bold text-red-400">{belowCount}</p>
-          <p className="text-xs text-red-400 mt-0.5">Below normal</p>
-        </div>
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard
+          label="Total anomalies"
+          value={String(anomalies.length)}
+          countTo={anomalies.length}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Above normal"
+          value={String(aboveCount)}
+          countTo={aboveCount}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
+        <StatCard
+          label="Below normal"
+          value={String(belowCount)}
+          countTo={belowCount}
+          format={(n) => Math.round(n).toLocaleString()}
+        />
       </div>
 
       {anomalies.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-stone-200 text-sm">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-stone-400 text-sm">
           No anomalous days detected. Your revenue is remarkably consistent!
         </div>
       ) : (
@@ -100,7 +107,7 @@ export default function AnomalyView() {
                 className={`px-4 py-2.5 text-sm font-medium transition-colors ${
                   filter === f
                     ? 'border-b-2 border-amber-500 text-amber-400'
-                    : 'text-stone-200 hover:text-stone-300'
+                    : 'text-stone-400 hover:text-stone-100'
                 }`}
               >
                 {f === 'all' ? `All (${anomalies.length})` : f === 'above' ? `Above (${aboveCount})` : `Below (${belowCount})`}
@@ -109,7 +116,7 @@ export default function AnomalyView() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="p-8 text-center text-sm text-stone-200">No {filter} anomalies.</div>
+            <div className="p-8 text-center text-sm text-stone-400">No {filter} anomalies.</div>
           ) : (
             <div>
               {filtered.map((a, i) => <AnomalyRow key={i} anomaly={a} />)}
@@ -118,7 +125,7 @@ export default function AnomalyView() {
         </div>
       )}
 
-      <p className="text-xs text-stone-200">
+      <p className="text-xs text-stone-500">
         A day is flagged as anomalous when its revenue is more than 2.0 standard deviations from the mean for that day of the week.
         Strong anomalies are more than 2.5 standard deviations away.
       </p>

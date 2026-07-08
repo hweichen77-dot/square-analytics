@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useProductBundles, useAllTransactions } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
+import { StatCard } from '../components/ui/StatCard'
 import { db } from '../db/database'
 import { formatCurrency } from '../utils/format'
 import type { SalesTransaction, ProductBundle } from '../types/models'
@@ -94,26 +95,26 @@ function BundleEditorModal({
       <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-[500px] max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <h2 className="text-base font-semibold">{bundle ? 'Edit Bundle' : 'Create Bundle'}</h2>
-          <button onClick={onClose} className="text-stone-200 hover:text-stone-200 text-xl">×</button>
+          <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl">×</button>
         </div>
         <div className="overflow-y-auto flex-1 p-6 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Bundle Name</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Bundle Name</label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Snack Combo" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Bundle Price</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Bundle Price</label>
             <input type="number" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={priceText} onChange={e => setPriceText(e.target.value)} placeholder="0.00" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">Notes (optional)</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1">Notes (optional)</label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1">
+            <label className="block text-xs font-medium text-stone-400 mb-1">
               Products (select 2–3 · {selectedProducts.size}/3)
             </label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm mb-2"
@@ -138,7 +139,7 @@ function BundleEditorModal({
           </div>
         </div>
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-stone-700/50">
-          <button onClick={onClose} className="text-sm text-stone-200 hover:text-stone-300">Cancel</button>
+          <button onClick={onClose} className="text-sm text-stone-400 hover:text-stone-100">Cancel</button>
           <button
             disabled={!name.trim() || selectedProducts.size < 2}
             onClick={() => {
@@ -217,19 +218,12 @@ export default function BundleView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Bundle & Cross-Sell</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Bundle & Cross-Sell</h1>
 
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: 'Multi-Item Transactions', value: multiItemTxCount },
-          { label: 'Product Pairs Found', value: pairs.length },
-          { label: 'Saved Bundles', value: savedBundles.length },
-        ].map(c => (
-          <div key={c.label} className="bg-stone-800/30 border border-stone-700/40 p-4">
-            <p className="text-xs text-stone-200">{c.label}</p>
-            <p className="text-xl font-bold text-stone-100 mt-1">{c.value}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard label="Multi-Item Transactions" value={String(multiItemTxCount)} countTo={multiItemTxCount} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Product Pairs Found" value={String(pairs.length)} countTo={pairs.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Saved Bundles" value={String(savedBundles.length)} countTo={savedBundles.length} format={(n) => Math.round(n).toLocaleString()} />
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
@@ -244,7 +238,7 @@ export default function BundleView() {
         </select>
 
         {selectedProduct && affinityForSelected.length === 0 && (
-          <p className="text-sm text-stone-200">No co-purchase data found for "{selectedProduct}".</p>
+          <p className="text-sm text-stone-400">No co-purchase data found for "{selectedProduct}".</p>
         )}
         {affinityForSelected.length > 0 && (
           <div className="space-y-2">
@@ -255,7 +249,7 @@ export default function BundleView() {
                 <div key={pair.id} className="flex items-center gap-3 p-3 bg-stone-900 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm text-stone-100">{partner}</p>
-                    <p className="text-xs text-stone-200">
+                    <p className="text-xs text-stone-400">
                       Bought together {pair.count}× · Score: {pair.score.toFixed(1)}%
                     </p>
                   </div>
@@ -275,14 +269,14 @@ export default function BundleView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="text-base font-semibold text-stone-100 mb-4">Top Co-Purchase Pairs</h2>
         {pairs.length === 0 ? (
-          <p className="text-sm text-stone-200">No multi-item transactions found.</p>
+          <p className="text-sm text-stone-400">No multi-item transactions found.</p>
         ) : (
           <div className="space-y-6">
             {groupedPairs.map(([category, categoryPairs]) => {
               const maxCount = categoryPairs[0]?.count ?? 1
               return (
                 <div key={category}>
-                  <p className="text-xs font-semibold text-stone-200 uppercase tracking-widest mb-3">{category}</p>
+                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-3">{category}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {categoryPairs.map((p, idx) => {
                       const isTop = idx === 0 && category === groupedPairs[0][0]
@@ -304,7 +298,7 @@ export default function BundleView() {
                           <div className="flex items-start gap-2">
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-sm text-stone-100 truncate">{p.productA}</p>
-                              <p className="text-xs text-stone-200 mt-0.5">+</p>
+                              <p className="text-xs text-stone-400 mt-0.5">+</p>
                               <p className="font-semibold text-sm text-stone-100 truncate">{p.productB}</p>
                             </div>
                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${strengthColors[strength]}`}>
@@ -313,7 +307,7 @@ export default function BundleView() {
                           </div>
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-stone-200">Bought together {p.count}×</span>
+                              <span className="text-xs text-stone-400">Bought together {p.count}×</span>
                               <span className="text-xs font-mono font-semibold" style={{ color: barColor }}>{p.score.toFixed(1)}% match</span>
                             </div>
                             <div className="w-full bg-stone-800 rounded-full h-1.5">
@@ -324,8 +318,8 @@ export default function BundleView() {
                             </div>
                           </div>
                           <div className="flex items-center justify-between pt-1 border-t border-stone-700/50">
-                            <span className="text-xs text-stone-200">Suggested bundle price</span>
-                            <span className="text-sm font-mono font-bold text-stone-200">{formatCurrency(p.suggestedPrice)}</span>
+                            <span className="text-xs text-stone-400">Suggested bundle price</span>
+                            <span className="text-sm font-mono font-bold text-stone-100">{formatCurrency(p.suggestedPrice)}</span>
                           </div>
                         </div>
                       )
@@ -349,7 +343,7 @@ export default function BundleView() {
           </button>
         </div>
         {savedBundles.length === 0 ? (
-          <p className="text-sm text-stone-200">No bundles created yet.</p>
+          <p className="text-sm text-stone-400">No bundles created yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {savedBundles.map(bundle => (
@@ -357,18 +351,18 @@ export default function BundleView() {
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-sm text-stone-100">{bundle.name}</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setEditingBundle(bundle)} className="text-xs text-stone-200 hover:text-amber-400">Edit</button>
+                    <button onClick={() => setEditingBundle(bundle)} className="text-xs text-stone-400 hover:text-amber-400">Edit</button>
                     <button onClick={() => deleteBundle(bundle)} className="text-xs text-red-400 hover:text-red-400">Delete</button>
                   </div>
                 </div>
                 {bundle.productNames.map(p => (
-                  <div key={p} className="text-xs text-stone-200 flex items-center gap-1">
-                    <span className="text-stone-200">–</span> {p}
+                  <div key={p} className="text-xs text-stone-300 flex items-center gap-1">
+                    <span className="text-stone-500">–</span> {p}
                   </div>
                 ))}
                 <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-700/50">
                   <span className="text-sm font-semibold text-stone-100">{formatCurrency(bundle.bundlePrice)}</span>
-                  <span className="text-xs text-stone-200">{format(bundle.createdDate, 'MMM d, yyyy')}</span>
+                  <span className="text-xs text-stone-500">{format(bundle.createdDate, 'MMM d, yyyy')}</span>
                 </div>
               </div>
             ))}

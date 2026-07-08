@@ -5,6 +5,7 @@ import { useDateRangeStore } from '../store/dateRangeStore'
 import { computeHeatmap, computeMonthlyComparison } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
+import { chart } from '../lib/chartTheme'
 
 const HOURS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -34,17 +35,17 @@ export default function TimeAnalysisView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Time Analysis</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Time Analysis</h1>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="text-base font-semibold text-stone-100">Sales Heatmap</h2>
-        <p className="text-xs text-stone-200 mt-0.5 mb-4">Sales volume by day and hour</p>
+        <p className="text-xs text-stone-400 mt-0.5 mb-4">Sales volume by day and hour</p>
 
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full">
             <div className="flex gap-1 mb-1 ml-10">
               {HOURS.map(h => (
-                <div key={h} className="text-center text-xs text-stone-200 font-medium" style={{ width: 36 }}>
+                <div key={h} className="text-center text-xs text-stone-400 font-medium" style={{ width: 36 }}>
                   {hourLabel(h)}
                 </div>
               ))}
@@ -52,7 +53,7 @@ export default function TimeAnalysisView() {
 
             {Array.from({ length: 7 }, (_, i) => i + 1).map(dow => (
               <div key={dow} className="flex gap-1 mb-1 items-center">
-                <div className="text-xs text-stone-200 w-9 text-right pr-1 shrink-0">
+                <div className="text-xs text-stone-400 w-9 text-right pr-1 shrink-0">
                   {DAY_NAMES[dow - 1]}
                 </div>
                 {HOURS.map(hour => {
@@ -69,9 +70,9 @@ export default function TimeAnalysisView() {
                         height: 28,
                         backgroundColor:
                           count === 0
-                            ? 'rgb(15, 23, 42)'
-                            : `rgba(99, 102, 241, ${0.15 + intensity * 0.8})`,
-                        color: intensity > 0.5 ? '#f5f5f4' : '#64748b',
+                            ? 'rgb(28, 25, 23)'
+                            : `rgba(245, 158, 11, ${0.15 + intensity * 0.8})`,
+                        color: intensity > 0.5 ? '#fafaf9' : '#a8a29e',
                       }}
                     >
                       {count > 0 ? count : ''}
@@ -82,7 +83,7 @@ export default function TimeAnalysisView() {
             ))}
 
             <div className="flex items-center gap-1 mt-3 ml-10">
-              <span className="text-xs text-stone-200">Less</span>
+              <span className="text-xs text-stone-400">Less</span>
               {[0, 0.25, 0.5, 0.75, 1].map(v => (
                 <div
                   key={v}
@@ -91,11 +92,11 @@ export default function TimeAnalysisView() {
                     width: 14,
                     height: 14,
                     backgroundColor:
-                      v === 0 ? 'rgb(15, 23, 42)' : `rgba(99, 102, 241, ${0.15 + v * 0.8})`,
+                      v === 0 ? 'rgb(28, 25, 23)' : `rgba(245, 158, 11, ${0.15 + v * 0.8})`,
                   }}
                 />
               ))}
-              <span className="text-xs text-stone-200">More</span>
+              <span className="text-xs text-stone-400">More</span>
             </div>
           </div>
         </div>
@@ -104,16 +105,16 @@ export default function TimeAnalysisView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="text-base font-semibold text-stone-100 mb-4">Monthly Comparison</h2>
         {monthly.length === 0 ? (
-          <p className="text-sm text-stone-200">No monthly data available.</p>
+          <p className="text-sm text-stone-400">No monthly data available.</p>
         ) : (
           <>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={monthly} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                <Bar dataKey="revenue" fill="#F59E0B" radius={[3, 3, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: chart.axis }} />
+                <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: chart.axis }} />
+                <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
+                <Bar dataKey="revenue" fill={chart.bar} radius={[3, 3, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
 
@@ -121,10 +122,10 @@ export default function TimeAnalysisView() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-stone-700/50 text-left">
-                    <th className="pb-2 font-semibold text-stone-200 text-xs">Month</th>
-                    <th className="pb-2 font-semibold text-stone-200 text-xs text-right">Revenue</th>
-                    <th className="pb-2 font-semibold text-stone-200 text-xs text-right">Transactions</th>
-                    <th className="pb-2 font-semibold text-stone-200 text-xs text-right">Avg Value</th>
+                    <th className="pb-2 font-semibold text-stone-400 text-xs">Month</th>
+                    <th className="pb-2 font-semibold text-stone-400 text-xs text-right">Revenue</th>
+                    <th className="pb-2 font-semibold text-stone-400 text-xs text-right">Transactions</th>
+                    <th className="pb-2 font-semibold text-stone-400 text-xs text-right">Avg Value</th>
                   </tr>
                 </thead>
                 <tbody>

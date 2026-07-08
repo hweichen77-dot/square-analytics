@@ -14,8 +14,6 @@
   --color-stone-100: oklch(0.93 0.004 65);
   --color-stone-50:  oklch(0.97 0.003 65);
 
-  /* Brass-amber accent (warm gold hue ~78) — the single decorative accent.
-     Chroma tapers toward the light end so highlights don't turn garish. */
   --color-amber-950: oklch(0.20 0.030 72);
   --color-amber-900: oklch(0.28 0.050 74);
   --color-amber-800: oklch(0.38 0.075 75);
@@ -67,3 +65,17 @@ input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.4;
   filter: invert(0.8);
 }
+
+@keyframes dropIn { from { opacity: 0; transform: translateY(-4px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
+@keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.cf-page-enter { animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.cf-stagger > * { animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cf-stagger > *:nth-child(1){animation-delay:.02s} .cf-stagger > *:nth-child(2){animation-delay:.06s}
+.cf-stagger > *:nth-child(3){animation-delay:.10s} .cf-stagger > *:nth-child(4){animation-delay:.14s}
+.cf-stagger > *:nth-child(5){animation-delay:.18s} .cf-stagger > *:nth-child(n+6){animation-delay:.22s}

@@ -4,7 +4,9 @@ import { useStaffWages, useShifts } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency, formatNumber } from '../utils/format'
+import { StatCard } from '../components/ui/StatCard'
 import { format } from 'date-fns'
+import { chart } from '../lib/chartTheme'
 import { upsertStaffWage } from '../db/dbUtils'
 import type { SalesTransaction, StoredShift } from '../types/models'
 
@@ -108,21 +110,12 @@ export default function StaffView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-stone-100">Staff Performance</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Staff Performance</h1>
 
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Staff Members</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{staffStats.length}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Total Revenue</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{formatCurrency(totalRevenue)}</p>
-        </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-          <p className="text-xs text-stone-200">Total Transactions</p>
-          <p className="text-xl font-bold text-stone-100 mt-1">{formatNumber(transactions.length)}</p>
-        </div>
+      <div className="grid grid-cols-3 gap-4 cf-stagger">
+        <StatCard label="Staff Members" value={String(staffStats.length)} countTo={staffStats.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Total Revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
+        <StatCard label="Total Transactions" value={formatNumber(transactions.length)} countTo={transactions.length} format={(n) => Math.round(n).toLocaleString()} />
       </div>
 
       {staffStats.length > 0 && (
@@ -150,15 +143,15 @@ export default function StaffView() {
                   </div>
                   <div className="hidden sm:flex items-center gap-8 shrink-0 text-right">
                     <div>
-                      <p className="text-[10px] text-stone-200">Revenue</p>
+                      <p className="text-[10px] text-stone-400">Revenue</p>
                       <p className="text-sm font-mono font-semibold text-stone-100">{formatCurrency(s.totalSales)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-stone-200">Transactions</p>
+                      <p className="text-[10px] text-stone-400">Transactions</p>
                       <p className="text-sm font-mono text-stone-100">{formatNumber(s.transactionCount)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-stone-200">Avg Sale</p>
+                      <p className="text-[10px] text-stone-400">Avg Sale</p>
                       <p className="text-sm font-mono text-stone-200">{formatCurrency(avg)}</p>
                     </div>
                   </div>
@@ -173,7 +166,7 @@ export default function StaffView() {
         <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold text-stone-100">Staff ROI</h2>
-            <p className="text-xs text-stone-200 mt-0.5">
+            <p className="text-xs text-stone-400 mt-0.5">
               {hasAnyRealHours
                 ? 'Hours from Square shift data where available; estimated from transactions otherwise. Enter wage to see net ROI.'
                 : 'Hours estimated from first → last transaction per shift. Enter wage to see net ROI.'}
@@ -184,13 +177,13 @@ export default function StaffView() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-stone-700/50 text-left">
-                <th className="px-5 py-3 text-xs font-semibold text-stone-200">Staff</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Revenue</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Hours</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Rev/hr</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-center">Wage/hr</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Wage Cost</th>
-                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Net ROI</th>
+                <th className="px-5 py-3 text-xs font-semibold text-stone-400">Staff</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-right">Revenue</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-right">Hours</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-right">Rev/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-center">Wage/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-right">Wage Cost</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-400 text-right">Net ROI</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/30">
@@ -227,7 +220,7 @@ export default function StaffView() {
                             placeholder="0.00"
                           />
                           <button type="submit" className="text-xs text-amber-400 hover:text-amber-300 px-1">✓</button>
-                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-stone-200 hover:text-stone-300">✕</button>
+                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-stone-400 hover:text-stone-100">✕</button>
                         </form>
                       ) : (
                         <button
@@ -249,7 +242,7 @@ export default function StaffView() {
                           {formatCurrency(s.netROI)}
                         </span>
                       ) : (
-                        <span className="text-stone-200 text-xs">enter wage</span>
+                        <span className="text-stone-400 text-xs">enter wage</span>
                       )}
                     </td>
                   </tr>
@@ -264,17 +257,17 @@ export default function StaffView() {
         <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue by Staff Member</h2>
         <ResponsiveContainer width="100%" height={Math.max(200, staffStats.length * 40)}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 60, left: 16, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chart.grid} />
             <XAxis
               type="number"
               tickFormatter={v => `$${(v / 1000).toFixed(0)}k`}
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 11, fill: chart.axis }}
             />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
-            <Tooltip formatter={(v: number) => formatCurrency(v)} />
-            <Bar dataKey="totalSales" radius={[0, 3, 3, 0]} label={{ position: 'right', formatter: (v: number) => `$${Math.round(v)}`, fontSize: 10, fill: '#64748B' }}>
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: chart.axis }} width={90} />
+            <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
+            <Bar dataKey="totalSales" radius={[0, 3, 3, 0]} label={{ position: 'right', formatter: (v: number) => `$${Math.round(v)}`, fontSize: 10, fill: chart.axis }}>
               {chartData.map((_, i) => (
-                <Cell key={i} fill="#F59E0B" />
+                <Cell key={i} fill={chart.bar} />
               ))}
             </Bar>
           </BarChart>
@@ -284,7 +277,7 @@ export default function StaffView() {
       <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50">
           <h2 className="text-base font-semibold text-stone-100">Staff Breakdown</h2>
-          <p className="text-xs text-stone-200 mt-0.5">Click a row to see individual transactions</p>
+          <p className="text-xs text-stone-400 mt-0.5">Click a row to see individual transactions</p>
         </div>
         <div className="divide-y divide-stone-700/40">
           {staffStats.map((staff, idx) => {
@@ -308,7 +301,7 @@ export default function StaffView() {
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-stone-100 text-sm">{staff.name}</p>
                       {staff.name === 'Unknown' && (
-                        <span className="text-xs px-1.5 py-0.5 bg-stone-800 text-stone-200 rounded-full">no name in CSV</span>
+                        <span className="text-xs px-1.5 py-0.5 bg-stone-800 text-stone-400 rounded-full">no name in CSV</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
@@ -318,46 +311,46 @@ export default function StaffView() {
                           style={{ width: `${share}%`, opacity: 0.7 }}
                         />
                       </div>
-                      <span className="text-xs text-stone-200">{share.toFixed(1)}% of revenue</span>
+                      <span className="text-xs text-stone-400">{share.toFixed(1)}% of revenue</span>
                     </div>
                   </div>
 
                   <div className="hidden sm:flex items-center gap-8 shrink-0">
                     <div className="text-right">
-                      <p className="text-xs text-stone-200">Transactions</p>
+                      <p className="text-xs text-stone-400">Transactions</p>
                       <p className="font-mono font-semibold text-sm text-stone-100">{formatNumber(staff.transactionCount)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-stone-200">Total Sales</p>
+                      <p className="text-xs text-stone-400">Total Sales</p>
                       <p className="font-mono font-semibold text-sm text-stone-100">{formatCurrency(staff.totalSales)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-stone-200">Avg Sale</p>
+                      <p className="text-xs text-stone-400">Avg Sale</p>
                       <p className="font-mono text-sm text-stone-100">{formatCurrency(avg)}</p>
                     </div>
                   </div>
 
-                  <span className="text-stone-200 text-sm shrink-0">{isExpanded ? '▲' : '▼'}</span>
+                  <span className="text-stone-400 text-sm shrink-0">{isExpanded ? '▲' : '▼'}</span>
                 </button>
 
                 {isExpanded && (
                   <div className="border-t border-stone-700/50 bg-stone-900">
                     <div className="px-5 py-3">
-                      <p className="text-xs font-semibold text-stone-200 uppercase tracking-wide mb-2">
+                      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">
                         Recent Transactions — {staff.name}
                       </p>
                       {staffTxs.length === 0 ? (
-                        <p className="text-xs text-stone-200">No transactions found.</p>
+                        <p className="text-xs text-stone-400">No transactions found.</p>
                       ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs">
                             <thead>
                               <tr className="border-b border-stone-700 text-left">
-                                <th className="pb-2 font-semibold text-stone-200">Date</th>
-                                <th className="pb-2 font-semibold text-stone-200">Staff</th>
-                                <th className="pb-2 font-semibold text-stone-200">Items</th>
-                                <th className="pb-2 font-semibold text-stone-200 text-right">Amount</th>
-                                <th className="pb-2 font-semibold text-stone-200">Payment</th>
+                                <th className="pb-2 font-semibold text-stone-400">Date</th>
+                                <th className="pb-2 font-semibold text-stone-400">Staff</th>
+                                <th className="pb-2 font-semibold text-stone-400">Items</th>
+                                <th className="pb-2 font-semibold text-stone-400 text-right">Amount</th>
+                                <th className="pb-2 font-semibold text-stone-400">Payment</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -375,7 +368,7 @@ export default function StaffView() {
                             </tbody>
                           </table>
                           {staffTxs.length > 20 && (
-                            <p className="text-xs text-stone-200 mt-2">Showing 20 of {staffTxs.length} transactions.</p>
+                            <p className="text-xs text-stone-400 mt-2">Showing 20 of {staffTxs.length} transactions.</p>
                           )}
                         </div>
                       )}

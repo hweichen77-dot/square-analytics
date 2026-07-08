@@ -3,7 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
 import { EmptyState } from '../components/ui/EmptyState'
 import { Badge } from '../components/ui/Badge'
-import { formatCurrency } from '../utils/format'
+import { formatCurrency, formatNumber } from '../utils/format'
+import { StatCard } from '../components/ui/StatCard'
 import { exportCatalogueToXLSX } from '../engine/catalogueExporter'
 import { useToastStore } from '../store/toastStore'
 import { splitItemVariation } from '../types/models'
@@ -156,18 +157,18 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-stone-800 border border-stone-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="bg-stone-800 border border-stone-700 shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-stone-100 text-base">{title}</h2>
             {!editing && !isAddVariation && (
-              <p className="text-xs text-stone-200 mt-0.5">Creates the item with its first variation</p>
+              <p className="text-xs text-stone-400 mt-0.5">Creates the item with its first variation</p>
             )}
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-stone-200 hover:text-stone-200 transition-colors cursor-pointer p-1 rounded-md hover:bg-stone-700"
+            className="text-stone-400 hover:text-stone-100 transition-colors cursor-pointer p-1 rounded-md hover:bg-stone-700"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -177,7 +178,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
         <div className="px-6 py-5 space-y-4 max-h-[72vh] overflow-y-auto">
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1.5">
+            <label className="block text-xs font-medium text-stone-400 mb-1.5">
               Item Name <span className="text-red-400">*</span>
             </label>
             <input
@@ -192,7 +193,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1.5">Variation Name</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1.5">Variation Name</label>
             <input
               type="text"
               value={form.variationName}
@@ -204,7 +205,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-stone-200 mb-1.5">Price ($)</label>
+              <label className="block text-xs font-medium text-stone-400 mb-1.5">Price ($)</label>
               <input
                 type="number" min="0" step="0.01"
                 value={form.price} onChange={field('price')}
@@ -214,7 +215,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
             </div>
             <div>
-              <label className="block text-xs font-medium text-stone-200 mb-1.5">Stock Qty</label>
+              <label className="block text-xs font-medium text-stone-400 mb-1.5">Stock Qty</label>
               <input
                 type="number" min="0" step="1"
                 value={form.quantity} onChange={field('quantity')}
@@ -226,7 +227,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1.5">SKU</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1.5">SKU</label>
             <input
               type="text"
               value={form.sku} onChange={field('sku')}
@@ -236,7 +237,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-stone-200 mb-1.5">Category</label>
+            <label className="block text-xs font-medium text-stone-400 mb-1.5">Category</label>
             <select
               value={form.category} onChange={field('category')}
               className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
@@ -248,7 +249,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           </div>
           {form.category === '__custom__' && (
             <div>
-              <label className="block text-xs font-medium text-stone-200 mb-1.5">Custom Category</label>
+              <label className="block text-xs font-medium text-stone-400 mb-1.5">Custom Category</label>
               <input
                 type="text"
                 value={form.customCategory} onChange={field('customCategory')}
@@ -270,13 +271,13 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
             </label>
           </div>
 
-          <div className="text-xs text-stone-200 bg-stone-700/30 rounded-lg px-3 py-2 border border-stone-700/60">
+          <div className="text-xs text-stone-400 bg-stone-700/30 rounded-lg px-3 py-2 border border-stone-700/60">
             Tax rule: only <span className="text-amber-400">ramen</span> and <span className="text-amber-400">carbonated drinks</span> are taxable.
           </div>
         </div>
 
         <div className="px-6 py-4 border-t border-stone-700 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-stone-200 hover:text-stone-200 transition-colors cursor-pointer">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-stone-400 hover:text-stone-100 transition-colors cursor-pointer">
             Cancel
           </button>
           <button
@@ -293,7 +294,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 }
 
 function PriceDisplay({ range }: { range: { min: number; max: number } | null }) {
-  if (!range) return <span className="text-stone-200">—</span>
+  if (!range) return <span className="text-stone-500">—</span>
   if (range.min === range.max) return <span className="text-stone-100">{formatCurrency(range.min)}</span>
   return <span className="text-stone-100">{formatCurrency(range.min)} – {formatCurrency(range.max)}</span>
 }
@@ -439,8 +440,8 @@ export default function CatalogueProductsView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-stone-100">Catalogue Products</h1>
-          <p className="text-sm text-stone-200 mt-0.5">{totalItems} items · {totalVars} total variations</p>
+          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Catalogue Products</h1>
+          <p className="text-sm text-stone-400 mt-0.5">{totalItems} items · {totalVars} total variations</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
@@ -462,18 +463,21 @@ export default function CatalogueProductsView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 cf-stagger">
         {[
-          { label: 'Items',           value: totalItems,    color: 'text-amber-400' },
-          { label: 'Multi-variation', value: multiVarItems, color: 'text-amber-400' },
-          { label: 'Active vars',     value: activeVars,    color: 'text-emerald-400' },
-          { label: 'Archived',        value: archivedVars,  color: 'text-stone-200' },
-          { label: 'Total stock',     value: totalStock,    color: 'text-amber-400' },
+          { label: 'Items',           value: totalItems },
+          { label: 'Multi-variation', value: multiVarItems },
+          { label: 'Active vars',     value: activeVars },
+          { label: 'Archived',        value: archivedVars },
+          { label: 'Total stock',     value: totalStock },
         ].map(s => (
-          <div key={s.label} className="bg-stone-800/30 border border-stone-700/40 px-4 py-3">
-            <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
-            <p className="text-xs text-stone-200 mt-0.5">{s.label}</p>
-          </div>
+          <StatCard
+            key={s.label}
+            label={s.label}
+            value={s.value.toLocaleString()}
+            countTo={s.value}
+            format={formatNumber}
+          />
         ))}
       </div>
 
@@ -492,17 +496,17 @@ export default function CatalogueProductsView() {
         >
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <label className="flex items-center gap-2 text-sm text-stone-200 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-sm text-stone-400 cursor-pointer select-none">
           <input type="checkbox" checked={showArchived} onChange={e => setShowArchived(e.target.checked)} className="rounded" />
           Show archived
         </label>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-stone-200">{filteredGroups.length} items</span>
-          <button onClick={expandAll} className="text-xs text-stone-200 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
+          <span className="text-xs text-stone-400">{filteredGroups.length} items</span>
+          <button onClick={expandAll} className="text-xs text-stone-400 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
             Expand all
           </button>
-          <button onClick={collapseAll} className="text-xs text-stone-200 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
+          <button onClick={collapseAll} className="text-xs text-stone-400 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
             Collapse all
           </button>
         </div>
@@ -511,7 +515,7 @@ export default function CatalogueProductsView() {
       <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-stone-900 text-stone-200 uppercase text-xs border-b border-stone-700/60">
+            <thead className="bg-stone-900 text-stone-400 uppercase text-xs border-b border-stone-700/60">
               <tr>
                 <th className="px-4 py-3 text-left w-8"></th>
                 <th className="px-4 py-3 text-left">Item</th>
@@ -535,7 +539,7 @@ export default function CatalogueProductsView() {
                       onClick={() => varCount > 1 && toggleExpand(group.itemName)}
                       className={`border-b border-stone-700/40 transition-colors ${varCount > 1 ? 'cursor-pointer hover:bg-stone-700/40' : 'hover:bg-stone-700/20'} ${isOpen ? 'bg-stone-700/20' : ''}`}
                     >
-                      <td className="px-4 py-3 text-stone-200">
+                      <td className="px-4 py-3 text-stone-400">
                         {varCount > 1
                           ? <Chevron open={isOpen} />
                           : <span className="w-3.5 inline-block" />
@@ -551,18 +555,18 @@ export default function CatalogueProductsView() {
                             </span>
                           )}
                           {varCount === 1 && group.variations[0].variationName !== 'Regular' && (
-                            <span className="text-xs text-stone-200">{group.variations[0].variationName}</span>
+                            <span className="text-xs text-stone-400">{group.variations[0].variationName}</span>
                           )}
                         </div>
                         {varCount === 1 && group.variations[0].sku && (
-                          <p className="text-[11px] text-stone-200 font-mono mt-0.5">{group.variations[0].sku}</p>
+                          <p className="text-[11px] text-stone-500 font-mono mt-0.5">{group.variations[0].sku}</p>
                         )}
                       </td>
 
                       <td className="px-4 py-3">
                         {group.category
                           ? <Badge variant="secondary">{group.category}</Badge>
-                          : <span className="text-stone-200">—</span>}
+                          : <span className="text-stone-500">—</span>}
                       </td>
 
                       <td className="px-4 py-3 text-right">
@@ -570,13 +574,13 @@ export default function CatalogueProductsView() {
                       </td>
 
                       <td className="px-4 py-3 text-right text-stone-100 tabular-nums">
-                        {group.totalQuantity > 0 ? group.totalQuantity : <span className="text-stone-200">—</span>}
+                        {group.totalQuantity > 0 ? group.totalQuantity : <span className="text-stone-500">—</span>}
                       </td>
 
                       <td className="px-4 py-3 text-center">
                         {group.anyTaxable
                           ? <span className="text-xs font-medium text-emerald-400">Yes</span>
-                          : <span className="text-xs text-stone-200">No</span>}
+                          : <span className="text-xs text-stone-400">No</span>}
                       </td>
 
                       <td className="px-4 py-3 text-center">
@@ -619,31 +623,31 @@ export default function CatalogueProductsView() {
                         <td className="px-4 py-2.5 pl-10">
                           <div className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-stone-600 shrink-0" />
-                            <span className="text-stone-200 text-xs font-medium">
+                            <span className="text-stone-400 text-xs font-medium">
                               {v.variationName || 'Regular'}
                             </span>
-                            {v.sku && <span className="text-[10px] text-stone-200 font-mono">{v.sku}</span>}
+                            {v.sku && <span className="text-[10px] text-stone-500 font-mono">{v.sku}</span>}
                           </div>
                         </td>
 
                         <td className="px-4 py-2.5">
                           {vi === 0
-                            ? group.category ? <Badge variant="secondary">{group.category}</Badge> : <span className="text-stone-200">—</span>
+                            ? group.category ? <Badge variant="secondary">{group.category}</Badge> : <span className="text-stone-500">—</span>
                             : null}
                         </td>
 
                         <td className="px-4 py-2.5 text-right text-stone-100 text-xs tabular-nums">
-                          {v.price != null ? formatCurrency(v.price) : <span className="text-stone-200">—</span>}
+                          {v.price != null ? formatCurrency(v.price) : <span className="text-stone-500">—</span>}
                         </td>
 
                         <td className="px-4 py-2.5 text-right text-stone-100 text-xs tabular-nums">
-                          {v.quantity != null ? v.quantity : <span className="text-stone-200">—</span>}
+                          {v.quantity != null ? v.quantity : <span className="text-stone-500">—</span>}
                         </td>
 
                         <td className="px-4 py-2.5 text-center">
                           {v.taxable
                             ? <span className="text-xs text-emerald-400">Yes</span>
-                            : <span className="text-xs text-stone-200">No</span>}
+                            : <span className="text-xs text-stone-400">No</span>}
                         </td>
 
                         <td className="px-4 py-2.5 text-center">
@@ -669,11 +673,11 @@ export default function CatalogueProductsView() {
           </table>
         </div>
         {filteredGroups.length === 0 && (
-          <div className="text-center py-12 text-stone-200 text-sm">No items match your filters.</div>
+          <div className="text-center py-12 text-stone-400 text-sm">No items match your filters.</div>
         )}
       </div>
 
-      <p className="text-xs text-stone-200 text-right">
+      <p className="text-xs text-stone-500 text-right">
         "Export to Square" downloads a .xlsx importable at Square Dashboard → Items → Actions → Import Library.
       </p>
 

@@ -30,8 +30,7 @@ function parseCurrency(value: string): number {
   if (!value) return 0
   let s = String(value).trim()
   if (!s) return 0
-  // Accounting negatives: "(45.00)" means -45.00. Without this, refund rows
-  // silently parsed to 0 and vanished from returns/net-revenue.
+
   let negative = false
   if (/^\(.*\)$/.test(s)) { negative = true; s = s.slice(1, -1) }
   s = s.replace(/[$£€,\s]/g, '').replace(/USD|CAD|EUR|GBP/gi, '').replace(/−/g, '-')

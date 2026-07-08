@@ -36,7 +36,6 @@ export interface AnomalyDay {
   severity: 'mild' | 'strong'
 }
 
-
 function computeDailyTotals(txs: SalesTransaction[]): Map<string, number> {
   const map = new Map<string, number>()
   for (const tx of txs) {
@@ -60,7 +59,6 @@ function emptyWeek(ws: Date): WeekForecast {
     actualTotal: 0,
   }
 }
-
 
 export function computeForecast(transactions: SalesTransaction[]): ForecastResult {
   const today = startOfDay(new Date())
@@ -189,7 +187,6 @@ export function computeForecast(transactions: SalesTransaction[]): ForecastResul
     weeksOfHistory,
   }
 }
-
 
 export function computeAnomalies(transactions: SalesTransaction[]): AnomalyDay[] {
   if (transactions.length === 0) return []
