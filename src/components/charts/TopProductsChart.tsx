@@ -5,11 +5,11 @@ import { formatCurrency } from '../../utils/format'
 
 const CAT_COLORS: Record<string, string> = {
   'Food':           '#F59E0B',
-  'Drinks':         '#14B8A6',
+  'Drinks':         '#F59E0B',
   'Ice Cream':      '#34D399',
   'Ramen/Hot Food': '#F87171',
   'Merch':          '#818CF8',
-  'Other':          '#475569',
+  'Other':          '#57534e',
 }
 
 interface TopProductsChartProps {
@@ -27,9 +27,9 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
   }))
 
   return (
-    <div className="bg-slate-800/30 border border-slate-700/40 p-4">
+    <div className="bg-stone-800/30 border border-stone-700/40 p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-semibold text-slate-200 text-sm tracking-tight">Top Products</h2>
+        <h2 className="font-display font-semibold text-stone-200 text-sm tracking-tight">Top Products</h2>
         <div className="flex gap-0.5">
           {(['revenue', 'units'] as const).map(m => (
             <button
@@ -37,8 +37,8 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
               onClick={() => setMode(m)}
               className={`px-2.5 py-1 text-xs font-medium capitalize transition-colors duration-150 cursor-pointer ${
                 mode === m
-                  ? 'bg-teal-500/15 text-teal-400'
-                  : 'text-slate-200 hover:text-slate-300 hover:bg-slate-700/50'
+                  ? 'bg-amber-500/15 text-amber-400'
+                  : 'text-stone-200 hover:text-stone-300 hover:bg-stone-700/50'
               }`}
             >
               {m === 'revenue' ? 'By Revenue' : 'By Qty'}
@@ -48,13 +48,13 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
       </div>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
-          <XAxis type="number" tick={{ fontSize: 10, fill: '#cbd5e1' }} axisLine={false} tickLine={false}
+          <XAxis type="number" tick={{ fontSize: 10, fill: '#d6d3d1' }} axisLine={false} tickLine={false}
             tickFormatter={v => mode === 'revenue' ? `$${v}` : String(v)} />
-          <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: '#cbd5e1' }} width={120} axisLine={false} tickLine={false} />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: '#d6d3d1' }} width={120} axisLine={false} tickLine={false} />
           <Tooltip
-            contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', fontSize: '12px' }}
-            labelStyle={{ color: '#ffffff', fontWeight: 600 }}
-            itemStyle={{ color: '#ffffff' }}
+            contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: '8px', fontSize: '12px' }}
+            labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
+            itemStyle={{ color: '#fafaf9' }}
             formatter={(v: number, _n, props) => [
               mode === 'revenue' ? formatCurrency(v) : `${v} units`,
               props.payload?.fullName ?? '',
@@ -62,7 +62,7 @@ export function TopProductsChart({ products }: TopProductsChartProps) {
           />
           <Bar dataKey="value" maxBarSize={16} radius={[0, 3, 3, 0]}>
             {chartData.map((d, i) => (
-              <Cell key={i} fill={CAT_COLORS[d.category] ?? '#475569'} />
+              <Cell key={i} fill={CAT_COLORS[d.category] ?? '#57534e'} />
             ))}
           </Bar>
         </BarChart>

@@ -18,16 +18,16 @@ const PERIOD_OPTIONS = [
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Food:           'bg-orange-500/15 text-orange-400',
-  Drinks:         'bg-teal-500/15 text-teal-400',
+  Food:           'bg-amber-500/15 text-amber-400',
+  Drinks:         'bg-amber-500/15 text-amber-400',
   'Ice Cream':    'bg-emerald-500/15 text-emerald-400',
   'Ramen/Hot Food': 'bg-red-500/15 text-red-400',
-  Merch:          'bg-slate-700 text-slate-200',
-  Other:          'bg-slate-700 text-slate-200',
+  Merch:          'bg-stone-700 text-stone-200',
+  Other:          'bg-stone-700 text-stone-200',
 }
 
 function categoryClass(cat: string) {
-  return CATEGORY_COLORS[cat] ?? 'bg-slate-700 text-slate-200'
+  return CATEGORY_COLORS[cat] ?? 'bg-stone-700 text-stone-200'
 }
 
 function seasonLabel(month: number) {
@@ -184,21 +184,21 @@ export default function PurchaseOrderView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-100">Purchase Order</h1>
+        <h1 className="text-xl font-bold text-stone-100">Purchase Order</h1>
         {generated && (
           <button
             onClick={() => exportToXLSX(displayItems, qtyOverrides)}
             disabled={displayItems.length === 0}
-            className="px-4 py-2 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600 disabled:opacity-40 font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-40 font-semibold transition-colors cursor-pointer"
           >
             Export XLSX
           </button>
         )}
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-6">
-        <h2 className="text-sm font-semibold text-slate-200 mb-1">Select time period to order for</h2>
-        <p className="text-xs text-slate-200 mb-5">
+      <div className="bg-stone-800/30 border border-stone-700/40 p-6">
+        <h2 className="text-sm font-semibold text-stone-200 mb-1">Select time period to order for</h2>
+        <p className="text-xs text-stone-200 mb-5">
           The report will recommend quantities based on sales velocity over your full transaction history,
           scaled to cover the selected period.
         </p>
@@ -210,8 +210,8 @@ export default function PurchaseOrderView() {
               onClick={() => { setSelectedWeeks(opt.weeks); setGenerated(false) }}
               className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
                 selectedWeeks === opt.weeks
-                  ? 'bg-teal-500 text-slate-950 border-teal-500'
-                  : 'border-slate-600 text-slate-200 hover:border-teal-500/50 hover:text-slate-200'
+                  ? 'bg-amber-500 text-stone-950 border-amber-500'
+                  : 'border-stone-600 text-stone-200 hover:border-amber-500/50 hover:text-stone-200'
               }`}
             >
               {opt.label}
@@ -222,11 +222,11 @@ export default function PurchaseOrderView() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => { setGenerated(true); setQtyOverrides({}) }}
-            className="px-6 py-2.5 bg-teal-500 text-slate-950 rounded-lg text-sm font-bold hover:bg-teal-400 transition-colors cursor-pointer"
+            className="px-6 py-2.5 bg-amber-500 text-stone-950 rounded-lg text-sm font-bold hover:bg-amber-400 transition-colors cursor-pointer"
           >
             Generate Report
           </button>
-          <p className="text-xs text-slate-200">
+          <p className="text-xs text-stone-200">
             {selectedWeeks}-week window · {dateRangeLabel}
           </p>
         </div>
@@ -235,62 +235,62 @@ export default function PurchaseOrderView() {
       {!generated && velocityPreview.length > 0 && (
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-              <p className="text-xs text-slate-200">Products Tracked</p>
-              <p className="text-2xl font-bold text-slate-100 mt-1">{totalProductCount}</p>
-              <p className="text-xs text-slate-200 mt-0.5">in transaction history</p>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+              <p className="text-xs text-stone-200">Products Tracked</p>
+              <p className="text-2xl font-bold text-stone-100 mt-1">{totalProductCount}</p>
+              <p className="text-xs text-stone-200 mt-0.5">in transaction history</p>
             </div>
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-              <p className="text-xs text-slate-200">Top Velocity Item</p>
-              <p className="text-sm font-bold text-teal-400 mt-1 truncate">{velocityPreview[0]?.name ?? '—'}</p>
-              <p className="text-xs text-slate-200 mt-0.5">
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+              <p className="text-xs text-stone-200">Top Velocity Item</p>
+              <p className="text-sm font-bold text-amber-400 mt-1 truncate">{velocityPreview[0]?.name ?? '—'}</p>
+              <p className="text-xs text-stone-200 mt-0.5">
                 {velocityPreview[0] ? `${velocityPreview[0].weeklyVelocity.toFixed(1)} units/wk` : ''}
               </p>
             </div>
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-              <p className="text-xs text-slate-200">Projected Units ({selectedWeeks}wk)</p>
-              <p className="text-2xl font-bold text-slate-100 mt-1">
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+              <p className="text-xs text-stone-200">Projected Units ({selectedWeeks}wk)</p>
+              <p className="text-2xl font-bold text-stone-100 mt-1">
                 {velocityPreview.reduce((s, p) => s + Math.ceil(p.weeklyVelocity * selectedWeeks), 0)}
               </p>
-              <p className="text-xs text-slate-200 mt-0.5">top 8 items combined</p>
+              <p className="text-xs text-stone-200 mt-0.5">top 8 items combined</p>
             </div>
           </div>
 
-          <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-            <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
+          <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+            <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-slate-200">Velocity Preview</h2>
-                <p className="text-xs text-slate-200 mt-0.5">Top 8 items by weekly sales — likely candidates for reorder</p>
+                <h2 className="font-semibold text-stone-200">Velocity Preview</h2>
+                <p className="text-xs text-stone-200 mt-0.5">Top 8 items by weekly sales — likely candidates for reorder</p>
               </div>
-              <span className="text-xs text-slate-200 bg-slate-700/50 px-2 py-1 rounded-lg">
+              <span className="text-xs text-stone-200 bg-stone-700/50 px-2 py-1 rounded-lg">
                 {selectedWeeks}-week window
               </span>
             </div>
-            <div className="divide-y divide-slate-700/30">
+            <div className="divide-y divide-stone-700/30">
               {velocityPreview.map((item, i) => {
                 const maxVel = velocityPreview[0].weeklyVelocity
                 const barWidth = maxVel > 0 ? (item.weeklyVelocity / maxVel) * 100 : 0
                 const projectedQty = Math.ceil(item.weeklyVelocity * selectedWeeks)
                 return (
-                  <div key={item.name} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-700/20 transition-colors">
-                    <span className="text-sm font-bold text-slate-200 w-5 shrink-0">{i + 1}</span>
+                  <div key={item.name} className="flex items-center gap-4 px-5 py-3 hover:bg-stone-700/20 transition-colors">
+                    <span className="text-sm font-bold text-stone-200 w-5 shrink-0">{i + 1}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-200 truncate">{item.name}</p>
-                      <div className="mt-1.5 h-1.5 bg-slate-700 rounded-full overflow-hidden w-full">
-                        <div className="h-full rounded-full bg-teal-500/60" style={{ width: `${barWidth}%` }} />
+                      <p className="text-sm font-medium text-stone-200 truncate">{item.name}</p>
+                      <div className="mt-1.5 h-1.5 bg-stone-700 rounded-full overflow-hidden w-full">
+                        <div className="h-full rounded-full bg-amber-500/60" style={{ width: `${barWidth}%` }} />
                       </div>
                     </div>
                     <div className="text-right shrink-0 min-w-[100px]">
-                      <p className="text-sm font-semibold text-slate-100">{item.weeklyVelocity.toFixed(1)} <span className="text-xs font-normal text-slate-200">/wk</span></p>
-                      <p className="text-xs text-slate-200">~{projectedQty} units for {selectedWeeks}wk</p>
+                      <p className="text-sm font-semibold text-stone-100">{item.weeklyVelocity.toFixed(1)} <span className="text-xs font-normal text-stone-200">/wk</span></p>
+                      <p className="text-xs text-stone-200">~{projectedQty} units for {selectedWeeks}wk</p>
                     </div>
                   </div>
                 )
               })}
             </div>
-            <div className="px-5 py-3 bg-slate-900/40 border-t border-slate-700/50">
-              <p className="text-xs text-slate-200">
-                Click <span className="text-teal-400 font-medium">Generate Report</span> above to build the full order with seasonal adjustments, low-stock flags, and XLSX export.
+            <div className="px-5 py-3 bg-stone-900/40 border-t border-stone-700/50">
+              <p className="text-xs text-stone-200">
+                Click <span className="text-amber-400 font-medium">Generate Report</span> above to build the full order with seasonal adjustments, low-stock flags, and XLSX export.
               </p>
             </div>
           </div>
@@ -300,47 +300,47 @@ export default function PurchaseOrderView() {
       {generated && (
         <>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                 <IconBox />
               </div>
               <div>
-                <p className="text-xs text-slate-200">Items to Order</p>
-                <p className="text-xl font-bold text-slate-100">{displayItems.length} products</p>
-                <p className="text-xs text-slate-200">{totalItemCount} total units</p>
+                <p className="text-xs text-stone-200">Items to Order</p>
+                <p className="text-xl font-bold text-stone-100">{displayItems.length} products</p>
+                <p className="text-xs text-stone-200">{totalItemCount} total units</p>
               </div>
             </div>
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <IconDollar />
               </div>
               <div>
-                <p className="text-xs text-slate-200">Estimated Revenue</p>
-                <p className="text-xl font-bold text-slate-100">{formatCurrency(totalRevenue)}</p>
-                <p className="text-xs text-slate-200">at avg sell price</p>
+                <p className="text-xs text-stone-200">Estimated Revenue</p>
+                <p className="text-xl font-bold text-stone-100">{formatCurrency(totalRevenue)}</p>
+                <p className="text-xs text-stone-200">at avg sell price</p>
               </div>
             </div>
-            <div className="bg-slate-800/30 border border-slate-700/40 p-4 flex items-center gap-4">
+            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                 <IconCalendar />
               </div>
               <div>
-                <p className="text-xs text-slate-200">Generated For</p>
-                <p className="text-xl font-bold text-slate-100">{selectedWeeks}-Week Window</p>
-                <p className="text-xs text-slate-200">{dateRangeLabel}</p>
+                <p className="text-xs text-stone-200">Generated For</p>
+                <p className="text-xl font-bold text-stone-100">{selectedWeeks}-Week Window</p>
+                <p className="text-xs text-stone-200">{dateRangeLabel}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-teal-500/10 border border-teal-500/20 rounded-xl p-4 flex items-start gap-3">
-            <div className="text-teal-400 mt-0.5">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+            <div className="text-amber-400 mt-0.5">
               <IconLeaf />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-sm text-slate-200">
+              <p className="font-semibold text-sm text-stone-200">
                 Upcoming Season: {seasonLabel(currentMonth)}
               </p>
-              <p className="text-xs text-slate-200 mt-0.5">
+              <p className="text-xs text-stone-200 mt-0.5">
                 Recommendations account for seasonal demand patterns and upcoming events.
               </p>
             </div>
@@ -353,62 +353,62 @@ export default function PurchaseOrderView() {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm text-slate-100 cursor-pointer select-none">
+              <label className="flex items-center gap-2 text-sm text-stone-100 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={onlyNeedingReorder}
                   onChange={e => setOnlyNeedingReorder(e.target.checked)}
-                  className="rounded accent-teal-500"
+                  className="rounded accent-amber-500"
                 />
                 Only show items needing reorder
               </label>
-              <label className="flex items-center gap-2 text-sm text-slate-100 cursor-pointer select-none">
+              <label className="flex items-center gap-2 text-sm text-stone-100 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={includeMerch}
                   onChange={e => setIncludeMerch(e.target.checked)}
-                  className="rounded accent-teal-500"
+                  className="rounded accent-amber-500"
                 />
                 Include Merch / Other
               </label>
             </div>
-            <p className="text-xs text-slate-200">{displayItems.length} of {orderItems.length} items</p>
+            <p className="text-xs text-stone-200">{displayItems.length} of {orderItems.length} items</p>
           </div>
 
-          <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
+          <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
-                <thead className="bg-slate-900 border-b border-slate-700/50">
+                <thead className="bg-stone-900 border-b border-stone-700/50">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-200 cursor-pointer hover:text-slate-300 select-none"
+                    <th className="px-4 py-3 text-left font-semibold text-stone-200 cursor-pointer hover:text-stone-300 select-none"
                       onClick={() => toggleSort('productName')}>Product{sortArrow('productName')}</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-200 cursor-pointer hover:text-slate-300 select-none"
+                    <th className="px-4 py-3 text-left font-semibold text-stone-200 cursor-pointer hover:text-stone-300 select-none"
                       onClick={() => toggleSort('avgDailyVelocity')}>Wkly Velocity{sortArrow('avgDailyVelocity')}</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-200 cursor-pointer hover:text-slate-300 select-none"
+                    <th className="px-4 py-3 text-right font-semibold text-stone-200 cursor-pointer hover:text-stone-300 select-none"
                       onClick={() => toggleSort('recommendedQty')}>Rec. Qty{sortArrow('recommendedQty')}</th>
-                    <th className="px-4 py-3 text-right font-semibold text-slate-200 cursor-pointer hover:text-slate-300 select-none"
+                    <th className="px-4 py-3 text-right font-semibold text-stone-200 cursor-pointer hover:text-stone-300 select-none"
                       onClick={() => toggleSort('estimatedRevenue')}>Est. Revenue{sortArrow('estimatedRevenue')}</th>
-                    <th className="px-4 py-3 text-left font-semibold text-slate-200">Reasoning</th>
+                    <th className="px-4 py-3 text-left font-semibold text-stone-200">Reasoning</th>
                   </tr>
                 </thead>
                 <tbody>
                   {displayItems.map((item, idx) => {
                     const qty = qtyOverrides[item.productName] ?? item.recommendedQty
                     return (
-                      <tr key={item.productName} className={`border-b border-slate-700/30 hover:bg-slate-700/30 ${idx % 2 === 1 ? 'bg-slate-800/40' : ''}`}>
+                      <tr key={item.productName} className={`border-b border-stone-700/30 hover:bg-stone-700/30 ${idx % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
                         <td className="px-4 py-2.5">
-                          <div className="font-medium text-slate-100">{item.productName}</div>
+                          <div className="font-medium text-stone-100">{item.productName}</div>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-0.5 inline-block ${categoryClass(item.category)}`}>
                             {item.category}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 font-mono text-slate-100">
-                          {(item.avgDailyVelocity * 7).toFixed(1)}<span className="text-slate-200"> /wk</span>
+                        <td className="px-4 py-2.5 font-mono text-stone-100">
+                          {(item.avgDailyVelocity * 7).toFixed(1)}<span className="text-stone-200"> /wk</span>
                         </td>
                         <td className="px-4 py-2.5 text-right">
                           <input
                             type="number"
-                            className="border border-slate-600 rounded px-2 py-0.5 text-xs w-16 text-right font-mono bg-slate-700/50 text-slate-200"
+                            className="border border-stone-600 rounded px-2 py-0.5 text-xs w-16 text-right font-mono bg-stone-700/50 text-stone-200"
                             value={qty}
                             onChange={e => {
                               const v = parseInt(e.target.value, 10)
@@ -419,10 +419,10 @@ export default function PurchaseOrderView() {
                             min={0}
                           />
                         </td>
-                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-slate-100">
+                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-stone-100">
                           {formatCurrency(item.avgPrice * qty)}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-200 max-w-48 truncate">
+                        <td className="px-4 py-2.5 text-stone-200 max-w-48 truncate">
                           {item.reasoning}
                         </td>
                       </tr>
@@ -434,16 +434,16 @@ export default function PurchaseOrderView() {
           </div>
 
           {categorySubtotals.length > 0 && (
-            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-              <h2 className="text-sm font-semibold text-slate-200 mb-4">Category Subtotals</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+              <h2 className="text-sm font-semibold text-stone-200 mb-4">Category Subtotals</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {categorySubtotals.map(([cat, { qty, rev }]) => (
-                  <div key={cat} className="flex items-center justify-between p-3 bg-slate-900 rounded-xl">
+                  <div key={cat} className="flex items-center justify-between p-3 bg-stone-900 rounded-xl">
                     <div>
-                      <p className="font-semibold text-sm text-slate-200">{cat}</p>
-                      <p className="text-xs text-slate-200">{qty} units</p>
+                      <p className="font-semibold text-sm text-stone-200">{cat}</p>
+                      <p className="text-xs text-stone-200">{qty} units</p>
                     </div>
-                    <p className="font-mono text-sm text-slate-100">{formatCurrency(rev)}</p>
+                    <p className="font-mono text-sm text-stone-100">{formatCurrency(rev)}</p>
                   </div>
                 ))}
               </div>

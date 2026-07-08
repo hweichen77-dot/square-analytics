@@ -151,36 +151,36 @@ export default function PriceOptimizationView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-100">Price Optimization</h1>
+      <h1 className="text-xl font-bold text-stone-100">Price Optimization</h1>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Price Changes Detected</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{changes.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Price Changes Detected</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{changes.length}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Revenue Improved</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Revenue Improved</p>
           <p className="text-2xl font-bold text-emerald-400 mt-1">{improved}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Revenue Declined</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Revenue Declined</p>
           <p className="text-2xl font-bold text-red-400 mt-1">{declined}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Products Tracked</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{productNames.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Products Tracked</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{productNames.length}</p>
         </div>
       </div>
 
       {changes.length > 0 && (
         <div
-          className={`p-4 border flex items-start gap-3 ${improved >= declined ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-orange-500/10 border-orange-500/30'}`}
+          className={`p-4 border flex items-start gap-3 ${improved >= declined ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-amber-500/10 border-amber-500/30'}`}
         >
           <div>
-            <p className="text-sm font-medium text-slate-200">
+            <p className="text-sm font-medium text-stone-200">
               {improved} of {changes.length} detected price changes resulted in higher revenue
             </p>
-            <p className="text-xs text-slate-200 mt-0.5">
+            <p className="text-xs text-stone-200 mt-0.5">
               Elasticity &lt; −1 means demand is price-sensitive; &gt; −1 means relatively inelastic
             </p>
           </div>
@@ -188,27 +188,27 @@ export default function PriceOptimizationView() {
       )}
 
       {changes.length > 0 && (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-          <h2 className="text-base font-semibold text-slate-100 mb-1">All Detected Price Changes</h2>
-          <p className="text-xs text-slate-200 mb-4">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-1">All Detected Price Changes</h2>
+          <p className="text-xs text-stone-200 mb-4">
             A price change is detected when a product's per-unit price differs by more than $0.10.
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-slate-700 text-left">
+                <tr className="border-b border-stone-700 text-left">
                   {['Product', 'Date', 'Old $', 'New $', 'Price Δ', 'Unit Δ (30d)', 'Revenue Δ', 'Elasticity'].map(h => (
-                    <th key={h} className="pb-2 font-semibold text-slate-200 pr-4">{h}</th>
+                    <th key={h} className="pb-2 font-semibold text-stone-200 pr-4">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {changes.map(c => (
-                  <tr key={c.id} className="border-b border-slate-800 hover:bg-slate-700/50">
-                    <td className="py-2 font-medium text-slate-100 pr-4">{c.productName}</td>
-                    <td className="py-2 font-mono text-slate-200 pr-4">{format(c.changeDate, 'MMM d, yyyy')}</td>
-                    <td className="py-2 font-mono text-slate-100 pr-4">${c.oldPrice.toFixed(2)}</td>
-                    <td className="py-2 font-mono text-slate-100 pr-4">${c.newPrice.toFixed(2)}</td>
+                  <tr key={c.id} className="border-b border-stone-800 hover:bg-stone-700/50">
+                    <td className="py-2 font-medium text-stone-100 pr-4">{c.productName}</td>
+                    <td className="py-2 font-mono text-stone-200 pr-4">{format(c.changeDate, 'MMM d, yyyy')}</td>
+                    <td className="py-2 font-mono text-stone-100 pr-4">${c.oldPrice.toFixed(2)}</td>
+                    <td className="py-2 font-mono text-stone-100 pr-4">${c.newPrice.toFixed(2)}</td>
                     <td className="py-2 font-mono pr-4" style={{ color: c.priceChangePct >= 0 ? '#dc2626' : '#16a34a' }}>
                       {c.priceChangePct >= 0 ? '+' : ''}{c.priceChangePct.toFixed(1)}%
                     </td>
@@ -218,7 +218,7 @@ export default function PriceOptimizationView() {
                     <td className="py-2 font-mono font-semibold pr-4" style={{ color: c.revenueImproved ? '#16a34a' : '#dc2626' }}>
                       {c.revenueChangePct >= 0 ? '+' : ''}{c.revenueChangePct.toFixed(1)}%
                     </td>
-                    <td className="py-2 font-mono" style={{ color: Math.abs(c.elasticity) > 1 ? '#f97316' : '#6b7280' }}>
+                    <td className="py-2 font-mono" style={{ color: Math.abs(c.elasticity) > 1 ? '#f59e0b' : '#6b7280' }}>
                       {c.elasticity.toFixed(2)}
                     </td>
                   </tr>
@@ -229,10 +229,10 @@ export default function PriceOptimizationView() {
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-3">Per-Product Price History</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Per-Product Price History</h2>
         <select
-          className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 mb-4"
+          className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-100 mb-4"
           value={selectedProduct}
           onChange={e => { setSelectedProduct(e.target.value); setSimPrice('') }}
         >
@@ -241,7 +241,7 @@ export default function PriceOptimizationView() {
         </select>
 
         {selectedProduct && changesForSelected.length === 0 && (
-          <p className="text-sm text-slate-200">No price changes detected for "{selectedProduct}".</p>
+          <p className="text-sm text-stone-200">No price changes detected for "{selectedProduct}".</p>
         )}
 
         {priceChartData.length > 0 && (
@@ -251,7 +251,7 @@ export default function PriceOptimizationView() {
               <XAxis dataKey="date" tick={{ fontSize: 11 }} />
               <YAxis tickFormatter={v => `$${v.toFixed(0)}`} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => formatCurrency(v)} />
-              <Line type="linear" dataKey="before" stroke="#3b82f6" dot strokeWidth={2} name="Before (30d)" />
+              <Line type="linear" dataKey="before" stroke="#d99a2b" dot strokeWidth={2} name="Before (30d)" />
               <Line type="linear" dataKey="after" stroke="#16a34a" dot strokeWidth={2} name="After (30d)" />
             </ComposedChart>
           </ResponsiveContainer>
@@ -259,22 +259,22 @@ export default function PriceOptimizationView() {
       </div>
 
       {selectedProduct && currentPrice !== undefined && (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-          <h2 className="text-base font-semibold text-slate-100 mb-1">Price Simulator</h2>
-          <p className="text-xs text-slate-200 mb-4">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-1">Price Simulator</h2>
+          <p className="text-xs text-stone-200 mb-4">
             Estimate the impact of a price change using historical elasticity.
           </p>
           <div className="flex items-center gap-6 flex-wrap">
             <div>
-              <p className="text-xs text-slate-200">Current Price</p>
-              <p className="text-lg font-bold text-slate-100">{formatCurrency(currentPrice)}</p>
+              <p className="text-xs text-stone-200">Current Price</p>
+              <p className="text-lg font-bold text-stone-100">{formatCurrency(currentPrice)}</p>
             </div>
-            <span className="text-slate-200">→</span>
+            <span className="text-stone-200">→</span>
             <div>
-              <p className="text-xs text-slate-200">New Hypothetical Price</p>
+              <p className="text-xs text-stone-200">New Hypothetical Price</p>
               <input
                 type="number"
-                className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-28"
+                className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm w-28"
                 placeholder="e.g. 2.99"
                 value={simPrice}
                 onChange={e => setSimPrice(e.target.value)}
@@ -283,11 +283,11 @@ export default function PriceOptimizationView() {
 
             {sim && (
               <>
-                <div className="border-l border-slate-700 pl-6">
-                  <p className="text-xs text-slate-200">Est. Weekly Revenue</p>
+                <div className="border-l border-stone-700 pl-6">
+                  <p className="text-xs text-stone-200">Est. Weekly Revenue</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-sm text-slate-200">{formatCurrency(sim.currentRevenue)}</span>
-                    <span className="text-slate-200 text-xs">→</span>
+                    <span className="text-sm text-stone-200">{formatCurrency(sim.currentRevenue)}</span>
+                    <span className="text-stone-200 text-xs">→</span>
                     <span
                       className="text-lg font-bold"
                       style={{ color: sim.estimatedRevenue >= sim.currentRevenue ? '#16a34a' : '#dc2626' }}
@@ -297,15 +297,15 @@ export default function PriceOptimizationView() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-200">Est. Weekly Units</p>
-                  <p className="text-sm font-mono text-slate-100 mt-0.5">
+                  <p className="text-xs text-stone-200">Est. Weekly Units</p>
+                  <p className="text-sm font-mono text-stone-100 mt-0.5">
                     {currentVelocity.toFixed(1)} → {sim.estimatedUnits.toFixed(1)}
                   </p>
                 </div>
               </>
             )}
           </div>
-          <p className="text-xs text-slate-200 mt-3">
+          <p className="text-xs text-stone-200 mt-3">
             {changesForSelected.length === 0
               ? 'Note: Using default elasticity of −1.0 (no historical price changes for this product).'
               : `Based on elasticity of ${elasticity.toFixed(2)} from ${changesForSelected.length} detected change(s).`}
@@ -313,58 +313,58 @@ export default function PriceOptimizationView() {
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between gap-4">
+      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">All Products</h2>
-            <p className="text-xs text-slate-200 mt-0.5">{filteredProductStats.length} of {productStats.length} products</p>
+            <h2 className="text-base font-semibold text-stone-100">All Products</h2>
+            <p className="text-xs text-stone-200 mt-0.5">{filteredProductStats.length} of {productStats.length} products</p>
           </div>
           <input
             type="text"
             placeholder="Search products..."
             value={productSearch}
             onChange={e => setProductSearch(e.target.value)}
-            className="border border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 w-56"
+            className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-56"
           />
         </div>
         <div className="overflow-y-auto max-h-96">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
+            <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left font-semibold text-slate-200">Product</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-slate-200">Avg Price</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-slate-200">Units Sold</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-slate-200">Revenue</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-slate-200">Weekly Velocity</th>
-                <th className="px-4 py-2.5 text-right font-semibold text-slate-200">Price Changes</th>
+                <th className="px-4 py-2.5 text-left font-semibold text-stone-200">Product</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Avg Price</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Units Sold</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Revenue</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Weekly Velocity</th>
+                <th className="px-4 py-2.5 text-right font-semibold text-stone-200">Price Changes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-stone-700/30">
               {filteredProductStats.map(p => {
                 const vel = velocityByProduct[p.name] ?? 0
                 const changeCount = changes.filter(c => c.productName === p.name).length
                 return (
                   <tr
                     key={p.name}
-                    className={`hover:bg-slate-700/40 cursor-pointer transition-colors ${selectedProduct === p.name ? 'bg-teal-500/10' : ''}`}
+                    className={`hover:bg-stone-700/40 cursor-pointer transition-colors ${selectedProduct === p.name ? 'bg-amber-500/10' : ''}`}
                     onClick={() => { setSelectedProduct(p.name); setSimPrice('') }}
                   >
-                    <td className="px-4 py-2.5 text-slate-100 font-medium">{p.name}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-slate-100">{formatCurrency(p.avgPrice)}</td>
-                    <td className="px-4 py-2.5 text-right text-slate-100">{p.totalUnitsSold.toLocaleString()}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-slate-100">{formatCurrency(p.totalRevenue)}</td>
-                    <td className="px-4 py-2.5 text-right text-slate-200">{vel.toFixed(1)}/wk</td>
+                    <td className="px-4 py-2.5 text-stone-100 font-medium">{p.name}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-stone-100">{formatCurrency(p.avgPrice)}</td>
+                    <td className="px-4 py-2.5 text-right text-stone-100">{p.totalUnitsSold.toLocaleString()}</td>
+                    <td className="px-4 py-2.5 text-right font-mono text-stone-100">{formatCurrency(p.totalRevenue)}</td>
+                    <td className="px-4 py-2.5 text-right text-stone-200">{vel.toFixed(1)}/wk</td>
                     <td className="px-4 py-2.5 text-right">
                       {changeCount > 0
-                        ? <span className="text-teal-400 font-medium">{changeCount}</span>
-                        : <span className="text-slate-400">—</span>}
+                        ? <span className="text-amber-400 font-medium">{changeCount}</span>
+                        : <span className="text-stone-400">—</span>}
                     </td>
                   </tr>
                 )
               })}
               {filteredProductStats.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-slate-200">No products match your search.</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-stone-200">No products match your search.</td>
                 </tr>
               )}
             </tbody>

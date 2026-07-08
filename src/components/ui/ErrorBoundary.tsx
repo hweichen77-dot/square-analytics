@@ -23,13 +23,13 @@ export class ErrorBoundary extends Component<Props, State> {
               <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-slate-200 mb-1">Something went wrong</h3>
-          <p className="text-sm text-slate-200 max-w-sm leading-relaxed mb-5">
+          <h3 className="text-base font-semibold text-stone-200 mb-1">Something went wrong</h3>
+          <p className="text-sm text-stone-200 max-w-sm leading-relaxed mb-5">
             {this.state.error.message}
           </p>
           <button
             onClick={() => this.setState({ error: null })}
-            className="px-4 py-2 bg-teal-500 text-slate-950 rounded-lg text-sm font-semibold hover:bg-teal-400 transition-colors"
+            className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-semibold hover:bg-amber-400 transition-colors"
           >
             Try again
           </button>

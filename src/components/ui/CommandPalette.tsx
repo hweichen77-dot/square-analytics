@@ -56,11 +56,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg mx-4 bg-slate-900 border border-slate-700 shadow-2xl overflow-hidden"
+        className="w-full max-w-lg mx-4 bg-stone-900 border border-stone-700 shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-700">
-          <svg className="w-4 h-4 text-slate-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-700">
+          <svg className="w-4 h-4 text-stone-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
           <input
@@ -68,26 +68,26 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search products…"
-            className="flex-1 bg-transparent text-slate-100 placeholder-slate-500 text-sm focus:outline-none"
+            className="flex-1 bg-transparent text-stone-100 placeholder-stone-500 text-sm focus:outline-none"
           />
-          <kbd className="text-[10px] text-slate-300 border border-slate-700 px-1.5 py-0.5">esc</kbd>
+          <kbd className="text-[10px] text-stone-300 border border-stone-700 px-1.5 py-0.5">esc</kbd>
         </div>
 
         <div className="max-h-80 overflow-y-auto">
           {results.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-slate-200 text-center">No products found</p>
+            <p className="px-4 py-6 text-sm text-stone-200 text-center">No products found</p>
           ) : (
             results.map((p, i) => (
               <button
                 key={p.name}
                 className={`w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors ${
-                  i === selected ? 'bg-teal-500/10 text-teal-300' : 'text-slate-200 hover:bg-slate-800'
+                  i === selected ? 'bg-amber-500/10 text-amber-300' : 'text-stone-200 hover:bg-stone-800'
                 }`}
                 onClick={() => { navigate(`/inventory/${encodeURIComponent(p.name)}`); onClose() }}
                 onMouseEnter={() => setSelected(i)}
               >
                 <span className="text-sm font-medium truncate">{p.name}</span>
-                <span className="text-xs text-slate-200 font-mono shrink-0 ml-4">
+                <span className="text-xs text-stone-200 font-mono shrink-0 ml-4">
                   {formatCurrency(p.totalRevenue)} · {formatNumber(p.totalUnitsSold)} units
                 </span>
               </button>
@@ -95,10 +95,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           )}
         </div>
 
-        <div className="px-4 py-2 border-t border-slate-700/50 flex items-center gap-4 text-[10px] text-slate-300">
-          <span><kbd className="border border-slate-700 px-1">↑↓</kbd> navigate</span>
-          <span><kbd className="border border-slate-700 px-1">↵</kbd> open</span>
-          <span><kbd className="border border-slate-700 px-1">esc</kbd> close</span>
+        <div className="px-4 py-2 border-t border-stone-700/50 flex items-center gap-4 text-[10px] text-stone-300">
+          <span><kbd className="border border-stone-700 px-1">↑↓</kbd> navigate</span>
+          <span><kbd className="border border-stone-700 px-1">↵</kbd> open</span>
+          <span><kbd className="border border-stone-700 px-1">esc</kbd> close</span>
         </div>
       </div>
     </div>

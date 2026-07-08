@@ -117,36 +117,36 @@ export default function StaffShiftView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-100">Staff Shift Analysis</h1>
+      <h1 className="text-xl font-bold text-stone-100">Staff Shift Analysis</h1>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Top Earner</p>
-          <p className="text-lg font-bold text-slate-100 mt-1 truncate">{topStaff?.name ?? '—'}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Top Earner</p>
+          <p className="text-lg font-bold text-stone-100 mt-1 truncate">{topStaff?.name ?? '—'}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Total Staff</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{profiles.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Total Staff</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{profiles.length}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Avg Revenue/Staff</p>
-          <p className="text-xl font-bold text-slate-100 mt-1 font-mono">{formatCurrency(avgRevenue)}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Avg Revenue/Staff</p>
+          <p className="text-xl font-bold text-stone-100 mt-1 font-mono">{formatCurrency(avgRevenue)}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Coverage</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{coveragePct}%</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Coverage</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{coveragePct}%</p>
         </div>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-slate-100">Staff Leaderboard</h2>
+          <h2 className="text-base font-semibold text-stone-100">Staff Leaderboard</h2>
           <div className="flex gap-1">
             {([['revenue', 'Total Revenue'], ['transactions', 'Transactions'], ['avgValue', 'Avg Value']] as [StaffMetric, string][]).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setMetric(key)}
-                className={`px-3 py-1 text-xs rounded-full transition-colors ${metric === key ? 'bg-teal-500/15 text-teal-400 font-semibold' : 'text-slate-200 hover:bg-slate-700'}`}
+                className={`px-3 py-1 text-xs rounded-full transition-colors ${metric === key ? 'bg-amber-500/15 text-amber-400 font-semibold' : 'text-stone-200 hover:bg-stone-700'}`}
               >
                 {label}
               </button>
@@ -163,7 +163,7 @@ export default function StaffShiftView() {
             <Bar dataKey={d => metricValue(d)} radius={[0, 3, 3, 0]}
               label={{ position: 'right', formatter: (v: number) => metricLabel(v), fontSize: 10, fill: '#64748B' }}>
               {chartData.map((p, i) => (
-                <Cell key={i} fill={p.name === selectedStaff ? '#0d9488' : '#14B8A660'} />
+                <Cell key={i} fill={p.name === selectedStaff ? '#0d9488' : '#F59E0B60'} />
               ))}
             </Bar>
           </BarChart>
@@ -172,9 +172,9 @@ export default function StaffShiftView() {
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-700 text-left">
+              <tr className="border-b border-stone-700 text-left">
                 {['Staff Member', 'Transactions', 'Total Revenue', 'Avg Transaction', 'Days Worked', 'Top Product'].map(h => (
-                  <th key={h} className="pb-2 font-semibold text-slate-200">{h}</th>
+                  <th key={h} className="pb-2 font-semibold text-stone-200">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -182,7 +182,7 @@ export default function StaffShiftView() {
               {sorted.map(p => (
                 <tr
                   key={p.name}
-                  className="border-b border-slate-800 hover:bg-slate-700/50 cursor-pointer"
+                  className="border-b border-stone-800 hover:bg-stone-700/50 cursor-pointer"
                   onClick={() => setSelectedStaff(selectedStaff === p.name ? '' : p.name)}
                 >
                   <td className="py-2 flex items-center gap-2">
@@ -190,13 +190,13 @@ export default function StaffShiftView() {
                       className="w-2 h-2 rounded-full inline-block"
                       style={{ backgroundColor: p.name === selectedStaff ? '#4f46e5' : '#d1d5db' }}
                     />
-                    <span className="font-medium text-slate-100">{p.name}</span>
+                    <span className="font-medium text-stone-100">{p.name}</span>
                   </td>
-                  <td className="py-2 font-mono text-slate-100">{p.totalTransactions}</td>
-                  <td className="py-2 font-mono text-slate-100">{formatCurrency(p.totalRevenue)}</td>
-                  <td className="py-2 font-mono text-slate-100">{formatCurrency(p.avgTransactionValue)}</td>
-                  <td className="py-2 font-mono text-slate-100">{p.activeDays}</td>
-                  <td className="py-2 text-slate-200 truncate max-w-32">{p.topProducts[0]?.name ?? '—'}</td>
+                  <td className="py-2 font-mono text-stone-100">{p.totalTransactions}</td>
+                  <td className="py-2 font-mono text-stone-100">{formatCurrency(p.totalRevenue)}</td>
+                  <td className="py-2 font-mono text-stone-100">{formatCurrency(p.avgTransactionValue)}</td>
+                  <td className="py-2 font-mono text-stone-100">{p.activeDays}</td>
+                  <td className="py-2 text-stone-200 truncate max-w-32">{p.topProducts[0]?.name ?? '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -204,19 +204,19 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-1">Staff × Day of Week Revenue Heatmap</h2>
-        <p className="text-xs text-slate-200 mb-4">Color intensity = revenue generated in that slot</p>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-1">Staff × Day of Week Revenue Heatmap</h2>
+        <p className="text-xs text-stone-200 mb-4">Color intensity = revenue generated in that slot</p>
         <div className="overflow-x-auto">
           <div className="inline-block">
             <div className="flex gap-1 mb-1 ml-28">
               {DAY_NAMES.map(d => (
-                <div key={d} className="text-xs text-slate-200 font-medium text-center" style={{ width: 44 }}>{d}</div>
+                <div key={d} className="text-xs text-stone-200 font-medium text-center" style={{ width: 44 }}>{d}</div>
               ))}
             </div>
             {sorted.slice(0, 10).map(p => (
               <div key={p.name} className="flex gap-1 mb-1 items-center">
-                <div className="text-xs text-slate-200 w-28 text-right pr-2 truncate">{p.name}</div>
+                <div className="text-xs text-stone-200 w-28 text-right pr-2 truncate">{p.name}</div>
                 {Array.from({ length: 7 }, (_, i) => i + 1).map(dow => {
                   const rev = p.dailyRevenue[dow] ?? 0
                   const intensity = rev / heatmapMax
@@ -246,14 +246,14 @@ export default function StaffShiftView() {
       </div>
 
       {selectedProfile && (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-slate-100">{selectedProfile.name} — Detail View</h2>
-            <button onClick={() => setSelectedStaff('')} className="text-slate-200 hover:text-slate-200 text-lg">×</button>
+            <h2 className="text-base font-semibold text-stone-100">{selectedProfile.name} — Detail View</h2>
+            <button onClick={() => setSelectedStaff('')} className="text-stone-200 hover:text-stone-200 text-lg">×</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-slate-900 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-slate-100 mb-3">Revenue by Hour of Day</h3>
+            <div className="bg-stone-900 rounded-xl p-4">
+              <h3 className="text-sm font-medium text-stone-100 mb-3">Revenue by Hour of Day</h3>
               <ResponsiveContainer width="100%" height={140}>
                 <BarChart data={selectedProfile.revenueByHour} margin={{ top: 4, right: 8, left: -20, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -264,17 +264,17 @@ export default function StaffShiftView() {
                   />
                   <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${v}`} />
                   <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  <Bar dataKey="revenue" fill="#14B8A6" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#F59E0B" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="bg-slate-900 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-slate-100 mb-3">Top 5 Products Sold</h3>
+            <div className="bg-stone-900 rounded-xl p-4">
+              <h3 className="text-sm font-medium text-stone-100 mb-3">Top 5 Products Sold</h3>
               <div className="space-y-2">
                 {selectedProfile.topProducts.slice(0, 5).map(item => (
                   <div key={item.name} className="flex items-center justify-between">
-                    <span className="text-xs text-slate-100 truncate flex-1 mr-2">{item.name}</span>
-                    <span className="text-xs font-semibold font-mono text-slate-100">{item.count}×</span>
+                    <span className="text-xs text-stone-100 truncate flex-1 mr-2">{item.name}</span>
+                    <span className="text-xs font-semibold font-mono text-stone-100">{item.count}×</span>
                   </div>
                 ))}
               </div>

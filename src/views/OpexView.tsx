@@ -9,13 +9,13 @@ import { useToastStore } from '../store/toastStore'
 
 
 const CATEGORY_STYLES: Record<string, string> = {
-  'Store Equipment':   'bg-blue-500/15 text-blue-400 border border-blue-500/25',
-  'Marketing':         'bg-purple-500/15 text-purple-400 border border-purple-500/25',
-  'Misc':              'bg-slate-500/15 text-slate-200 border border-slate-500/25',
-  'Employee Expenses': 'bg-orange-500/15 text-orange-400 border border-orange-500/25',
+  'Store Equipment':   'bg-amber-500/15 text-amber-400 border border-amber-500/25',
+  'Marketing':         'bg-amber-500/15 text-amber-400 border border-amber-500/25',
+  'Misc':              'bg-stone-500/15 text-stone-200 border border-stone-500/25',
+  'Employee Expenses': 'bg-amber-500/15 text-amber-400 border border-amber-500/25',
   'Gift Cards':        'bg-pink-500/15 text-pink-400 border border-pink-500/25',
-  'Service Charge':    'bg-cyan-500/15 text-cyan-400 border border-cyan-500/25',
-  'Other':             'bg-slate-600/15 text-slate-200 border border-slate-600/25',
+  'Service Charge':    'bg-amber-500/15 text-amber-400 border border-amber-500/25',
+  'Other':             'bg-stone-600/15 text-stone-200 border border-stone-600/25',
 }
 
 function CategoryBadge({ category }: { category: string }) {
@@ -64,11 +64,11 @@ function EntryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md mx-4">
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="font-semibold text-slate-100">{initial ? 'Edit Expense' : 'Add Expense'}</h2>
-          <button onClick={onClose} className="text-slate-200 hover:text-slate-300 transition-colors cursor-pointer">
+      <div className="absolute inset-0 bg-stone-950/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-stone-800 border border-stone-700 rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
+          <h2 className="font-semibold text-stone-100">{initial ? 'Edit Expense' : 'Add Expense'}</h2>
+          <button onClick={onClose} className="text-stone-200 hover:text-stone-300 transition-colors cursor-pointer">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -77,44 +77,44 @@ function EntryModal({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">Expense Name</label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">Expense Name</label>
             <input
               type="text"
               required
               value={form.name}
               onChange={e => set('name', e.target.value)}
               placeholder="e.g. Display shelving unit"
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/60"
+              className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-200 mb-1.5">Category</label>
+              <label className="block text-xs font-medium text-stone-200 mb-1.5">Category</label>
               <select
                 value={form.category}
                 onChange={e => set('category', e.target.value as OpexCategory)}
-                className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/60 cursor-pointer"
+                className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 cursor-pointer"
               >
                 {OPEX_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-200 mb-1.5">Month</label>
+              <label className="block text-xs font-medium text-stone-200 mb-1.5">Month</label>
               <input
                 type="month"
                 required
                 value={form.month}
                 onChange={e => set('month', e.target.value)}
-                className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/60"
+                className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">Amount ($)</label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">Amount ($)</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-200 text-sm">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-200 text-sm">$</span>
               <input
                 type="number"
                 required
@@ -123,19 +123,19 @@ function EntryModal({
                 value={form.amount || ''}
                 onChange={e => set('amount', parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
-                className="w-full bg-slate-900 border border-slate-600 rounded-lg pl-7 pr-3 py-2 text-sm text-slate-100 placeholder-slate-600 font-mono focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/60"
+                className="w-full bg-stone-900 border border-stone-600 rounded-lg pl-7 pr-3 py-2 text-sm text-stone-100 placeholder-stone-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">Notes <span className="text-slate-200">(optional)</span></label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">Notes <span className="text-stone-200">(optional)</span></label>
             <input
               type="text"
               value={form.notes}
               onChange={e => set('notes', e.target.value)}
               placeholder="e.g. Receipt #12345"
-              className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-teal-500/40 focus:border-teal-500/60"
+              className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
             />
           </div>
 
@@ -143,14 +143,14 @@ function EntryModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 text-sm font-medium border border-slate-600 text-slate-200 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer"
+              className="flex-1 py-2 text-sm font-medium border border-stone-600 text-stone-200 rounded-lg hover:bg-stone-700/50 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || !form.name.trim() || form.amount <= 0}
-              className="flex-1 py-2 text-sm font-semibold bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="flex-1 py-2 text-sm font-semibold bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               {saving ? 'Saving…' : initial ? 'Save Changes' : 'Add Expense'}
             </button>
@@ -217,12 +217,12 @@ export default function OpexView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-slate-100">Operating Expenses</h1>
-          <p className="text-sm text-slate-200 mt-0.5">Track manual OPEX entries that appear in the Monthly Income Statement</p>
+          <h1 className="text-xl font-semibold text-stone-100">Operating Expenses</h1>
+          <p className="text-sm text-stone-200 mt-0.5">Track manual OPEX entries that appear in the Monthly Income Statement</p>
         </div>
         <button
           onClick={() => setModalEntry('new')}
-          className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-slate-950 text-sm font-semibold rounded-lg hover:bg-teal-400 transition-colors cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-stone-950 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors cursor-pointer"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -232,28 +232,28 @@ export default function OpexView() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200 mb-1">{filterMonth === 'all' ? 'Total OPEX' : 'OPEX This Month'}</p>
-          <p className="text-xl font-semibold font-mono text-slate-100">{formatCurrency(totalOpex)}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200 mb-1">{filterMonth === 'all' ? 'Total OPEX' : 'OPEX This Month'}</p>
+          <p className="text-xl font-semibold font-mono text-stone-100">{formatCurrency(totalOpex)}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200 mb-1">Entries</p>
-          <p className="text-xl font-semibold text-slate-100">{filtered.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200 mb-1">Entries</p>
+          <p className="text-xl font-semibold text-stone-100">{filtered.length}</p>
         </div>
         {byCategory.slice(0, 2).map(([cat, amt]) => (
-          <div key={cat} className="bg-slate-800/30 border border-slate-700/40 p-4">
-            <p className="text-xs text-slate-200 mb-1 truncate">{cat}</p>
-            <p className="text-xl font-semibold font-mono text-slate-100">{formatCurrency(amt)}</p>
+          <div key={cat} className="bg-stone-800/30 border border-stone-700/40 p-4">
+            <p className="text-xs text-stone-200 mb-1 truncate">{cat}</p>
+            <p className="text-xl font-semibold font-mono text-stone-100">{formatCurrency(amt)}</p>
           </div>
         ))}
       </div>
 
       <div className="flex items-center gap-3">
-        <label className="text-xs font-medium text-slate-200">Filter by month</label>
+        <label className="text-xs font-medium text-stone-200">Filter by month</label>
         <select
           value={filterMonth}
           onChange={e => setFilterMonth(e.target.value)}
-          className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/40 cursor-pointer"
+          className="bg-stone-800 border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
         >
           <option value="all">All months</option>
           {availableMonths.map(m => (
@@ -263,49 +263,49 @@ export default function OpexView() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-12 text-center">
-          <div className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-12 text-center">
+          <div className="w-10 h-10 bg-stone-700 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
           </div>
-          <p className="text-slate-200 font-medium mb-1">No expenses yet</p>
-          <p className="text-sm text-slate-200">Add operating expenses to include them in your Monthly Income Statement.</p>
+          <p className="text-stone-200 font-medium mb-1">No expenses yet</p>
+          <p className="text-sm text-stone-200">Add operating expenses to include them in your Monthly Income Statement.</p>
           <button
             onClick={() => setModalEntry('new')}
-            className="mt-4 px-4 py-2 bg-teal-500/15 text-teal-400 border border-teal-500/30 rounded-lg text-sm font-medium hover:bg-teal-500/25 transition-colors cursor-pointer"
+            className="mt-4 px-4 py-2 bg-amber-500/15 text-amber-400 border border-amber-500/30 rounded-lg text-sm font-medium hover:bg-amber-500/25 transition-colors cursor-pointer"
           >
             Add your first expense
           </button>
         </div>
       ) : (
-        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
+        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-slate-900 border-b border-slate-700/50">
+            <thead className="bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-200 uppercase tracking-wide">Name</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-200 uppercase tracking-wide">Category</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-200 uppercase tracking-wide">Month</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold text-slate-200 uppercase tracking-wide">Amount</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-200 uppercase tracking-wide">Notes</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold text-slate-200 uppercase tracking-wide">Actions</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-200 uppercase tracking-wide">Name</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-200 uppercase tracking-wide">Category</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-200 uppercase tracking-wide">Month</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-200 uppercase tracking-wide">Amount</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-200 uppercase tracking-wide">Notes</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-200 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/40">
+            <tbody className="divide-y divide-stone-700/40">
               {filtered.map(entry => (
-                <tr key={entry.id} className="hover:bg-slate-700/30 transition-colors">
-                  <td className="px-4 py-3 font-medium text-slate-200">{entry.name}</td>
+                <tr key={entry.id} className="hover:bg-stone-700/30 transition-colors">
+                  <td className="px-4 py-3 font-medium text-stone-200">{entry.name}</td>
                   <td className="px-4 py-3"><CategoryBadge category={entry.category} /></td>
-                  <td className="px-4 py-3 text-slate-200 text-xs">
+                  <td className="px-4 py-3 text-stone-200 text-xs">
                     {format(parseISO(entry.month + '-01'), 'MMM yyyy')}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-slate-200">{formatCurrency(entry.amount)}</td>
-                  <td className="px-4 py-3 text-slate-200 text-xs max-w-xs truncate">{entry.notes || '—'}</td>
+                  <td className="px-4 py-3 text-right font-mono text-stone-200">{formatCurrency(entry.amount)}</td>
+                  <td className="px-4 py-3 text-stone-200 text-xs max-w-xs truncate">{entry.notes || '—'}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => setModalEntry(entry)}
-                        className="p-1.5 text-slate-200 hover:text-teal-400 hover:bg-teal-500/10 rounded-md transition-colors cursor-pointer"
+                        className="p-1.5 text-stone-200 hover:text-amber-400 hover:bg-amber-500/10 rounded-md transition-colors cursor-pointer"
                         aria-label="Edit"
                       >
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -323,7 +323,7 @@ export default function OpexView() {
                           </button>
                           <button
                             onClick={() => setDeletingId(null)}
-                            className="px-2 py-1 text-xs text-slate-200 hover:text-slate-300 transition-colors cursor-pointer"
+                            className="px-2 py-1 text-xs text-stone-200 hover:text-stone-300 transition-colors cursor-pointer"
                           >
                             Cancel
                           </button>
@@ -331,7 +331,7 @@ export default function OpexView() {
                       ) : (
                         <button
                           onClick={() => setDeletingId(entry.id!)}
-                          className="p-1.5 text-slate-200 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors cursor-pointer"
+                          className="p-1.5 text-stone-200 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors cursor-pointer"
                           aria-label="Delete"
                         >
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -348,16 +348,16 @@ export default function OpexView() {
           </table>
 
           {byCategory.length > 0 && (
-            <div className="border-t border-slate-700 px-4 py-3 bg-slate-900/50">
+            <div className="border-t border-stone-700 px-4 py-3 bg-stone-900/50">
               <div className="flex items-center gap-4 flex-wrap">
-                <span className="text-xs font-semibold text-slate-200 uppercase tracking-wide">Totals:</span>
+                <span className="text-xs font-semibold text-stone-200 uppercase tracking-wide">Totals:</span>
                 {byCategory.map(([cat, amt]) => (
-                  <span key={cat} className="text-xs text-slate-200">
-                    <span className="text-slate-200">{cat}: </span>
-                    <span className="font-mono text-slate-100">{formatCurrency(amt)}</span>
+                  <span key={cat} className="text-xs text-stone-200">
+                    <span className="text-stone-200">{cat}: </span>
+                    <span className="font-mono text-stone-100">{formatCurrency(amt)}</span>
                   </span>
                 ))}
-                <span className="ml-auto text-xs font-semibold text-slate-200 font-mono">
+                <span className="ml-auto text-xs font-semibold text-stone-200 font-mono">
                   Total: {formatCurrency(totalOpex)}
                 </span>
               </div>

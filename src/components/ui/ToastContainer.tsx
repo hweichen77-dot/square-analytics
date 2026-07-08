@@ -3,7 +3,7 @@ import { useToastStore } from '../../store/toastStore'
 const VARIANT_STYLES = {
   success: 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30',
   error:   'bg-red-500/10 text-red-300 border border-red-500/30',
-  info:    'bg-slate-700 text-slate-200 border border-slate-600',
+  info:    'bg-stone-700 text-stone-200 border border-stone-600',
 }
 
 export function ToastContainer() {

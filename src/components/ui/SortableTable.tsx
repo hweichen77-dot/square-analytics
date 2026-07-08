@@ -53,27 +53,27 @@ export function SortableTable<T>({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-slate-900/70 text-slate-200 uppercase text-[10px] tracking-wider">
+        <thead className="bg-stone-900/70 text-stone-200 uppercase text-[10px] tracking-wider">
           <tr>
             {columns.map(col => (
               <th
                 key={col.key}
                 onClick={() => handleSort(col.key)}
-                className={`px-4 py-3 font-semibold cursor-pointer select-none hover:text-slate-300 transition-colors ${alignClass(col.align)}`}
+                className={`px-4 py-3 font-semibold cursor-pointer select-none hover:text-stone-300 transition-colors ${alignClass(col.align)}`}
               >
                 {col.label}
                 {sortKey === col.key && (
-                  <span className="ml-1 text-teal-400">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ml-1 text-amber-400">{sortDir === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-700/40">
+        <tbody className="divide-y divide-stone-700/40">
           {displayed.map((row, idx) => (
-            <tr key={rowKey(row)} className={`hover:bg-slate-700/30 transition-colors ${idx % 2 === 1 ? 'bg-slate-800/40' : ''}`}>
+            <tr key={rowKey(row)} className={`hover:bg-stone-700/30 transition-colors ${idx % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
               {columns.map(col => (
-                <td key={col.key} className={`px-4 py-3 text-slate-100 ${alignClass(col.align)}`}>
+                <td key={col.key} className={`px-4 py-3 text-stone-100 ${alignClass(col.align)}`}>
                   {col.render ? col.render(row) : col.getValue ? String(col.getValue(row)) : ''}
                 </td>
               ))}
@@ -82,7 +82,7 @@ export function SortableTable<T>({
         </tbody>
       </table>
       {displayed.length === 0 && (
-        <div className="text-center py-10 text-slate-200 text-sm">No data to display.</div>
+        <div className="text-center py-10 text-stone-200 text-sm">No data to display.</div>
       )}
     </div>
   )

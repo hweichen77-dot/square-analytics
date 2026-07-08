@@ -28,7 +28,7 @@ export default function SquareCallbackView() {
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
           <p className="font-semibold text-red-400">{error}</p>
-          <button onClick={() => navigate('/square-sync')} className="mt-4 text-sm text-teal-400 underline">
+          <button onClick={() => navigate('/square-sync')} className="mt-4 text-sm text-amber-400 underline">
             Back to settings
           </button>
         </div>
@@ -39,8 +39,8 @@ export default function SquareCallbackView() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
-        <div className="w-10 h-10 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-200">Connecting to Square…</p>
+        <div className="w-10 h-10 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-stone-200">Connecting to Square…</p>
       </div>
     </div>
   )

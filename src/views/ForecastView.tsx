@@ -16,7 +16,7 @@ function TrendBadge({ label }: { label: string }) {
   const base = 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium'
   const cls = up ? `${base} bg-emerald-500/15 text-emerald-400` :
                down ? `${base} bg-red-500/15 text-red-400` :
-               `${base} bg-slate-800 text-slate-200`
+               `${base} bg-stone-800 text-stone-200`
   return <span className={cls}>{label}</span>
 }
 
@@ -54,7 +54,7 @@ export default function ForecastView() {
   if (!forecast.hasEnoughData) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-bold text-slate-100">Sales Forecast</h1>
+        <h1 className="text-xl font-bold text-stone-100">Sales Forecast</h1>
         <div className="bg-amber-500/10 border border-amber-500/30 p-5 text-sm text-amber-300">
           <p className="font-semibold">Not enough history to forecast</p>
           <p className="mt-1">Need at least 2 complete weeks of data. You have {forecast.weeksOfHistory} week{forecast.weeksOfHistory === 1 ? '' : 's'}.</p>
@@ -86,7 +86,7 @@ export default function ForecastView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-100">Sales Forecast</h1>
+        <h1 className="text-xl font-bold text-stone-100">Sales Forecast</h1>
         <TrendBadge label={trendLabel} />
       </div>
 
@@ -105,15 +105,15 @@ export default function ForecastView() {
               <p className={`text-2xl font-bold ${onTrack ? 'text-emerald-400' : 'text-amber-400'}`}>
                 {formatCurrency(thisWeek.projectedTotal)}
               </p>
-              <p className="text-xs text-slate-200">projected this week</p>
+              <p className="text-xs text-stone-200">projected this week</p>
             </div>
           </div>
           <div className="mt-3">
-            <div className="flex justify-between text-xs text-slate-200 mb-1">
+            <div className="flex justify-between text-xs text-stone-200 mb-1">
               <span>{daysWithData} of 7 days in</span>
               <span>{progressPct.toFixed(0)}% of projected</span>
             </div>
-            <div className="w-full bg-slate-800 rounded-full h-2 border border-slate-700">
+            <div className="w-full bg-stone-800 rounded-full h-2 border border-stone-700">
               <div
                 className={`h-2 rounded-full transition-all ${onTrack ? 'bg-emerald-500' : 'bg-amber-400'}`}
                 style={{ width: `${Math.min(progressPct, 100)}%` }}
@@ -123,30 +123,30 @@ export default function ForecastView() {
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="font-semibold text-slate-200 mb-1">{weekLabel(thisWeek.weekStart)} — Current Week</h2>
-        <p className="text-xs text-slate-200 mb-4">Solid bars = actual revenue. Striped bars = forecast for remaining days.</p>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="font-semibold text-stone-200 mb-1">{weekLabel(thisWeek.weekStart)} — Current Week</h2>
+        <p className="text-xs text-stone-200 mb-4">Solid bars = actual revenue. Striped bars = forecast for remaining days.</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={thisWeekData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
             <XAxis dataKey="label" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={48} />
             <Tooltip formatter={(v: number) => formatCurrency(v)} />
-            <Bar dataKey="actual" name="Actual" fill="#14B8A6" radius={[3, 3, 0, 0]} />
+            <Bar dataKey="actual" name="Actual" fill="#F59E0B" radius={[3, 3, 0, 0]} />
             <Bar dataKey="projected" name="Forecast" fill="#5eead4" radius={[3, 3, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-semibold text-slate-200">{weekLabel(nextWeek.weekStart)} — Forecast</h2>
-          <span className="text-sm font-semibold text-teal-400">{formatCurrency(nextWeek.projectedTotal)} projected</span>
+          <h2 className="font-semibold text-stone-200">{weekLabel(nextWeek.weekStart)} — Forecast</h2>
+          <span className="text-sm font-semibold text-amber-400">{formatCurrency(nextWeek.projectedTotal)} projected</span>
         </div>
-        <p className="text-xs text-slate-200 mb-4">Based on day-of-week averages from the last {Math.min(12, forecast.weeksOfHistory)} weeks.</p>
+        <p className="text-xs text-stone-200 mb-4">Based on day-of-week averages from the last {Math.min(12, forecast.weeksOfHistory)} weeks.</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={nextWeekData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
             <XAxis dataKey="label" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 10 }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} width={48} />
             <Tooltip formatter={(v: number) => formatCurrency(v)} />
@@ -161,12 +161,12 @@ export default function ForecastView() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {accuracyData && (
-          <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-            <p className="text-xs text-slate-200 font-medium mb-1">Forecast Accuracy (This Week)</p>
+          <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+            <p className="text-xs text-stone-200 font-medium mb-1">Forecast Accuracy (This Week)</p>
             <p className={`text-3xl font-bold tabular-nums ${accuracyData.accuracyPct >= 90 ? 'text-emerald-400' : accuracyData.accuracyPct >= 70 ? 'text-amber-400' : 'text-red-400'}`}>
               {accuracyData.accuracyPct.toFixed(0)}%
             </p>
-            <p className="text-xs text-slate-200 mt-1">
+            <p className="text-xs text-stone-200 mt-1">
               {accuracyData.elapsedDays} day{accuracyData.elapsedDays !== 1 ? 's' : ''} elapsed ·{' '}
               <span className={accuracyData.diff >= 0 ? 'text-emerald-400' : 'text-red-400'}>
                 {accuracyData.diff >= 0 ? '+' : ''}{formatCurrency(accuracyData.diff)} vs projected
@@ -175,45 +175,45 @@ export default function ForecastView() {
           </div>
         )}
 
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200 font-medium mb-1">Next Week Projection</p>
-          <p className="text-3xl font-bold tabular-nums text-teal-400">{formatCurrency(nextWeek.projectedTotal)}</p>
-          <p className="text-xs text-slate-200 mt-1">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200 font-medium mb-1">Next Week Projection</p>
+          <p className="text-3xl font-bold tabular-nums text-amber-400">{formatCurrency(nextWeek.projectedTotal)}</p>
+          <p className="text-xs text-stone-200 mt-1">
             {format(nextWeek.weekStart, 'MMM d')} – {format(new Date(nextWeek.weekStart.getTime() + 6 * 86_400_000), 'MMM d')}
           </p>
         </div>
 
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200 font-medium mb-1">History Used</p>
-          <p className="text-3xl font-bold tabular-nums text-slate-200">{forecast.weeksOfHistory}</p>
-          <p className="text-xs text-slate-200 mt-1">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200 font-medium mb-1">History Used</p>
+          <p className="text-3xl font-bold tabular-nums text-stone-200">{forecast.weeksOfHistory}</p>
+          <p className="text-xs text-stone-200 mt-1">
             complete week{forecast.weeksOfHistory !== 1 ? 's' : ''} · up to 12 used for baseline
           </p>
         </div>
       </div>
 
       {topProducts.length > 0 && (
-        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-700/50">
-            <h2 className="font-semibold text-slate-200">Top Products by Demand</h2>
-            <p className="text-xs text-slate-200 mt-0.5">Highest-velocity items — expect continued strong demand</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-700/50">
+            <h2 className="font-semibold text-stone-200">Top Products by Demand</h2>
+            <p className="text-xs text-stone-200 mt-0.5">Highest-velocity items — expect continued strong demand</p>
           </div>
-          <div className="divide-y divide-slate-700/30">
+          <div className="divide-y divide-stone-700/30">
             {topProducts.map((p, i) => {
               const maxRev = topProducts[0].totalRevenue
               const barWidth = maxRev > 0 ? (p.totalRevenue / maxRev) * 100 : 0
               return (
-                <div key={p.name} className="flex items-center gap-4 px-5 py-3 hover:bg-slate-700/20 transition-colors">
-                  <span className="text-sm font-bold text-slate-200 w-5 shrink-0">{i + 1}</span>
+                <div key={p.name} className="flex items-center gap-4 px-5 py-3 hover:bg-stone-700/20 transition-colors">
+                  <span className="text-sm font-bold text-stone-200 w-5 shrink-0">{i + 1}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-200 truncate">{p.name}</p>
-                    <div className="mt-1 h-1.5 bg-slate-700 rounded-full overflow-hidden w-full">
-                      <div className="h-full rounded-full bg-teal-500/60" style={{ width: `${barWidth}%` }} />
+                    <p className="text-sm font-medium text-stone-200 truncate">{p.name}</p>
+                    <div className="mt-1 h-1.5 bg-stone-700 rounded-full overflow-hidden w-full">
+                      <div className="h-full rounded-full bg-amber-500/60" style={{ width: `${barWidth}%` }} />
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-semibold text-slate-100">{formatCurrency(p.totalRevenue)}</p>
-                    <p className="text-xs text-slate-200">{p.totalUnitsSold} units</p>
+                    <p className="text-sm font-semibold text-stone-100">{formatCurrency(p.totalRevenue)}</p>
+                    <p className="text-xs text-stone-200">{p.totalUnitsSold} units</p>
                   </div>
                 </div>
               )
@@ -222,7 +222,7 @@ export default function ForecastView() {
         </div>
       )}
 
-      <p className="text-xs text-slate-200">
+      <p className="text-xs text-stone-200">
         Forecast uses day-of-week averages from up to 12 weeks of history, adjusted by a trend factor computed from the last 8 weeks.
         Based on {forecast.weeksOfHistory} complete week{forecast.weeksOfHistory === 1 ? '' : 's'} of data.
       </p>

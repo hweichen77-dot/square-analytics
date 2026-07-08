@@ -1,8 +1,8 @@
 type BadgeVariant = 'default' | 'secondary' | 'success' | 'warning' | 'danger'
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  default:   'bg-teal-500/15 text-teal-400 border border-teal-500/20',
-  secondary: 'bg-slate-700 text-slate-200 border border-slate-600',
+  default:   'bg-amber-500/15 text-amber-400 border border-amber-500/20',
+  secondary: 'bg-stone-700 text-stone-200 border border-stone-600',
   success:   'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
   warning:   'bg-amber-500/15 text-amber-400 border border-amber-500/20',
   danger:    'bg-red-500/15 text-red-400 border border-red-500/20',

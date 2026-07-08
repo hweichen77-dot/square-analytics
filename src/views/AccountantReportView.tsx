@@ -11,7 +11,7 @@ import { exportQuickBooksPL } from '../engine/quickbooksExport'
 import { useToastStore } from '../store/toastStore'
 import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 
-const PIE_COLORS = ['#14B8A6', '#6366F1', '#F59E0B', '#EF4444', '#8B5CF6', '#10B981', '#F97316']
+const PIE_COLORS = ['#F59E0B', '#6366F1', '#F59E0B', '#EF4444', '#F59E0B', '#10B981', '#F59E0B']
 
 type QuickRange = 'this-month' | 'last-month' | 'last-quarter' | 'ytd' | 'custom'
 
@@ -45,11 +45,11 @@ function getQuickDates(key: QuickRange): { start: Date; end: Date } | null {
 
 function MetricRow({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
-    <div className={`flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0 ${highlight ? 'font-semibold' : ''}`}>
-      <span className={`text-sm ${highlight ? 'text-slate-100' : 'text-slate-200'}`}>{label}</span>
+    <div className={`flex items-center justify-between py-2 border-b border-stone-700/50 last:border-0 ${highlight ? 'font-semibold' : ''}`}>
+      <span className={`text-sm ${highlight ? 'text-stone-100' : 'text-stone-200'}`}>{label}</span>
       <div className="text-right">
-        <span className={`text-sm ${highlight ? 'text-slate-100' : 'text-slate-200'}`}>{value}</span>
-        {sub && <p className="text-xs text-slate-200">{sub}</p>}
+        <span className={`text-sm ${highlight ? 'text-stone-100' : 'text-stone-200'}`}>{value}</span>
+        {sub && <p className="text-xs text-stone-200">{sub}</p>}
       </div>
     </div>
   )
@@ -222,8 +222,8 @@ export default function AccountantReportView() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Accountant Report</h1>
-          <p className="text-sm text-slate-200 mt-1">
+          <h1 className="text-xl font-bold text-stone-100">Accountant Report</h1>
+          <p className="text-sm text-stone-200 mt-1">
             One-click PDF summary ready to hand to your accountant — revenue, COGS, margins, and payment breakdown.
           </p>
         </div>
@@ -231,13 +231,13 @@ export default function AccountantReportView() {
           <div className="flex gap-2 shrink-0">
             <button
               onClick={handleExportXLSX}
-              className="px-4 py-2.5 bg-slate-700 border border-slate-600 text-slate-200 rounded-xl text-sm font-semibold hover:bg-slate-600 transition-colors"
+              className="px-4 py-2.5 bg-stone-700 border border-stone-600 text-stone-200 rounded-xl text-sm font-semibold hover:bg-stone-600 transition-colors"
             >
               QuickBooks XLSX
             </button>
             <button
               onClick={handleExport}
-              className="px-5 py-2.5 bg-teal-500 text-slate-950 rounded-xl text-sm font-semibold hover:bg-teal-600 transition-colors"
+              className="px-5 py-2.5 bg-amber-500 text-stone-950 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-colors"
             >
               Download PDF
             </button>
@@ -245,8 +245,8 @@ export default function AccountantReportView() {
         )}
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5 space-y-4">
-        <h2 className="font-semibold text-slate-200">Report Period</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5 space-y-4">
+        <h2 className="font-semibold text-stone-200">Report Period</h2>
         <div className="flex flex-wrap gap-2">
           {QUICK_RANGES.map(r => (
             <button
@@ -254,8 +254,8 @@ export default function AccountantReportView() {
               onClick={() => setQuick(r.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                 quick === r.key
-                  ? 'bg-teal-500 text-slate-950'
-                  : 'bg-slate-800 text-slate-200 hover:bg-slate-600'
+                  ? 'bg-amber-500 text-stone-950'
+                  : 'bg-stone-800 text-stone-200 hover:bg-stone-600'
               }`}
             >
               {r.label}
@@ -266,40 +266,40 @@ export default function AccountantReportView() {
         {quick === 'custom' && (
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="block text-xs text-slate-200 mb-1">Start</label>
+              <label className="block text-xs text-stone-200 mb-1">Start</label>
               <input
                 type="date"
                 value={customStart}
                 onChange={e => setCustomStart(e.target.value)}
-                className="w-full border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-xs text-slate-200 mb-1">End</label>
+              <label className="block text-xs text-stone-200 mb-1">End</label>
               <input
                 type="date"
                 value={customEnd}
                 onChange={e => setCustomEnd(e.target.value)}
-                className="w-full border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
               />
             </div>
           </div>
         )}
 
-        <div className="text-xs text-slate-200">
+        <div className="text-xs text-stone-200">
           {format(dates.start, 'MMMM d, yyyy')} — {format(dates.end, 'MMMM d, yyyy')}
         </div>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center text-sm text-slate-200">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-200">
           No transactions in this period.
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-              <h2 className="font-semibold text-slate-200 mb-3">Revenue Summary</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Revenue Summary</h2>
               <MetricRow label="Gross Revenue" value={formatCurrency(report.totalRevenue)} />
               <MetricRow
                 label="Refunds / Adjustments"
@@ -324,14 +324,14 @@ export default function AccountantReportView() {
                 </>
               )}
               {!hasCOGS && (
-                <p className="text-xs text-slate-200 mt-3">
+                <p className="text-xs text-stone-200 mt-3">
                   Import your Square catalog XLSX to include cost of goods and profit margins.
                 </p>
               )}
             </div>
 
-            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-              <h2 className="font-semibold text-slate-200 mb-3">Payment Breakdown</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Payment Breakdown</h2>
               {report.paymentBreakdown.length > 0 && (
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
@@ -351,25 +351,25 @@ export default function AccountantReportView() {
                     </Pie>
                     <ReTooltip
                       formatter={(v: number) => [formatCurrency(v), '']}
-                      contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-                      labelStyle={{ color: '#ffffff', fontWeight: 600 }}
-                      itemStyle={{ color: '#ffffff' }}
+                      contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
+                      labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
+                      itemStyle={{ color: '#fafaf9' }}
                     />
                     <Legend
                       iconType="circle"
                       iconSize={8}
-                      formatter={(v) => <span style={{ color: '#e2e8f0', fontSize: 11 }}>{v}</span>}
+                      formatter={(v) => <span style={{ color: '#e7e5e4', fontSize: 11 }}>{v}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               )}
               <div className="mt-2 space-y-1">
                 {report.paymentBreakdown.map((p, i) => (
-                  <div key={p.method} className="flex items-center gap-3 py-1 border-b border-slate-700/40 last:border-0">
+                  <div key={p.method} className="flex items-center gap-3 py-1 border-b border-stone-700/40 last:border-0">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                    <span className="text-sm text-slate-100 flex-1">{p.method}</span>
-                    <span className="text-xs text-slate-200 w-9 text-right">{p.pct.toFixed(0)}%</span>
-                    <span className="text-sm font-medium text-slate-100 w-24 text-right">{formatCurrency(p.revenue)}</span>
+                    <span className="text-sm text-stone-100 flex-1">{p.method}</span>
+                    <span className="text-xs text-stone-200 w-9 text-right">{p.pct.toFixed(0)}%</span>
+                    <span className="text-sm font-medium text-stone-100 w-24 text-right">{formatCurrency(p.revenue)}</span>
                   </div>
                 ))}
               </div>
@@ -377,8 +377,8 @@ export default function AccountantReportView() {
           </div>
 
           {hasCOGS && (opexTotal > 0) && (
-            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-              <h2 className="font-semibold text-slate-200 mb-3">Profit & Loss Summary</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Profit & Loss Summary</h2>
               <MetricRow label="Net Revenue" value={formatCurrency(report.netRevenue)} />
               <MetricRow label="Cost of Goods Sold" value={`(${formatCurrency(report.totalCOGS!)})`} />
               <MetricRow label="Gross Profit" value={formatCurrency(report.grossProfit!)} sub={`${report.grossMarginPct!.toFixed(1)}% margin`} highlight />
@@ -393,61 +393,61 @@ export default function AccountantReportView() {
           )}
 
           {weeklyRevenue.length > 1 && (
-            <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-              <h2 className="font-semibold text-slate-200 mb-4">Weekly Revenue Trend</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+              <h2 className="font-semibold text-stone-200 mb-4">Weekly Revenue Trend</h2>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={weeklyRevenue} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#cbd5e1' }} />
-                  <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#cbd5e1' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#292524" />
+                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#d6d3d1' }} />
+                  <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#d6d3d1' }} />
                   <ReTooltip
                     formatter={(v: number) => [formatCurrency(v), 'Revenue']}
-                    contentStyle={{ background: '#0f172a', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-                    labelStyle={{ color: '#ffffff' }}
-                    itemStyle={{ color: '#ffffff' }}
+                    contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
+                    labelStyle={{ color: '#fafaf9' }}
+                    itemStyle={{ color: '#fafaf9' }}
                   />
-                  <Bar dataKey="revenue" fill="#14b8a6" radius={[2, 2, 0, 0]} />
+                  <Bar dataKey="revenue" fill="#f59e0b" radius={[2, 2, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
 
-          <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-            <h2 className="font-semibold text-slate-200 mb-4">Revenue by Day of Week</h2>
+          <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+            <h2 className="font-semibold text-stone-200 mb-4">Revenue by Day of Week</h2>
             <div className="grid grid-cols-7 gap-2">
               {byDayOfWeek.map(d => (
                 <div key={d.day} className="text-center">
-                  <p className="text-[10px] font-semibold text-slate-200 uppercase mb-1">{d.day}</p>
-                  <p className="text-sm font-bold text-slate-100">{formatCurrency(d.revenue)}</p>
-                  <p className="text-[10px] text-slate-200">{d.transactions} txns</p>
+                  <p className="text-[10px] font-semibold text-stone-200 uppercase mb-1">{d.day}</p>
+                  <p className="text-sm font-bold text-stone-100">{formatCurrency(d.revenue)}</p>
+                  <p className="text-[10px] text-stone-200">{d.transactions} txns</p>
                 </div>
               ))}
             </div>
           </div>
 
           {categoryBreakdown.length > 0 && (
-            <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-700/50">
-                <h2 className="font-semibold text-slate-200">Revenue by Category</h2>
+            <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+              <div className="px-5 py-4 border-b border-stone-700/50">
+                <h2 className="font-semibold text-stone-200">Revenue by Category</h2>
               </div>
               <table className="w-full text-xs">
-                <thead className="bg-slate-900/60">
+                <thead className="bg-stone-900/60">
                   <tr>
-                    <th className="px-4 py-2.5 text-left text-slate-200 font-semibold">Category</th>
-                    <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Products</th>
-                    <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Units</th>
-                    <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Revenue</th>
-                    <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">% of Total</th>
+                    <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Category</th>
+                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Products</th>
+                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Units</th>
+                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Revenue</th>
+                    <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">% of Total</th>
                   </tr>
                 </thead>
                 <tbody>
                   {categoryBreakdown.map((c, i) => (
-                    <tr key={c.category} className={`border-t border-slate-700/30 hover:bg-slate-700/20 ${i % 2 === 1 ? 'bg-slate-800/40' : ''}`}>
-                      <td className="px-4 py-2 text-slate-100 font-medium">{c.category}</td>
-                      <td className="px-4 py-2 text-right text-slate-200">{c.count}</td>
-                      <td className="px-4 py-2 text-right text-slate-200 font-mono">{c.units.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-right text-slate-100 font-mono font-semibold">{formatCurrency(c.revenue)}</td>
-                      <td className="px-4 py-2 text-right text-slate-200">
+                    <tr key={c.category} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+                      <td className="px-4 py-2 text-stone-100 font-medium">{c.category}</td>
+                      <td className="px-4 py-2 text-right text-stone-200">{c.count}</td>
+                      <td className="px-4 py-2 text-right text-stone-200 font-mono">{c.units.toLocaleString()}</td>
+                      <td className="px-4 py-2 text-right text-stone-100 font-mono font-semibold">{formatCurrency(c.revenue)}</td>
+                      <td className="px-4 py-2 text-right text-stone-200">
                         {report.totalRevenue > 0 ? `${(c.revenue / report.totalRevenue * 100).toFixed(1)}%` : '—'}
                       </td>
                     </tr>
@@ -458,55 +458,55 @@ export default function AccountantReportView() {
           )}
 
           {allProducts.length > 0 && (
-            <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between gap-4">
+            <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+              <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="font-semibold text-slate-200">All Products</h2>
-                  <p className="text-xs text-slate-200 mt-0.5">{filteredProducts.length} of {allProducts.length} products</p>
+                  <h2 className="font-semibold text-stone-200">All Products</h2>
+                  <p className="text-xs text-stone-200 mt-0.5">{filteredProducts.length} of {allProducts.length} products</p>
                 </div>
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={productSearch}
                   onChange={e => setProductSearch(e.target.value)}
-                  className="border border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-slate-900 text-slate-100 placeholder:text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/30 w-52"
+                  className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
                 />
               </div>
               <div className="overflow-y-auto max-h-[32rem] overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
+                  <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
                     <tr>
-                      <th className="px-4 py-2.5 text-left text-slate-200 font-semibold">Product</th>
-                      <th className="px-4 py-2.5 text-left text-slate-200 font-semibold">Category</th>
-                      <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Units</th>
-                      <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Revenue</th>
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">COGS</th>}
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Gross Profit</th>}
-                      {hasCOGS && <th className="px-4 py-2.5 text-right text-slate-200 font-semibold">Margin %</th>}
+                      <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Product</th>
+                      <th className="px-4 py-2.5 text-left text-stone-200 font-semibold">Category</th>
+                      <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Units</th>
+                      <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Revenue</th>
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">COGS</th>}
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Gross Profit</th>}
+                      {hasCOGS && <th className="px-4 py-2.5 text-right text-stone-200 font-semibold">Margin %</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {filteredProducts.map((p, i) => (
-                      <tr key={p.name} className={`border-t border-slate-700/30 hover:bg-slate-700/20 ${i % 2 === 1 ? 'bg-slate-800/40' : ''}`}>
-                        <td className="px-4 py-2 text-slate-100 font-medium">{p.name}</td>
-                        <td className="px-4 py-2 text-slate-200">{p.category}</td>
-                        <td className="px-4 py-2 text-right text-slate-200 font-mono">{p.units.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right text-slate-100 font-mono font-semibold">{formatCurrency(p.revenue)}</td>
-                        {hasCOGS && <td className="px-4 py-2 text-right text-slate-200 font-mono">{p.totalCost !== null ? formatCurrency(p.totalCost) : '—'}</td>}
+                      <tr key={p.name} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+                        <td className="px-4 py-2 text-stone-100 font-medium">{p.name}</td>
+                        <td className="px-4 py-2 text-stone-200">{p.category}</td>
+                        <td className="px-4 py-2 text-right text-stone-200 font-mono">{p.units.toLocaleString()}</td>
+                        <td className="px-4 py-2 text-right text-stone-100 font-mono font-semibold">{formatCurrency(p.revenue)}</td>
+                        {hasCOGS && <td className="px-4 py-2 text-right text-stone-200 font-mono">{p.totalCost !== null ? formatCurrency(p.totalCost) : '—'}</td>}
                         {hasCOGS && <td className="px-4 py-2 text-right font-mono font-semibold">
                           {p.grossProfit !== null ? (
                             <span className={p.grossProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{formatCurrency(p.grossProfit)}</span>
-                          ) : <span className="text-slate-200">—</span>}
+                          ) : <span className="text-stone-200">—</span>}
                         </td>}
                         {hasCOGS && <td className="px-4 py-2 text-right font-mono">
                           {p.marginPct !== null
                             ? <span className={p.marginPct >= 40 ? 'text-emerald-400' : p.marginPct >= 20 ? 'text-amber-400' : 'text-red-400'}>{p.marginPct.toFixed(0)}%</span>
-                            : <span className="text-slate-200">—</span>}
+                            : <span className="text-stone-200">—</span>}
                         </td>}
                       </tr>
                     ))}
                     {filteredProducts.length === 0 && (
-                      <tr><td colSpan={hasCOGS ? 7 : 4} className="px-4 py-6 text-center text-slate-200">No products match.</td></tr>
+                      <tr><td colSpan={hasCOGS ? 7 : 4} className="px-4 py-6 text-center text-stone-200">No products match.</td></tr>
                     )}
                   </tbody>
                 </table>

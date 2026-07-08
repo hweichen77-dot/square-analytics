@@ -91,61 +91,61 @@ function BundleEditorModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 w-[500px] max-h-[85vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/50">
+      <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-[500px] max-h-[85vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <h2 className="text-base font-semibold">{bundle ? 'Edit Bundle' : 'Create Bundle'}</h2>
-          <button onClick={onClose} className="text-slate-200 hover:text-slate-200 text-xl">×</button>
+          <button onClick={onClose} className="text-stone-200 hover:text-stone-200 text-xl">×</button>
         </div>
         <div className="overflow-y-auto flex-1 p-6 space-y-4">
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1">Bundle Name</label>
-            <input className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
+            <label className="block text-xs font-medium text-stone-200 mb-1">Bundle Name</label>
+            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Snack Combo" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1">Bundle Price</label>
-            <input type="number" className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
+            <label className="block text-xs font-medium text-stone-200 mb-1">Bundle Price</label>
+            <input type="number" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={priceText} onChange={e => setPriceText(e.target.value)} placeholder="0.00" />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1">Notes (optional)</label>
-            <input className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm"
+            <label className="block text-xs font-medium text-stone-200 mb-1">Notes (optional)</label>
+            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1">
+            <label className="block text-xs font-medium text-stone-200 mb-1">
               Products (select 2–3 · {selectedProducts.size}/3)
             </label>
-            <input className="w-full border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm mb-2"
+            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm mb-2"
               placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
-            <div className="border border-slate-700 rounded-lg overflow-y-auto h-48">
+            <div className="border border-stone-700 rounded-lg overflow-y-auto h-48">
               {filtered.map(p => (
                 <button
                   key={p}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-slate-700/50"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-stone-700/50"
                   onClick={() => toggle(p)}
                   disabled={!selectedProducts.has(p) && selectedProducts.size >= 3}
                 >
-                  <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${selectedProducts.has(p) ? 'bg-teal-500 border-teal-500' : 'border-slate-600'}`}>
+                  <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${selectedProducts.has(p) ? 'bg-amber-500 border-amber-500' : 'border-stone-600'}`}>
                     {selectedProducts.has(p) && (
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#020617" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     )}
                   </span>
-                  <span className="truncate text-slate-100">{p}</span>
+                  <span className="truncate text-stone-100">{p}</span>
                 </button>
               ))}
             </div>
           </div>
         </div>
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-700/50">
-          <button onClick={onClose} className="text-sm text-slate-200 hover:text-slate-300">Cancel</button>
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-stone-700/50">
+          <button onClick={onClose} className="text-sm text-stone-200 hover:text-stone-300">Cancel</button>
           <button
             disabled={!name.trim() || selectedProducts.size < 2}
             onClick={() => {
               onSave(name, Array.from(selectedProducts), parseFloat(priceText) || 0, notes)
               onClose()
             }}
-            className="px-4 py-2 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600 disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-50"
           >
             Save Bundle
           </button>
@@ -217,7 +217,7 @@ export default function BundleView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-100">Bundle & Cross-Sell</h1>
+      <h1 className="text-xl font-bold text-stone-100">Bundle & Cross-Sell</h1>
 
       <div className="grid grid-cols-3 gap-4">
         {[
@@ -225,17 +225,17 @@ export default function BundleView() {
           { label: 'Product Pairs Found', value: pairs.length },
           { label: 'Saved Bundles', value: savedBundles.length },
         ].map(c => (
-          <div key={c.label} className="bg-slate-800/30 border border-slate-700/40 p-4">
-            <p className="text-xs text-slate-200">{c.label}</p>
-            <p className="text-xl font-bold text-slate-100 mt-1">{c.value}</p>
+          <div key={c.label} className="bg-stone-800/30 border border-stone-700/40 p-4">
+            <p className="text-xs text-stone-200">{c.label}</p>
+            <p className="text-xl font-bold text-stone-100 mt-1">{c.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-3">Product Affinity Lookup</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Product Affinity Lookup</h2>
         <select
-          className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-100 mb-4 max-w-xs"
+          className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-100 mb-4 max-w-xs"
           value={selectedProduct}
           onChange={e => setSelectedProduct(e.target.value)}
         >
@@ -244,7 +244,7 @@ export default function BundleView() {
         </select>
 
         {selectedProduct && affinityForSelected.length === 0 && (
-          <p className="text-sm text-slate-200">No co-purchase data found for "{selectedProduct}".</p>
+          <p className="text-sm text-stone-200">No co-purchase data found for "{selectedProduct}".</p>
         )}
         {affinityForSelected.length > 0 && (
           <div className="space-y-2">
@@ -252,16 +252,16 @@ export default function BundleView() {
               const partner = pair.productA === selectedProduct ? pair.productB : pair.productA
               const maxCount = affinityForSelected[0].count
               return (
-                <div key={pair.id} className="flex items-center gap-3 p-3 bg-slate-900 rounded-lg">
+                <div key={pair.id} className="flex items-center gap-3 p-3 bg-stone-900 rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-slate-100">{partner}</p>
-                    <p className="text-xs text-slate-200">
+                    <p className="font-medium text-sm text-stone-100">{partner}</p>
+                    <p className="text-xs text-stone-200">
                       Bought together {pair.count}× · Score: {pair.score.toFixed(1)}%
                     </p>
                   </div>
-                  <div className="w-20 bg-gray-200 rounded-full h-1.5">
+                  <div className="w-20 bg-stone-200 rounded-full h-1.5">
                     <div
-                      className="bg-teal-500/100 rounded-full h-1.5"
+                      className="bg-amber-500/100 rounded-full h-1.5"
                       style={{ width: `${(pair.count / maxCount) * 100}%` }}
                     />
                   </div>
@@ -272,17 +272,17 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-4">Top Co-Purchase Pairs</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-4">Top Co-Purchase Pairs</h2>
         {pairs.length === 0 ? (
-          <p className="text-sm text-slate-200">No multi-item transactions found.</p>
+          <p className="text-sm text-stone-200">No multi-item transactions found.</p>
         ) : (
           <div className="space-y-6">
             {groupedPairs.map(([category, categoryPairs]) => {
               const maxCount = categoryPairs[0]?.count ?? 1
               return (
                 <div key={category}>
-                  <p className="text-xs font-semibold text-slate-200 uppercase tracking-widest mb-3">{category}</p>
+                  <p className="text-xs font-semibold text-stone-200 uppercase tracking-widest mb-3">{category}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {categoryPairs.map((p, idx) => {
                       const isTop = idx === 0 && category === groupedPairs[0][0]
@@ -290,22 +290,22 @@ export default function BundleView() {
                       const strengthColors = {
                         Strong: 'bg-emerald-100 text-emerald-700',
                         Medium: 'bg-amber-100 text-amber-400',
-                        Weak: 'bg-slate-800 text-slate-200',
+                        Weak: 'bg-stone-800 text-stone-200',
                       }
-                      const barColor = p.score > 20 ? '#10b981' : p.score > 10 ? '#f59e0b' : '#9ca3af'
+                      const barColor = p.score > 20 ? '#10b981' : p.score > 10 ? '#f59e0b' : '#a8a29e'
                       return (
                         <div
                           key={p.id}
-                          className={`border p-4 flex flex-col gap-3 ${isTop ? 'border-teal-300/60 bg-teal-500/10' : 'border-slate-700/40 bg-slate-800/30'}`}
+                          className={`border p-4 flex flex-col gap-3 ${isTop ? 'border-amber-300/60 bg-amber-500/10' : 'border-stone-700/40 bg-stone-800/30'}`}
                         >
                           {isTop && (
-                            <p className="text-xs font-semibold text-teal-400 uppercase tracking-wide">Top Recommendation</p>
+                            <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide">Top Recommendation</p>
                           )}
                           <div className="flex items-start gap-2">
                             <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm text-slate-100 truncate">{p.productA}</p>
-                              <p className="text-xs text-slate-200 mt-0.5">+</p>
-                              <p className="font-semibold text-sm text-slate-100 truncate">{p.productB}</p>
+                              <p className="font-semibold text-sm text-stone-100 truncate">{p.productA}</p>
+                              <p className="text-xs text-stone-200 mt-0.5">+</p>
+                              <p className="font-semibold text-sm text-stone-100 truncate">{p.productB}</p>
                             </div>
                             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${strengthColors[strength]}`}>
                               {strength}
@@ -313,19 +313,19 @@ export default function BundleView() {
                           </div>
                           <div>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs text-slate-200">Bought together {p.count}×</span>
+                              <span className="text-xs text-stone-200">Bought together {p.count}×</span>
                               <span className="text-xs font-mono font-semibold" style={{ color: barColor }}>{p.score.toFixed(1)}% match</span>
                             </div>
-                            <div className="w-full bg-slate-800 rounded-full h-1.5">
+                            <div className="w-full bg-stone-800 rounded-full h-1.5">
                               <div
                                 className="rounded-full h-1.5 transition-all"
                                 style={{ width: `${Math.min(100, (p.count / maxCount) * 100)}%`, backgroundColor: barColor }}
                               />
                             </div>
                           </div>
-                          <div className="flex items-center justify-between pt-1 border-t border-slate-700/50">
-                            <span className="text-xs text-slate-200">Suggested bundle price</span>
-                            <span className="text-sm font-mono font-bold text-slate-200">{formatCurrency(p.suggestedPrice)}</span>
+                          <div className="flex items-center justify-between pt-1 border-t border-stone-700/50">
+                            <span className="text-xs text-stone-200">Suggested bundle price</span>
+                            <span className="text-sm font-mono font-bold text-stone-200">{formatCurrency(p.suggestedPrice)}</span>
                           </div>
                         </div>
                       )
@@ -338,37 +338,37 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-slate-100">Saved Bundles</h2>
+          <h2 className="text-base font-semibold text-stone-100">Saved Bundles</h2>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-3 py-1.5 text-sm bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-600"
+            className="px-3 py-1.5 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
           >
             + Create Bundle
           </button>
         </div>
         {savedBundles.length === 0 ? (
-          <p className="text-sm text-slate-200">No bundles created yet.</p>
+          <p className="text-sm text-stone-200">No bundles created yet.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {savedBundles.map(bundle => (
-              <div key={bundle.id} className="border border-slate-700/40 bg-slate-800/20 p-4">
+              <div key={bundle.id} className="border border-stone-700/40 bg-stone-800/20 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-sm text-slate-100">{bundle.name}</p>
+                  <p className="font-semibold text-sm text-stone-100">{bundle.name}</p>
                   <div className="flex gap-2">
-                    <button onClick={() => setEditingBundle(bundle)} className="text-xs text-slate-200 hover:text-teal-400">Edit</button>
+                    <button onClick={() => setEditingBundle(bundle)} className="text-xs text-stone-200 hover:text-amber-400">Edit</button>
                     <button onClick={() => deleteBundle(bundle)} className="text-xs text-red-400 hover:text-red-400">Delete</button>
                   </div>
                 </div>
                 {bundle.productNames.map(p => (
-                  <div key={p} className="text-xs text-slate-200 flex items-center gap-1">
-                    <span className="text-slate-200">–</span> {p}
+                  <div key={p} className="text-xs text-stone-200 flex items-center gap-1">
+                    <span className="text-stone-200">–</span> {p}
                   </div>
                 ))}
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-700/50">
-                  <span className="text-sm font-semibold text-slate-100">{formatCurrency(bundle.bundlePrice)}</span>
-                  <span className="text-xs text-slate-200">{format(bundle.createdDate, 'MMM d, yyyy')}</span>
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-stone-700/50">
+                  <span className="text-sm font-semibold text-stone-100">{formatCurrency(bundle.bundlePrice)}</span>
+                  <span className="text-xs text-stone-200">{format(bundle.createdDate, 'MMM d, yyyy')}</span>
                 </div>
               </div>
             ))}

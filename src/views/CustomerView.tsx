@@ -36,10 +36,10 @@ function segmentFor(count: number): CustomerSegment {
 }
 
 const SEGMENT_COLOR: Record<CustomerSegment, string> = {
-  Regulars: '#8b5cf6',
-  Frequent: '#3b82f6',
-  Occasional: '#14b8a6',
-  'One-Timers': '#9ca3af',
+  Regulars: '#f59e0b',
+  Frequent: '#d99a2b',
+  Occasional: '#f59e0b',
+  'One-Timers': '#a8a29e',
 }
 
 function buildProfiles(transactions: SalesTransaction[]): {
@@ -197,11 +197,11 @@ export default function CustomerView() {
   if (identifiedCount === 0) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-bold text-slate-100">Customer Frequency</h1>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-8 text-center">
+        <h1 className="text-xl font-bold text-stone-100">Customer Frequency</h1>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center">
           <p className="text-4xl mb-3">🙅</p>
-          <h2 className="text-lg font-semibold text-slate-100 mb-2">No Customer IDs Found</h2>
-          <p className="text-sm text-slate-200 max-w-md mx-auto">
+          <h2 className="text-lg font-semibold text-stone-100 mb-2">No Customer IDs Found</h2>
+          <p className="text-sm text-stone-200 max-w-md mx-auto">
             Customer IDs are found in Square CSV exports when customers have accounts.
             Cash and guest transactions won't have IDs.
           </p>
@@ -212,51 +212,51 @@ export default function CustomerView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-100">Customer Frequency</h1>
-      <p className="text-sm text-slate-200 -mt-4">{identifiedPct}% of transactions have customer data</p>
+      <h1 className="text-xl font-bold text-stone-100">Customer Frequency</h1>
+      <p className="text-sm text-stone-200 -mt-4">{identifiedPct}% of transactions have customer data</p>
 
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Identified Customers</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{profiles.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Identified Customers</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{profiles.length}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Repeat Customers</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Repeat Customers</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">
             {repeatCustomers} ({profiles.length ? Math.round(repeatCustomers / profiles.length * 100) : 0}%)
           </p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Avg Lifetime Value</p>
-          <p className="text-xl font-bold text-slate-100 mt-1 font-mono">{formatCurrency(avgCLV)}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Avg Lifetime Value</p>
+          <p className="text-xl font-bold text-stone-100 mt-1 font-mono">{formatCurrency(avgCLV)}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Avg Transactions</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Avg Transactions</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">
             {profiles.length ? (profiles.reduce((s, p) => s + p.transactionCount, 0) / profiles.length).toFixed(1) : '—'}
           </p>
         </div>
       </div>
 
       {pareto && (
-        <div className="border border-teal-500/20 bg-teal-500/5 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="border border-amber-500/20 bg-amber-500/5 px-5 py-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400 mb-1">Pareto Insight</p>
-            <p className="text-sm text-slate-100">
-              Top <span className="text-teal-400 font-semibold">{pareto.count}</span> customers
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400 mb-1">Pareto Insight</p>
+            <p className="text-sm text-stone-100">
+              Top <span className="text-amber-400 font-semibold">{pareto.count}</span> customers
               ({Math.round((pareto.count / pareto.total) * 100)}% of {pareto.total}) generate{' '}
-              <span className="text-teal-400 font-semibold">{pareto.pct.toFixed(0)}%</span> of all customer revenue
+              <span className="text-amber-400 font-semibold">{pareto.pct.toFixed(0)}%</span> of all customer revenue
             </p>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-2xl font-mono font-bold text-teal-400">{pareto.pct.toFixed(0)}%</p>
-            <p className="text-[10px] text-slate-200">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
+            <p className="text-2xl font-mono font-bold text-amber-400">{pareto.pct.toFixed(0)}%</p>
+            <p className="text-[10px] text-stone-200">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
           </div>
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-3">Customer Segments</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Customer Segments</h2>
         <div className="grid grid-cols-4 gap-3 mb-4">
           {segmentData.map(({ seg, count, rev }) => {
             const pct = profiles.length ? Math.round(count / profiles.length * 100) : 0
@@ -265,15 +265,15 @@ export default function CustomerView() {
               <button
                 key={seg}
                 onClick={() => setSelectedSegment(isSelected ? null : seg)}
-                className={`text-left p-3 rounded-xl border-2 transition-colors ${isSelected ? 'border-current' : 'border-slate-700/50 hover:border-slate-700'}`}
+                className={`text-left p-3 rounded-xl border-2 transition-colors ${isSelected ? 'border-current' : 'border-stone-700/50 hover:border-stone-700'}`}
                 style={{ borderColor: isSelected ? SEGMENT_COLOR[seg] : undefined, backgroundColor: isSelected ? SEGMENT_COLOR[seg] + '18' : undefined }}
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: SEGMENT_COLOR[seg] }} />
-                  <span className="text-xs text-slate-200">{seg}</span>
+                  <span className="text-xs text-stone-200">{seg}</span>
                 </div>
-                <p className="text-xl font-bold text-slate-100">{count}</p>
-                <p className="text-xs text-slate-200">{pct}% · {formatCurrency(rev)}</p>
+                <p className="text-xl font-bold text-stone-100">{count}</p>
+                <p className="text-xs text-stone-200">{pct}% · {formatCurrency(rev)}</p>
               </button>
             )
           })}
@@ -291,9 +291,9 @@ export default function CustomerView() {
       </div>
 
       {retention.length > 0 && (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-          <h2 className="text-base font-semibold text-slate-100 mb-1">Retention Curve</h2>
-          <p className="text-xs text-slate-200 mb-4">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-1">Retention Curve</h2>
+          <p className="text-xs text-stone-200 mb-4">
             Of customers who first purchased in a given month, what % returned the next month.
           </p>
           <ResponsiveContainer width="100%" height={160}>
@@ -302,25 +302,25 @@ export default function CustomerView() {
               <XAxis dataKey="month" label={{ value: 'Months After First Purchase', position: 'insideBottom', offset: -4, fontSize: 11 }} />
               <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v: number) => `${v.toFixed(1)}%`} />
-              <Line type="linear" dataKey="rate" stroke="#14B8A6" strokeWidth={2} dot={{ r: 4 }} />
+              <Line type="linear" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700/50 flex items-center gap-4 flex-wrap">
-          <h2 className="text-base font-semibold text-slate-100 flex-1">
+      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-700/50 flex items-center gap-4 flex-wrap">
+          <h2 className="text-base font-semibold text-stone-100 flex-1">
             {selectedSegment ? `${selectedSegment} (${filteredProfiles.length})` : `All Customers (${filteredProfiles.length})`}
           </h2>
           <input
-            className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm w-48"
+            className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm w-48"
             placeholder="Search name or ID..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
           <select
-            className="border border-slate-700 rounded-lg px-3 py-1.5 text-sm"
+            className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm"
             value={sort}
             onChange={e => setSort(e.target.value as CustomerSort)}
           >
@@ -332,10 +332,10 @@ export default function CustomerView() {
         </div>
         <div className="overflow-x-auto max-h-96">
           <table className="w-full text-xs">
-            <thead className="sticky top-0 bg-slate-900 border-b border-slate-700/50">
+            <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
                 {['Name', 'Segment', 'Transactions', 'Total Spent', 'Avg Tx', 'Annual LTV', 'First', 'Last', 'Days Since', 'Fav Product'].map(h => (
-                  <th key={h} className="px-4 py-2.5 font-semibold text-slate-200 text-left">{h}</th>
+                  <th key={h} className="px-4 py-2.5 font-semibold text-stone-200 text-left">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -343,12 +343,12 @@ export default function CustomerView() {
               {filteredProfiles.map(p => (
                 <tr
                   key={p.id}
-                  className="border-b border-slate-800 hover:bg-slate-700/50 cursor-pointer"
+                  className="border-b border-stone-800 hover:bg-stone-700/50 cursor-pointer"
                   onClick={() => setSelectedCustomer(selectedCustomer?.id === p.id ? null : p)}
                 >
                   <td className="px-4 py-2 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: SEGMENT_COLOR[p.segment] + '80' }} />
-                    <span className="font-medium text-slate-100 truncate max-w-32">{p.name || p.id}</span>
+                    <span className="font-medium text-stone-100 truncate max-w-32">{p.name || p.id}</span>
                   </td>
                   <td className="px-4 py-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
@@ -356,21 +356,21 @@ export default function CustomerView() {
                       {p.segment}
                     </span>
                   </td>
-                  <td className="px-4 py-2 font-mono text-slate-100">{p.transactionCount}</td>
-                  <td className="px-4 py-2 font-mono text-slate-100">{formatCurrency(p.totalSpent)}</td>
-                  <td className="px-4 py-2 font-mono text-slate-100">{formatCurrency(p.avgTransaction)}</td>
-                  <td className="px-4 py-2 font-mono text-teal-400/80">
+                  <td className="px-4 py-2 font-mono text-stone-100">{p.transactionCount}</td>
+                  <td className="px-4 py-2 font-mono text-stone-100">{formatCurrency(p.totalSpent)}</td>
+                  <td className="px-4 py-2 font-mono text-stone-100">{formatCurrency(p.avgTransaction)}</td>
+                  <td className="px-4 py-2 font-mono text-amber-400/80">
                     {(() => {
                       const months = Math.max(1, differenceInMonths(p.lastPurchase, p.firstPurchase) + 1)
                       return formatCurrency((p.totalSpent / months) * 12)
                     })()}
                   </td>
-                  <td className="px-4 py-2 font-mono text-slate-200">{format(p.firstPurchase, 'M/d/yy')}</td>
-                  <td className="px-4 py-2 font-mono text-slate-200">{format(p.lastPurchase, 'M/d/yy')}</td>
-                  <td className="px-4 py-2 font-mono" style={{ color: p.daysSinceLastVisit > 60 ? '#dc2626' : p.daysSinceLastVisit > 30 ? '#f97316' : '#374151' }}>
+                  <td className="px-4 py-2 font-mono text-stone-200">{format(p.firstPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 font-mono text-stone-200">{format(p.lastPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 font-mono" style={{ color: p.daysSinceLastVisit > 60 ? '#dc2626' : p.daysSinceLastVisit > 30 ? '#f59e0b' : '#374151' }}>
                     {p.daysSinceLastVisit}
                   </td>
-                  <td className="px-4 py-2 text-slate-200 truncate max-w-32">{p.favoriteProduct}</td>
+                  <td className="px-4 py-2 text-stone-200 truncate max-w-32">{p.favoriteProduct}</td>
                 </tr>
               ))}
             </tbody>
@@ -379,16 +379,16 @@ export default function CustomerView() {
       </div>
 
       {selectedCustomer && (
-        <div className="bg-slate-800/30 border border-slate-700/40 p-5">
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-base font-semibold text-slate-100">{selectedCustomer.name || selectedCustomer.id}</h2>
+              <h2 className="text-base font-semibold text-stone-100">{selectedCustomer.name || selectedCustomer.id}</h2>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
                 style={{ backgroundColor: SEGMENT_COLOR[selectedCustomer.segment] + '20', color: SEGMENT_COLOR[selectedCustomer.segment] }}>
                 {selectedCustomer.segment}
               </span>
             </div>
-            <button onClick={() => setSelectedCustomer(null)} className="text-slate-200 hover:text-slate-200 text-lg">×</button>
+            <button onClick={() => setSelectedCustomer(null)} className="text-stone-200 hover:text-stone-200 text-lg">×</button>
           </div>
           <div className="grid grid-cols-4 gap-4 mb-5">
             {[
@@ -398,21 +398,21 @@ export default function CustomerView() {
               { label: 'Favorite Product', value: selectedCustomer.favoriteProduct },
             ].map(c => (
               <div key={c.label}>
-                <p className="text-xs text-slate-200">{c.label}</p>
-                <p className="font-semibold text-sm text-slate-100 mt-0.5">{c.value}</p>
+                <p className="text-xs text-stone-200">{c.label}</p>
+                <p className="font-semibold text-sm text-stone-100 mt-0.5">{c.value}</p>
               </div>
             ))}
           </div>
           {selectedCustomer.monthlySpending.length > 0 && (
             <>
-              <p className="text-sm font-medium text-slate-100 mb-2">Spending Over Time</p>
+              <p className="text-sm font-medium text-stone-100 mb-2">Spending Over Time</p>
               <ResponsiveContainer width="100%" height={120}>
                 <BarChart data={selectedCustomer.monthlySpending} margin={{ top: 4, right: 8, left: 0, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                   <YAxis tickFormatter={v => `$${v}`} tick={{ fontSize: 10 }} />
                   <Tooltip formatter={(v: number) => formatCurrency(v)} />
-                  <Bar dataKey="amount" fill="#14B8A6" radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="amount" fill="#F59E0B" radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </>

@@ -102,64 +102,64 @@ export default function StaffView() {
   }
 
   const AVATAR_COLORS = [
-    'bg-teal-500/100', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500',
-    'bg-violet-500', 'bg-cyan-500', 'bg-pink-500', 'bg-teal-500',
+    'bg-amber-500/100', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500',
+    'bg-amber-500', 'bg-amber-500', 'bg-pink-500', 'bg-amber-500',
   ]
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-bold text-slate-100">Staff Performance</h1>
+      <h1 className="text-xl font-bold text-stone-100">Staff Performance</h1>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Staff Members</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{staffStats.length}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Staff Members</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{staffStats.length}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Total Revenue</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{formatCurrency(totalRevenue)}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Total Revenue</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{formatCurrency(totalRevenue)}</p>
         </div>
-        <div className="bg-slate-800/30 border border-slate-700/40 p-4">
-          <p className="text-xs text-slate-200">Total Transactions</p>
-          <p className="text-xl font-bold text-slate-100 mt-1">{formatNumber(transactions.length)}</p>
+        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <p className="text-xs text-stone-200">Total Transactions</p>
+          <p className="text-xl font-bold text-stone-100 mt-1">{formatNumber(transactions.length)}</p>
         </div>
       </div>
 
       {staffStats.length > 0 && (
-        <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-          <div className="px-5 py-4 border-b border-slate-700/50">
-            <h2 className="text-base font-semibold text-slate-100">Leaderboard</h2>
+        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+          <div className="px-5 py-4 border-b border-stone-700/50">
+            <h2 className="text-base font-semibold text-stone-100">Leaderboard</h2>
           </div>
-          <div className="divide-y divide-slate-700/30">
+          <div className="divide-y divide-stone-700/30">
             {staffStats.map((s, i) => {
               const avg = s.transactionCount > 0 ? s.totalSales / s.transactionCount : 0
               const share = totalRevenue > 0 ? (s.totalSales / totalRevenue) * 100 : 0
               return (
                 <div key={s.name} className="flex items-center gap-4 px-5 py-3">
                   <span className="w-6 text-center shrink-0">
-                    <span className="text-xs font-mono text-slate-300">{i + 1}</span>
+                    <span className="text-xs font-mono text-stone-300">{i + 1}</span>
                   </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-slate-100 truncate">{s.name}</p>
+                    <p className="text-sm font-semibold text-stone-100 truncate">{s.name}</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <div className="h-1 bg-slate-700/60 rounded-full w-24">
-                        <div className="h-1 bg-teal-500 rounded-full" style={{ width: `${share}%` }} />
+                      <div className="h-1 bg-stone-700/60 rounded-full w-24">
+                        <div className="h-1 bg-amber-500 rounded-full" style={{ width: `${share}%` }} />
                       </div>
-                      <span className="text-[10px] text-slate-300">{share.toFixed(1)}%</span>
+                      <span className="text-[10px] text-stone-300">{share.toFixed(1)}%</span>
                     </div>
                   </div>
                   <div className="hidden sm:flex items-center gap-8 shrink-0 text-right">
                     <div>
-                      <p className="text-[10px] text-slate-200">Revenue</p>
-                      <p className="text-sm font-mono font-semibold text-slate-100">{formatCurrency(s.totalSales)}</p>
+                      <p className="text-[10px] text-stone-200">Revenue</p>
+                      <p className="text-sm font-mono font-semibold text-stone-100">{formatCurrency(s.totalSales)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-200">Transactions</p>
-                      <p className="text-sm font-mono text-slate-100">{formatNumber(s.transactionCount)}</p>
+                      <p className="text-[10px] text-stone-200">Transactions</p>
+                      <p className="text-sm font-mono text-stone-100">{formatNumber(s.transactionCount)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-200">Avg Sale</p>
-                      <p className="text-sm font-mono text-slate-200">{formatCurrency(avg)}</p>
+                      <p className="text-[10px] text-stone-200">Avg Sale</p>
+                      <p className="text-sm font-mono text-stone-200">{formatCurrency(avg)}</p>
                     </div>
                   </div>
                 </div>
@@ -169,11 +169,11 @@ export default function StaffView() {
         </div>
       )}
 
-      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700/50 flex items-center justify-between">
+      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-semibold text-slate-100">Staff ROI</h2>
-            <p className="text-xs text-slate-200 mt-0.5">
+            <h2 className="text-base font-semibold text-stone-100">Staff ROI</h2>
+            <p className="text-xs text-stone-200 mt-0.5">
               {hasAnyRealHours
                 ? 'Hours from Square shift data where available; estimated from transactions otherwise. Enter wage to see net ROI.'
                 : 'Hours estimated from first → last transaction per shift. Enter wage to see net ROI.'}
@@ -183,28 +183,28 @@ export default function StaffView() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-700/50 text-left">
-                <th className="px-5 py-3 text-xs font-semibold text-slate-200">Staff</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Revenue</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Hours</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Rev/hr</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-center">Wage/hr</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Wage Cost</th>
-                <th className="px-4 py-3 text-xs font-semibold text-slate-200 text-right">Net ROI</th>
+              <tr className="border-b border-stone-700/50 text-left">
+                <th className="px-5 py-3 text-xs font-semibold text-stone-200">Staff</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Revenue</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Hours</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Rev/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-center">Wage/hr</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Wage Cost</th>
+                <th className="px-4 py-3 text-xs font-semibold text-stone-200 text-right">Net ROI</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700/30">
+            <tbody className="divide-y divide-stone-700/30">
               {roiData.map(s => {
                 const isEditing = editingWage === s.name
                 return (
-                  <tr key={s.name} className="hover:bg-slate-700/20">
-                    <td className="px-5 py-3 font-medium text-slate-200">{s.name}</td>
-                    <td className="px-4 py-3 font-mono text-slate-100 text-right">{formatCurrency(s.totalSales)}</td>
-                    <td className="px-4 py-3 font-mono text-slate-200 text-right">
+                  <tr key={s.name} className="hover:bg-stone-700/20">
+                    <td className="px-5 py-3 font-medium text-stone-200">{s.name}</td>
+                    <td className="px-4 py-3 font-mono text-stone-100 text-right">{formatCurrency(s.totalSales)}</td>
+                    <td className="px-4 py-3 font-mono text-stone-200 text-right">
                       {s.hours.toFixed(1)}h
-                      {s.estimatedHours && <span className="ml-1 text-[10px] text-slate-400 font-sans">est.</span>}
+                      {s.estimatedHours && <span className="ml-1 text-[10px] text-stone-400 font-sans">est.</span>}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-100 text-right">
+                    <td className="px-4 py-3 font-mono text-stone-100 text-right">
                       {s.revenuePerHour != null ? formatCurrency(s.revenuePerHour) : '—'}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -223,24 +223,24 @@ export default function StaffView() {
                             type="number"
                             value={wageInput}
                             onChange={e => setWageInput(e.target.value)}
-                            className="w-16 bg-slate-900 border border-teal-500/50 px-2 py-0.5 text-xs text-slate-200 font-mono text-right focus:outline-none focus-visible:border-teal-400"
+                            className="w-16 bg-stone-900 border border-amber-500/50 px-2 py-0.5 text-xs text-stone-200 font-mono text-right focus:outline-none focus-visible:border-amber-400"
                             placeholder="0.00"
                           />
-                          <button type="submit" className="text-xs text-teal-400 hover:text-teal-300 px-1">✓</button>
-                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-slate-200 hover:text-slate-300">✕</button>
+                          <button type="submit" className="text-xs text-amber-400 hover:text-amber-300 px-1">✓</button>
+                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-stone-200 hover:text-stone-300">✕</button>
                         </form>
                       ) : (
                         <button
                           onClick={() => { setEditingWage(s.name); setWageInput(s.wage?.toString() ?? '') }}
-                          className={`font-mono text-xs px-2 py-0.5 border border-transparent hover:border-slate-600 hover:bg-slate-700/40 rounded ${
-                            s.wage != null ? 'text-slate-100' : 'text-slate-200 hover:text-slate-200'
+                          className={`font-mono text-xs px-2 py-0.5 border border-transparent hover:border-stone-600 hover:bg-stone-700/40 rounded ${
+                            s.wage != null ? 'text-stone-100' : 'text-stone-200 hover:text-stone-200'
                           }`}
                         >
                           {s.wage != null ? `$${s.wage.toFixed(2)}` : '+ Add'}
                         </button>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-mono text-slate-200 text-right">
+                    <td className="px-4 py-3 font-mono text-stone-200 text-right">
                       {s.wageCost != null ? formatCurrency(s.wageCost) : '—'}
                     </td>
                     <td className="px-4 py-3 font-mono font-semibold text-right">
@@ -249,7 +249,7 @@ export default function StaffView() {
                           {formatCurrency(s.netROI)}
                         </span>
                       ) : (
-                        <span className="text-slate-200 text-xs">enter wage</span>
+                        <span className="text-stone-200 text-xs">enter wage</span>
                       )}
                     </td>
                   </tr>
@@ -260,8 +260,8 @@ export default function StaffView() {
         </div>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 p-5">
-        <h2 className="text-base font-semibold text-slate-100 mb-4">Revenue by Staff Member</h2>
+      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue by Staff Member</h2>
         <ResponsiveContainer width="100%" height={Math.max(200, staffStats.length * 40)}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 60, left: 16, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
@@ -274,19 +274,19 @@ export default function StaffView() {
             <Tooltip formatter={(v: number) => formatCurrency(v)} />
             <Bar dataKey="totalSales" radius={[0, 3, 3, 0]} label={{ position: 'right', formatter: (v: number) => `$${Math.round(v)}`, fontSize: 10, fill: '#64748B' }}>
               {chartData.map((_, i) => (
-                <Cell key={i} fill="#14B8A6" />
+                <Cell key={i} fill="#F59E0B" />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-700/50">
-          <h2 className="text-base font-semibold text-slate-100">Staff Breakdown</h2>
-          <p className="text-xs text-slate-200 mt-0.5">Click a row to see individual transactions</p>
+      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-700/50">
+          <h2 className="text-base font-semibold text-stone-100">Staff Breakdown</h2>
+          <p className="text-xs text-stone-200 mt-0.5">Click a row to see individual transactions</p>
         </div>
-        <div className="divide-y divide-slate-700/40">
+        <div className="divide-y divide-stone-700/40">
           {staffStats.map((staff, idx) => {
             const avg = staff.transactionCount > 0 ? staff.totalSales / staff.transactionCount : 0
             const share = totalRevenue > 0 ? (staff.totalSales / totalRevenue) * 100 : 0
@@ -297,7 +297,7 @@ export default function StaffView() {
             return (
               <div key={staff.name}>
                 <button
-                  className="w-full flex items-center gap-4 px-5 py-4 hover:bg-slate-700/50 transition-colors text-left"
+                  className="w-full flex items-center gap-4 px-5 py-4 hover:bg-stone-700/50 transition-colors text-left"
                   onClick={() => setExpandedStaff(isExpanded ? null : staff.name)}
                 >
                   <div className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
@@ -306,76 +306,76 @@ export default function StaffView() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-slate-100 text-sm">{staff.name}</p>
+                      <p className="font-semibold text-stone-100 text-sm">{staff.name}</p>
                       {staff.name === 'Unknown' && (
-                        <span className="text-xs px-1.5 py-0.5 bg-slate-800 text-slate-200 rounded-full">no name in CSV</span>
+                        <span className="text-xs px-1.5 py-0.5 bg-stone-800 text-stone-200 rounded-full">no name in CSV</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <div className="flex-1 h-1.5 bg-slate-800 rounded-full max-w-32">
+                      <div className="flex-1 h-1.5 bg-stone-800 rounded-full max-w-32">
                         <div
                           className={`h-1.5 rounded-full ${avatarColor}`}
                           style={{ width: `${share}%`, opacity: 0.7 }}
                         />
                       </div>
-                      <span className="text-xs text-slate-200">{share.toFixed(1)}% of revenue</span>
+                      <span className="text-xs text-stone-200">{share.toFixed(1)}% of revenue</span>
                     </div>
                   </div>
 
                   <div className="hidden sm:flex items-center gap-8 shrink-0">
                     <div className="text-right">
-                      <p className="text-xs text-slate-200">Transactions</p>
-                      <p className="font-mono font-semibold text-sm text-slate-100">{formatNumber(staff.transactionCount)}</p>
+                      <p className="text-xs text-stone-200">Transactions</p>
+                      <p className="font-mono font-semibold text-sm text-stone-100">{formatNumber(staff.transactionCount)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-200">Total Sales</p>
-                      <p className="font-mono font-semibold text-sm text-slate-100">{formatCurrency(staff.totalSales)}</p>
+                      <p className="text-xs text-stone-200">Total Sales</p>
+                      <p className="font-mono font-semibold text-sm text-stone-100">{formatCurrency(staff.totalSales)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-200">Avg Sale</p>
-                      <p className="font-mono text-sm text-slate-100">{formatCurrency(avg)}</p>
+                      <p className="text-xs text-stone-200">Avg Sale</p>
+                      <p className="font-mono text-sm text-stone-100">{formatCurrency(avg)}</p>
                     </div>
                   </div>
 
-                  <span className="text-slate-200 text-sm shrink-0">{isExpanded ? '▲' : '▼'}</span>
+                  <span className="text-stone-200 text-sm shrink-0">{isExpanded ? '▲' : '▼'}</span>
                 </button>
 
                 {isExpanded && (
-                  <div className="border-t border-slate-700/50 bg-slate-900">
+                  <div className="border-t border-stone-700/50 bg-stone-900">
                     <div className="px-5 py-3">
-                      <p className="text-xs font-semibold text-slate-200 uppercase tracking-wide mb-2">
+                      <p className="text-xs font-semibold text-stone-200 uppercase tracking-wide mb-2">
                         Recent Transactions — {staff.name}
                       </p>
                       {staffTxs.length === 0 ? (
-                        <p className="text-xs text-slate-200">No transactions found.</p>
+                        <p className="text-xs text-stone-200">No transactions found.</p>
                       ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs">
                             <thead>
-                              <tr className="border-b border-slate-700 text-left">
-                                <th className="pb-2 font-semibold text-slate-200">Date</th>
-                                <th className="pb-2 font-semibold text-slate-200">Staff</th>
-                                <th className="pb-2 font-semibold text-slate-200">Items</th>
-                                <th className="pb-2 font-semibold text-slate-200 text-right">Amount</th>
-                                <th className="pb-2 font-semibold text-slate-200">Payment</th>
+                              <tr className="border-b border-stone-700 text-left">
+                                <th className="pb-2 font-semibold text-stone-200">Date</th>
+                                <th className="pb-2 font-semibold text-stone-200">Staff</th>
+                                <th className="pb-2 font-semibold text-stone-200">Items</th>
+                                <th className="pb-2 font-semibold text-stone-200 text-right">Amount</th>
+                                <th className="pb-2 font-semibold text-stone-200">Payment</th>
                               </tr>
                             </thead>
                             <tbody>
                               {staffTxs.slice(0, 20).map(tx => (
-                                <tr key={tx.transactionID} className="border-b border-slate-700/50 hover:bg-slate-800">
-                                  <td className="py-1.5 font-mono text-slate-200">{format(tx.date, 'MMM d, yyyy h:mm a')}</td>
+                                <tr key={tx.transactionID} className="border-b border-stone-700/50 hover:bg-stone-800">
+                                  <td className="py-1.5 font-mono text-stone-200">{format(tx.date, 'MMM d, yyyy h:mm a')}</td>
                                   <td className="py-1.5">
-                                    <span className="font-semibold text-slate-200">{tx.staffName.trim() || 'Unknown'}</span>
+                                    <span className="font-semibold text-stone-200">{tx.staffName.trim() || 'Unknown'}</span>
                                   </td>
-                                  <td className="py-1.5 text-slate-200 max-w-56 truncate">{tx.itemDescription || '—'}</td>
-                                  <td className="py-1.5 font-mono font-semibold text-slate-100 text-right">{formatCurrency(tx.netSales)}</td>
-                                  <td className="py-1.5 text-slate-200">{tx.paymentMethod || '—'}</td>
+                                  <td className="py-1.5 text-stone-200 max-w-56 truncate">{tx.itemDescription || '—'}</td>
+                                  <td className="py-1.5 font-mono font-semibold text-stone-100 text-right">{formatCurrency(tx.netSales)}</td>
+                                  <td className="py-1.5 text-stone-200">{tx.paymentMethod || '—'}</td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
                           {staffTxs.length > 20 && (
-                            <p className="text-xs text-slate-200 mt-2">Showing 20 of {staffTxs.length} transactions.</p>
+                            <p className="text-xs text-stone-200 mt-2">Showing 20 of {staffTxs.length} transactions.</p>
                           )}
                         </div>
                       )}

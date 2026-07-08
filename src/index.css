@@ -2,29 +2,31 @@
 @import "tailwindcss";
 
 @theme {
-  --color-slate-950: oklch(0.09 0.007 55);
-  --color-slate-900: oklch(0.12 0.008 55);
-  --color-slate-800: oklch(0.17 0.007 55);
-  --color-slate-700: oklch(0.23 0.006 55);
-  --color-slate-600: oklch(0.35 0.007 55);
-  --color-slate-500: oklch(0.47 0.008 65);
-  --color-slate-400: oklch(0.61 0.009 65);
-  --color-slate-300: oklch(0.74 0.007 65);
-  --color-slate-200: oklch(0.87 0.005 65);
-  --color-slate-100: oklch(0.93 0.004 65);
-  --color-slate-50:  oklch(0.97 0.003 65);
+  --color-stone-950: oklch(0.09 0.007 55);
+  --color-stone-900: oklch(0.12 0.008 55);
+  --color-stone-800: oklch(0.17 0.007 55);
+  --color-stone-700: oklch(0.23 0.006 55);
+  --color-stone-600: oklch(0.35 0.007 55);
+  --color-stone-500: oklch(0.47 0.008 65);
+  --color-stone-400: oklch(0.61 0.009 65);
+  --color-stone-300: oklch(0.74 0.007 65);
+  --color-stone-200: oklch(0.87 0.005 65);
+  --color-stone-100: oklch(0.93 0.004 65);
+  --color-stone-50:  oklch(0.97 0.003 65);
 
-  --color-teal-950: oklch(0.14 0.04 252);
-  --color-teal-900: oklch(0.20 0.07 252);
-  --color-teal-800: oklch(0.28 0.10 252);
-  --color-teal-700: oklch(0.40 0.14 252);
-  --color-teal-600: oklch(0.54 0.18 252);
-  --color-teal-500: oklch(0.65 0.22 252);
-  --color-teal-400: oklch(0.73 0.22 252);
-  --color-teal-300: oklch(0.82 0.16 252);
-  --color-teal-200: oklch(0.89 0.10 252);
-  --color-teal-100: oklch(0.94 0.05 252);
-  --color-teal-50:  oklch(0.97 0.02 252);
+  /* Brass-amber accent (warm gold hue ~78) — the single decorative accent.
+     Chroma tapers toward the light end so highlights don't turn garish. */
+  --color-amber-950: oklch(0.20 0.030 72);
+  --color-amber-900: oklch(0.28 0.050 74);
+  --color-amber-800: oklch(0.38 0.075 75);
+  --color-amber-700: oklch(0.50 0.100 76);
+  --color-amber-600: oklch(0.62 0.125 77);
+  --color-amber-500: oklch(0.72 0.140 78);
+  --color-amber-400: oklch(0.80 0.130 80);
+  --color-amber-300: oklch(0.86 0.100 82);
+  --color-amber-200: oklch(0.91 0.070 84);
+  --color-amber-100: oklch(0.95 0.040 85);
+  --color-amber-50:  oklch(0.97 0.020 85);
 
   --font-sans:    'Geist', system-ui, sans-serif;
   --font-mono:    'Geist Mono', ui-monospace, 'Cascadia Code', monospace;

@@ -10,7 +10,7 @@ import { useToastStore } from '../store/toastStore'
 const SEV: Record<AuditSeverity, { dot: string; badge: string; border: string }> = {
   error:   { dot: 'bg-red-400',   badge: 'bg-red-500/15 text-red-400 border-red-500/30',     border: 'border-red-500/20' },
   warning: { dot: 'bg-amber-400', badge: 'bg-amber-500/15 text-amber-400 border-amber-500/30', border: 'border-amber-500/20' },
-  info:    { dot: 'bg-blue-400',  badge: 'bg-blue-500/15 text-blue-400 border-blue-500/30',   border: 'border-blue-500/20' },
+  info:    { dot: 'bg-amber-400',  badge: 'bg-amber-500/15 text-amber-400 border-amber-500/30',   border: 'border-amber-500/20' },
 }
 
 async function applyFix(issue: AuditIssue): Promise<void> {
@@ -135,15 +135,15 @@ export default function CatalogueCheckerView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Catalogue Checker</h1>
-          <p className="text-sm text-slate-200 mt-0.5">
+          <h1 className="text-xl font-bold text-stone-100">Catalogue Checker</h1>
+          <p className="text-sm text-stone-200 mt-0.5">
             Audits {catalogue.length} variations across your catalogue for errors and data quality issues.
           </p>
         </div>
         {autoFixable.length > 0 && (
           <button
             onClick={fixAll} disabled={fixing}
-            className="shrink-0 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
+            className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
           >
             {fixing ? 'Fixing…' : `Fix All Auto-Fixable (${autoFixable.length})`}
           </button>
@@ -154,27 +154,27 @@ export default function CatalogueCheckerView() {
         {[
           { sev: 'error'   as Filter, label: 'Errors',   count: errorCount,   color: 'text-red-400',   bg: 'bg-red-500/10 border-red-500/25' },
           { sev: 'warning' as Filter, label: 'Warnings', count: warningCount, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/25' },
-          { sev: 'info'    as Filter, label: 'Info',     count: infoCount,    color: 'text-blue-400',  bg: 'bg-blue-500/10 border-blue-500/25' },
-          { sev: 'all'     as Filter, label: 'Total',    count: issues.length, color: 'text-slate-100', bg: 'bg-slate-700/50 border-slate-600/30' },
+          { sev: 'info'    as Filter, label: 'Info',     count: infoCount,    color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/25' },
+          { sev: 'all'     as Filter, label: 'Total',    count: issues.length, color: 'text-stone-100', bg: 'bg-stone-700/50 border-stone-600/30' },
         ].map(({ sev, label, count, color, bg }) => (
           <button
             key={sev}
             onClick={() => handleFilterClick(sev)}
-            className={`rounded-xl border p-4 text-left transition-all cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-teal-500/50' : 'hover:brightness-110'}`}
+            className={`rounded-xl border p-4 text-left transition-all cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
           >
             <p className={`text-3xl font-bold tabular-nums ${color}`}>{count}</p>
-            <p className="text-xs text-slate-200 mt-1 font-medium">{label}</p>
+            <p className="text-xs text-stone-200 mt-1 font-medium">{label}</p>
           </button>
         ))}
       </div>
 
-      <div className="bg-slate-800/60 border border-slate-700 rounded-xl px-4 py-3 text-sm text-slate-200 flex items-center gap-2">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+      <div className="bg-stone-800/60 border border-stone-700 rounded-xl px-4 py-3 text-sm text-stone-200 flex items-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" className="shrink-0">
           <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
         </svg>
         <span>
-          <span className="text-slate-200 font-medium">Tax rules: </span>
-          <span className="text-teal-400">Merch items must be taxable.</span> Food and beverage items (ramen, drinks, snacks) are non-taxable. Items with incorrect tax status will be flagged.
+          <span className="text-stone-200 font-medium">Tax rules: </span>
+          <span className="text-amber-400">Merch items must be taxable.</span> Food and beverage items (ramen, drinks, snacks) are non-taxable. Items with incorrect tax status will be flagged.
         </span>
       </div>
 
@@ -185,8 +185,8 @@ export default function CatalogueCheckerView() {
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
-          <p className="font-semibold text-slate-200 text-lg">Catalogue looks clean!</p>
-          <p className="text-sm text-slate-200 mt-1">No errors, warnings, or issues found.</p>
+          <p className="font-semibold text-stone-200 text-lg">Catalogue looks clean!</p>
+          <p className="text-sm text-stone-200 mt-1">No errors, warnings, or issues found.</p>
         </div>
       )}
 
@@ -194,8 +194,8 @@ export default function CatalogueCheckerView() {
         <div className="space-y-2">
           {filter !== 'all' && (
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-slate-200">Showing {filter}s only · {visibleIssues.length} issues across {itemGroups.length} items</p>
-              <button onClick={() => setFilter('all')} className="text-xs text-teal-400 hover:underline cursor-pointer">Show all</button>
+              <p className="text-xs text-stone-200">Showing {filter}s only · {visibleIssues.length} issues across {itemGroups.length} items</p>
+              <button onClick={() => setFilter('all')} className="text-xs text-amber-400 hover:underline cursor-pointer">Show all</button>
             </div>
           )}
 
@@ -204,13 +204,13 @@ export default function CatalogueCheckerView() {
             const worstSev: AuditSeverity = group.errorCount > 0 ? 'error' : group.warningCount > 0 ? 'warning' : 'info'
 
             return (
-              <div key={group.itemName} className={`bg-slate-800/30 border overflow-hidden ${SEV[worstSev].border}`}>
+              <div key={group.itemName} className={`bg-stone-800/30 border overflow-hidden ${SEV[worstSev].border}`}>
                 <button
                   onClick={() => toggleItem(group.itemName)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-700/40 transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-stone-700/40 transition-colors cursor-pointer"
                 >
                   <Chevron open={isOpen} />
-                  <span className="font-semibold text-slate-100 flex-1">{group.itemName}</span>
+                  <span className="font-semibold text-stone-100 flex-1">{group.itemName}</span>
 
                   <div className="flex items-center gap-1.5">
                     {group.errorCount > 0 && (
@@ -232,12 +232,12 @@ export default function CatalogueCheckerView() {
                 </button>
 
                 {isOpen && (
-                  <div className="border-t border-slate-700/40 divide-y divide-slate-700/30">
+                  <div className="border-t border-stone-700/40 divide-y divide-stone-700/30">
                     {group.issues.map(issue => {
                       const canFix = !!(issue.fixType && issue.productId)
                       const s = SEV[issue.severity]
                       return (
-                        <div key={issue.id} className="flex items-start gap-3 px-4 py-3 hover:bg-slate-700/20 transition-colors">
+                        <div key={issue.id} className="flex items-start gap-3 px-4 py-3 hover:bg-stone-700/20 transition-colors">
                           <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${s.dot}`} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
@@ -245,23 +245,23 @@ export default function CatalogueCheckerView() {
                                 {issue.issue}
                               </span>
                               {/\(.+\)$/.test(issue.productName) && (
-                                <span className="text-[11px] text-slate-200">
+                                <span className="text-[11px] text-stone-200">
                                   {splitItemVariation(issue.productName).variationName} variation
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-slate-200 mt-1 leading-relaxed">{issue.detail}</p>
+                            <p className="text-xs text-stone-200 mt-1 leading-relaxed">{issue.detail}</p>
                           </div>
                           <div className="shrink-0 pt-0.5">
                             {canFix ? (
                               <button
                                 onClick={() => fixOne(issue)}
-                                className="text-xs px-2.5 py-1 rounded-md bg-teal-600/20 text-teal-400 hover:bg-teal-600/40 border border-teal-500/30 transition-colors whitespace-nowrap cursor-pointer"
+                                className="text-xs px-2.5 py-1 rounded-md bg-amber-600/20 text-amber-400 hover:bg-amber-600/40 border border-amber-500/30 transition-colors whitespace-nowrap cursor-pointer"
                               >
                                 Auto-fix
                               </button>
                             ) : (
-                              <span className="text-[10px] text-slate-200 px-2">Manual</span>
+                              <span className="text-[10px] text-stone-200 px-2">Manual</span>
                             )}
                           </div>
                         </div>
@@ -276,9 +276,9 @@ export default function CatalogueCheckerView() {
       )}
 
       {visibleIssues.length === 0 && issues.length > 0 && (
-        <div className="text-center py-10 text-slate-200 text-sm">
+        <div className="text-center py-10 text-stone-200 text-sm">
           No {filter}s found.{' '}
-          <button onClick={() => setFilter('all')} className="text-teal-400 hover:underline cursor-pointer">Show all issues</button>
+          <button onClick={() => setFilter('all')} className="text-amber-400 hover:underline cursor-pointer">Show all issues</button>
         </div>
       )}
     </div>

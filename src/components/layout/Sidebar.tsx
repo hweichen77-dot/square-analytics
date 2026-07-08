@@ -116,8 +116,8 @@ function NavItemFull({ item, badge, onClose }: { item: NavItem; badge?: number; 
       className={({ isActive }) =>
         `flex items-center gap-2.5 px-3 py-1.5 mx-2 rounded-sm text-[13px] font-medium transition-all duration-150 cursor-pointer ${
           isActive
-            ? 'bg-teal-500/12 text-teal-400'
-            : 'text-slate-200 hover:text-slate-200 hover:bg-slate-800/60'
+            ? 'bg-amber-500/12 text-amber-400'
+            : 'text-stone-200 hover:text-stone-200 hover:bg-stone-800/60'
         }`
       }
     >
@@ -138,22 +138,22 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
 
   return (
     <aside className={[
-      'w-52 shrink-0 bg-slate-900 border-r border-slate-800 flex flex-col h-full',
+      'w-52 shrink-0 bg-stone-900 border-r border-stone-800 flex flex-col h-full',
       'fixed inset-y-0 left-0 z-50 transition-transform duration-200',
       'lg:static lg:translate-x-0',
       open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
     ].join(' ')}>
-      <div className="px-4 pt-5 pb-4 border-b border-slate-800 flex items-start justify-between">
+      <div className="px-4 pt-5 pb-4 border-b border-stone-800 flex items-start justify-between">
         <div>
-          <h1 className="font-display text-[14px] font-700 text-slate-100 leading-tight tracking-tight">
+          <h1 className="font-display text-[14px] font-700 text-stone-100 leading-tight tracking-tight">
             Walley's Analytics
           </h1>
-          <p className="text-[10px] font-medium tracking-[0.08em] uppercase text-slate-100 mt-1.5">
+          <p className="text-[10px] font-medium tracking-[0.08em] uppercase text-stone-100 mt-1.5">
             {txCount.toLocaleString()} transactions
           </p>
         </div>
         {onClose && (
-          <button onClick={onClose} className="lg:hidden p-1 text-slate-200 hover:text-slate-300 -mt-0.5 -mr-1" aria-label="Close menu">
+          <button onClick={onClose} className="lg:hidden p-1 text-stone-200 hover:text-stone-300 -mt-0.5 -mr-1" aria-label="Close menu">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -165,7 +165,7 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
         {NAV_SECTIONS.map((section, si) => (
           <div key={si} role={section.heading ? 'group' : undefined} aria-label={section.heading} className={si > 0 ? 'mt-1' : ''}>
             {section.heading && (
-              <p aria-hidden="true" className="px-5 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-100 select-none">
+              <p aria-hidden="true" className="px-5 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-100 select-none">
                 {section.heading}
               </p>
             )}
@@ -181,7 +181,7 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
         ))}
       </nav>
 
-      <div className="border-t border-slate-800 py-2 space-y-0.5">
+      <div className="border-t border-stone-800 py-2 space-y-0.5">
         {BOTTOM_ITEMS.map(item => (
           <NavItemFull key={item.path} item={item} onClose={onClose} />
         ))}

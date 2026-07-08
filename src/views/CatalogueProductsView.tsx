@@ -156,18 +156,18 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+      <div className="bg-stone-800 border border-stone-700 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
           <div>
-            <h2 className="font-semibold text-slate-100 text-base">{title}</h2>
+            <h2 className="font-semibold text-stone-100 text-base">{title}</h2>
             {!editing && !isAddVariation && (
-              <p className="text-xs text-slate-200 mt-0.5">Creates the item with its first variation</p>
+              <p className="text-xs text-stone-200 mt-0.5">Creates the item with its first variation</p>
             )}
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-slate-200 hover:text-slate-200 transition-colors cursor-pointer p-1 rounded-md hover:bg-slate-700"
+            className="text-stone-200 hover:text-stone-200 transition-colors cursor-pointer p-1 rounded-md hover:bg-stone-700"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -177,7 +177,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
         <div className="px-6 py-5 space-y-4 max-h-[72vh] overflow-y-auto">
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">
               Item Name <span className="text-red-400">*</span>
             </label>
             <input
@@ -186,60 +186,60 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               onChange={field('itemName')}
               disabled={isAddVariation}
               placeholder="e.g. Ramune Soda"
-              className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             {errors.itemName && <p className="text-xs text-red-400 mt-1">{errors.itemName}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">Variation Name</label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">Variation Name</label>
             <input
               type="text"
               value={form.variationName}
               onChange={field('variationName')}
               placeholder="e.g. Strawberry, Large, 12oz… (blank = Regular)"
-              className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-slate-200 mb-1.5">Price ($)</label>
+              <label className="block text-xs font-medium text-stone-200 mb-1.5">Price ($)</label>
               <input
                 type="number" min="0" step="0.01"
                 value={form.price} onChange={field('price')}
                 placeholder="e.g. 3.50"
-                className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-200 mb-1.5">Stock Qty</label>
+              <label className="block text-xs font-medium text-stone-200 mb-1.5">Stock Qty</label>
               <input
                 type="number" min="0" step="1"
                 value={form.quantity} onChange={field('quantity')}
                 placeholder="e.g. 24"
-                className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.quantity && <p className="text-xs text-red-400 mt-1">{errors.quantity}</p>}
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">SKU</label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">SKU</label>
             <input
               type="text"
               value={form.sku} onChange={field('sku')}
               placeholder="e.g. RAM-STRAW-001"
-              className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-200 mb-1.5">Category</label>
+            <label className="block text-xs font-medium text-stone-200 mb-1.5">Category</label>
             <select
               value={form.category} onChange={field('category')}
-              className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/40 cursor-pointer"
+              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
             >
               <option value="">Select a category…</option>
               {KNOWN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -248,12 +248,12 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           </div>
           {form.category === '__custom__' && (
             <div>
-              <label className="block text-xs font-medium text-slate-200 mb-1.5">Custom Category</label>
+              <label className="block text-xs font-medium text-stone-200 mb-1.5">Custom Category</label>
               <input
                 type="text"
                 value={form.customCategory} onChange={field('customCategory')}
                 placeholder="Enter category name"
-                className="w-full bg-slate-700/60 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
+                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.customCategory && <p className="text-xs text-red-400 mt-1">{errors.customCategory}</p>}
             </div>
@@ -261,28 +261,28 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
           <div className="flex gap-6 pt-1">
             <label className="flex items-center gap-2.5 cursor-pointer select-none">
-              <input type="checkbox" checked={form.taxable} onChange={field('taxable')} className="w-4 h-4 rounded accent-teal-500" />
-              <span className="text-sm text-slate-100">Taxable</span>
+              <input type="checkbox" checked={form.taxable} onChange={field('taxable')} className="w-4 h-4 rounded accent-amber-500" />
+              <span className="text-sm text-stone-100">Taxable</span>
             </label>
             <label className="flex items-center gap-2.5 cursor-pointer select-none">
-              <input type="checkbox" checked={form.enabled} onChange={field('enabled')} className="w-4 h-4 rounded accent-teal-500" />
-              <span className="text-sm text-slate-100">Active</span>
+              <input type="checkbox" checked={form.enabled} onChange={field('enabled')} className="w-4 h-4 rounded accent-amber-500" />
+              <span className="text-sm text-stone-100">Active</span>
             </label>
           </div>
 
-          <div className="text-xs text-slate-200 bg-slate-700/30 rounded-lg px-3 py-2 border border-slate-700/60">
-            Tax rule: only <span className="text-teal-400">ramen</span> and <span className="text-teal-400">carbonated drinks</span> are taxable.
+          <div className="text-xs text-stone-200 bg-stone-700/30 rounded-lg px-3 py-2 border border-stone-700/60">
+            Tax rule: only <span className="text-amber-400">ramen</span> and <span className="text-amber-400">carbonated drinks</span> are taxable.
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-700 flex justify-end gap-3">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-slate-200 hover:text-slate-200 transition-colors cursor-pointer">
+        <div className="px-6 py-4 border-t border-stone-700 flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-stone-200 hover:text-stone-200 transition-colors cursor-pointer">
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
+            className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
           >
             {saving ? 'Saving…' : editing ? 'Save Changes' : isAddVariation ? 'Add Variation' : 'Add Item'}
           </button>
@@ -293,9 +293,9 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 }
 
 function PriceDisplay({ range }: { range: { min: number; max: number } | null }) {
-  if (!range) return <span className="text-slate-200">—</span>
-  if (range.min === range.max) return <span className="text-slate-100">{formatCurrency(range.min)}</span>
-  return <span className="text-slate-100">{formatCurrency(range.min)} – {formatCurrency(range.max)}</span>
+  if (!range) return <span className="text-stone-200">—</span>
+  if (range.min === range.max) return <span className="text-stone-100">{formatCurrency(range.min)}</span>
+  return <span className="text-stone-100">{formatCurrency(range.min)} – {formatCurrency(range.max)}</span>
 }
 
 function Chevron({ open }: { open: boolean }) {
@@ -424,7 +424,7 @@ export default function CatalogueProductsView() {
     return (
       <>
         <div className="flex justify-end mb-4">
-          <button onClick={openAdd} className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer">
+          <button onClick={openAdd} className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
             New Item
           </button>
@@ -439,13 +439,13 @@ export default function CatalogueProductsView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-100">Catalogue Products</h1>
-          <p className="text-sm text-slate-200 mt-0.5">{totalItems} items · {totalVars} total variations</p>
+          <h1 className="text-xl font-bold text-stone-100">Catalogue Products</h1>
+          <p className="text-sm text-stone-200 mt-0.5">{totalItems} items · {totalVars} total variations</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleExport} disabled={exporting}
-            className="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 border border-slate-600 disabled:opacity-50 text-slate-200 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-stone-700 hover:bg-stone-600 border border-stone-600 disabled:opacity-50 text-stone-200 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -454,7 +454,7 @@ export default function CatalogueProductsView() {
           </button>
           <button
             onClick={openAdd}
-            className="px-3 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
             New Item
@@ -464,15 +464,15 @@ export default function CatalogueProductsView() {
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: 'Items',           value: totalItems,    color: 'text-teal-400' },
-          { label: 'Multi-variation', value: multiVarItems, color: 'text-blue-400' },
+          { label: 'Items',           value: totalItems,    color: 'text-amber-400' },
+          { label: 'Multi-variation', value: multiVarItems, color: 'text-amber-400' },
           { label: 'Active vars',     value: activeVars,    color: 'text-emerald-400' },
-          { label: 'Archived',        value: archivedVars,  color: 'text-slate-200' },
+          { label: 'Archived',        value: archivedVars,  color: 'text-stone-200' },
           { label: 'Total stock',     value: totalStock,    color: 'text-amber-400' },
         ].map(s => (
-          <div key={s.label} className="bg-slate-800/30 border border-slate-700/40 px-4 py-3">
+          <div key={s.label} className="bg-stone-800/30 border border-stone-700/40 px-4 py-3">
             <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
-            <p className="text-xs text-slate-200 mt-0.5">{s.label}</p>
+            <p className="text-xs text-stone-200 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -483,35 +483,35 @@ export default function CatalogueProductsView() {
           placeholder="Search items or SKU…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-slate-600 rounded-lg px-3 py-2 bg-slate-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 cursor-pointer"
+          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
         >
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
-        <label className="flex items-center gap-2 text-sm text-slate-200 cursor-pointer select-none">
+        <label className="flex items-center gap-2 text-sm text-stone-200 cursor-pointer select-none">
           <input type="checkbox" checked={showArchived} onChange={e => setShowArchived(e.target.checked)} className="rounded" />
           Show archived
         </label>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-slate-200">{filteredGroups.length} items</span>
-          <button onClick={expandAll} className="text-xs text-slate-200 hover:text-teal-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-slate-800">
+          <span className="text-xs text-stone-200">{filteredGroups.length} items</span>
+          <button onClick={expandAll} className="text-xs text-stone-200 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
             Expand all
           </button>
-          <button onClick={collapseAll} className="text-xs text-slate-200 hover:text-teal-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-slate-800">
+          <button onClick={collapseAll} className="text-xs text-stone-200 hover:text-amber-400 transition-colors cursor-pointer px-2 py-1 rounded hover:bg-stone-800">
             Collapse all
           </button>
         </div>
       </div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 overflow-hidden">
+      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-900 text-slate-200 uppercase text-xs border-b border-slate-700/60">
+            <thead className="bg-stone-900 text-stone-200 uppercase text-xs border-b border-stone-700/60">
               <tr>
                 <th className="px-4 py-3 text-left w-8"></th>
                 <th className="px-4 py-3 text-left">Item</th>
@@ -533,9 +533,9 @@ export default function CatalogueProductsView() {
                     <tr
                       key={`item-${group.itemName}`}
                       onClick={() => varCount > 1 && toggleExpand(group.itemName)}
-                      className={`border-b border-slate-700/40 transition-colors ${varCount > 1 ? 'cursor-pointer hover:bg-slate-700/40' : 'hover:bg-slate-700/20'} ${isOpen ? 'bg-slate-700/20' : ''}`}
+                      className={`border-b border-stone-700/40 transition-colors ${varCount > 1 ? 'cursor-pointer hover:bg-stone-700/40' : 'hover:bg-stone-700/20'} ${isOpen ? 'bg-stone-700/20' : ''}`}
                     >
-                      <td className="px-4 py-3 text-slate-200">
+                      <td className="px-4 py-3 text-stone-200">
                         {varCount > 1
                           ? <Chevron open={isOpen} />
                           : <span className="w-3.5 inline-block" />
@@ -544,46 +544,46 @@ export default function CatalogueProductsView() {
 
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-slate-100">{group.itemName}</span>
+                          <span className="font-semibold text-stone-100">{group.itemName}</span>
                           {varCount > 1 && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/25 tabular-nums">
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 tabular-nums">
                               {varCount} vars
                             </span>
                           )}
                           {varCount === 1 && group.variations[0].variationName !== 'Regular' && (
-                            <span className="text-xs text-slate-200">{group.variations[0].variationName}</span>
+                            <span className="text-xs text-stone-200">{group.variations[0].variationName}</span>
                           )}
                         </div>
                         {varCount === 1 && group.variations[0].sku && (
-                          <p className="text-[11px] text-slate-200 font-mono mt-0.5">{group.variations[0].sku}</p>
+                          <p className="text-[11px] text-stone-200 font-mono mt-0.5">{group.variations[0].sku}</p>
                         )}
                       </td>
 
                       <td className="px-4 py-3">
                         {group.category
                           ? <Badge variant="secondary">{group.category}</Badge>
-                          : <span className="text-slate-200">—</span>}
+                          : <span className="text-stone-200">—</span>}
                       </td>
 
                       <td className="px-4 py-3 text-right">
                         <PriceDisplay range={group.priceRange} />
                       </td>
 
-                      <td className="px-4 py-3 text-right text-slate-100 tabular-nums">
-                        {group.totalQuantity > 0 ? group.totalQuantity : <span className="text-slate-200">—</span>}
+                      <td className="px-4 py-3 text-right text-stone-100 tabular-nums">
+                        {group.totalQuantity > 0 ? group.totalQuantity : <span className="text-stone-200">—</span>}
                       </td>
 
                       <td className="px-4 py-3 text-center">
                         {group.anyTaxable
                           ? <span className="text-xs font-medium text-emerald-400">Yes</span>
-                          : <span className="text-xs text-slate-200">No</span>}
+                          : <span className="text-xs text-stone-200">No</span>}
                       </td>
 
                       <td className="px-4 py-3 text-center">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           group.allEnabled ? 'bg-emerald-500/15 text-emerald-400'
                           : group.hasEnabled ? 'bg-amber-500/15 text-amber-400'
-                          : 'bg-slate-700 text-slate-200'
+                          : 'bg-stone-700 text-stone-200'
                         }`}>
                           {group.allEnabled ? 'Active' : group.hasEnabled ? 'Partial' : 'Archived'}
                         </span>
@@ -594,14 +594,14 @@ export default function CatalogueProductsView() {
                           {varCount === 1 && (
                             <button
                               onClick={() => openEdit(group.variations[0])}
-                              className="text-xs px-2.5 py-1 rounded-md text-slate-200 hover:text-teal-400 hover:bg-slate-700 border border-slate-600/60 hover:border-teal-500/40 transition-colors cursor-pointer"
+                              className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer"
                             >
                               Edit
                             </button>
                           )}
                           <button
                             onClick={() => openAddVariation(group.itemName)}
-                            className="text-xs px-2.5 py-1 rounded-md text-slate-200 hover:text-teal-400 hover:bg-slate-700 border border-slate-600/60 hover:border-teal-500/40 transition-colors cursor-pointer whitespace-nowrap"
+                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer whitespace-nowrap"
                           >
                             + Variation
                           </button>
@@ -612,42 +612,42 @@ export default function CatalogueProductsView() {
                     {isOpen && group.variations.map((v, vi) => (
                       <tr
                         key={`var-${v.id ?? v.name}`}
-                        className={`border-b border-slate-700/20 bg-slate-900/60 hover:bg-slate-700/30 transition-colors ${!v.enabled ? 'opacity-50' : ''}`}
+                        className={`border-b border-stone-700/20 bg-stone-900/60 hover:bg-stone-700/30 transition-colors ${!v.enabled ? 'opacity-50' : ''}`}
                       >
                         <td className="px-4 py-2.5" />
 
                         <td className="px-4 py-2.5 pl-10">
                           <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-slate-600 shrink-0" />
-                            <span className="text-slate-200 text-xs font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-stone-600 shrink-0" />
+                            <span className="text-stone-200 text-xs font-medium">
                               {v.variationName || 'Regular'}
                             </span>
-                            {v.sku && <span className="text-[10px] text-slate-200 font-mono">{v.sku}</span>}
+                            {v.sku && <span className="text-[10px] text-stone-200 font-mono">{v.sku}</span>}
                           </div>
                         </td>
 
                         <td className="px-4 py-2.5">
                           {vi === 0
-                            ? group.category ? <Badge variant="secondary">{group.category}</Badge> : <span className="text-slate-200">—</span>
+                            ? group.category ? <Badge variant="secondary">{group.category}</Badge> : <span className="text-stone-200">—</span>
                             : null}
                         </td>
 
-                        <td className="px-4 py-2.5 text-right text-slate-100 text-xs tabular-nums">
-                          {v.price != null ? formatCurrency(v.price) : <span className="text-slate-200">—</span>}
+                        <td className="px-4 py-2.5 text-right text-stone-100 text-xs tabular-nums">
+                          {v.price != null ? formatCurrency(v.price) : <span className="text-stone-200">—</span>}
                         </td>
 
-                        <td className="px-4 py-2.5 text-right text-slate-100 text-xs tabular-nums">
-                          {v.quantity != null ? v.quantity : <span className="text-slate-200">—</span>}
+                        <td className="px-4 py-2.5 text-right text-stone-100 text-xs tabular-nums">
+                          {v.quantity != null ? v.quantity : <span className="text-stone-200">—</span>}
                         </td>
 
                         <td className="px-4 py-2.5 text-center">
                           {v.taxable
                             ? <span className="text-xs text-emerald-400">Yes</span>
-                            : <span className="text-xs text-slate-200">No</span>}
+                            : <span className="text-xs text-stone-200">No</span>}
                         </td>
 
                         <td className="px-4 py-2.5 text-center">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${v.enabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-200'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${v.enabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-stone-700 text-stone-200'}`}>
                             {v.enabled ? 'Active' : 'Archived'}
                           </span>
                         </td>
@@ -655,7 +655,7 @@ export default function CatalogueProductsView() {
                         <td className="px-4 py-2.5 text-right">
                           <button
                             onClick={() => openEdit(v)}
-                            className="text-xs px-2.5 py-1 rounded-md text-slate-200 hover:text-teal-400 hover:bg-slate-700 border border-slate-600/60 hover:border-teal-500/40 transition-colors cursor-pointer"
+                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer"
                           >
                             Edit
                           </button>
@@ -669,11 +669,11 @@ export default function CatalogueProductsView() {
           </table>
         </div>
         {filteredGroups.length === 0 && (
-          <div className="text-center py-12 text-slate-200 text-sm">No items match your filters.</div>
+          <div className="text-center py-12 text-stone-200 text-sm">No items match your filters.</div>
         )}
       </div>
 
-      <p className="text-xs text-slate-200 text-right">
+      <p className="text-xs text-stone-200 text-right">
         "Export to Square" downloads a .xlsx importable at Square Dashboard → Items → Actions → Import Library.
       </p>
 

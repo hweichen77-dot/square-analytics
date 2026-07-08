@@ -124,46 +124,48 @@ export default function DashboardView() {
   const productsTrend = hasPrevPeriod ? pctChange(uniqueProducts, prevProducts) : null
 
   if (transactions.length === 0) {
+    const paths = [
+      {
+        n: '01',
+        title: 'Connect Square directly',
+        desc: 'Paste your Square access token on the Sync page. Orders import on their own after every shift.',
+        cta: 'Set up Square Sync',
+        to: '/square-sync',
+      },
+      {
+        n: '02',
+        title: 'Or drop in a CSV',
+        desc: 'Export a Sales Summary from Square (Reports → Sales Summary → Export) and drop the file on the Import page.',
+        cta: 'Import a CSV file',
+        to: '/import',
+      },
+    ]
     return (
-      <div className="flex items-start justify-center pt-16">
-        <div className="max-w-sm w-full space-y-6">
-          <div>
-            <h1 className="font-display text-2xl font-700 text-slate-100 tracking-tight">Welcome to Walley's Analytics</h1>
-            <p className="text-slate-200 mt-1.5 text-sm">Get started in 3 steps.</p>
-          </div>
-          <div className="space-y-0 border border-slate-700/50">
-            {([
-              {
-                step: 1,
-                title: 'Export from Square',
-                desc: 'Go to Square Dashboard → Reports → Sales Summary → Export as CSV.',
-              },
-              {
-                step: 2,
-                title: 'Import your data',
-                desc: 'Drop the CSV on the Import page — it processes automatically.',
-              },
-              {
-                step: 3,
-                title: "You're all set",
-                desc: 'Analytics populate instantly. Come back after each shift.',
-              },
-            ] as const).map(({ step, title, desc }) => (
-              <div key={step} className="flex gap-4 px-5 py-4 border-b border-slate-700/40 last:border-b-0">
-                <span className="font-mono text-teal-400 font-semibold text-sm w-4 shrink-0 tabular-nums pt-0.5">{step}.</span>
-                <div>
-                  <p className="text-sm font-semibold text-slate-200">{title}</p>
-                  <p className="text-xs text-slate-200 mt-0.5 leading-relaxed">{desc}</p>
-                </div>
+      <div className="max-w-2xl pt-10">
+        <p className="font-mono text-xs uppercase tracking-[0.22em] text-amber-500/80">Walley&apos;s · Store Ledger</p>
+        <h1 className="font-display text-4xl font-700 text-stone-100 tracking-tight mt-3 leading-[1.06]">
+          No numbers yet.<br />Let&apos;s bring your sales in.
+        </h1>
+        <p className="text-stone-400 mt-4 text-[15px] leading-relaxed max-w-md">
+          Walley&apos;s turns your Square sales into plain answers — what&apos;s selling, what to restock,
+          where the money goes. Two ways to begin:
+        </p>
+        <div className="mt-10 space-y-8">
+          {paths.map(({ n, title, desc, cta, to }) => (
+            <div key={n} className="flex gap-5">
+              <span className="font-display text-3xl text-amber-500/90 tabular-nums leading-none w-10 shrink-0">{n}</span>
+              <div className="pt-0.5">
+                <h2 className="text-stone-100 font-semibold">{title}</h2>
+                <p className="text-stone-400 text-sm mt-1 leading-relaxed max-w-md">{desc}</p>
+                <button
+                  onClick={() => navigate(to)}
+                  className="text-amber-400 hover:text-amber-300 text-sm font-medium mt-2.5 underline underline-offset-4 decoration-amber-500/30 hover:decoration-amber-400"
+                >
+                  {cta} →
+                </button>
               </div>
-            ))}
-          </div>
-          <button
-            onClick={() => navigate('/import')}
-            className="w-full py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-900 font-semibold text-sm transition-colors duration-150"
-          >
-            Go to Import
-          </button>
+            </div>
+          ))}
         </div>
       </div>
     )
@@ -171,7 +173,7 @@ export default function DashboardView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-slate-100 tracking-tight">Dashboard</h1>
+      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dashboard</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
@@ -218,13 +220,13 @@ export default function DashboardView() {
       </div>
 
       {(
-        <div className="border border-slate-700/50 bg-slate-800/25 px-5 py-4 space-y-4">
+        <div className="border border-stone-700/50 bg-stone-800/25 px-5 py-4 space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400">Revenue Goals</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400">Revenue Goals</p>
             {editingGoal ? null : (
               <button
                 onClick={() => { setEditingGoal('weekly'); setGoalInput(weeklyGoal?.toString() ?? '') }}
-                className="text-[10px] text-slate-200 hover:text-slate-300 uppercase tracking-wide"
+                className="text-[10px] text-stone-200 hover:text-stone-300 uppercase tracking-wide"
               >
                 Edit
               </button>
@@ -233,25 +235,25 @@ export default function DashboardView() {
           {editingGoal ? (
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1">
-                <label className="block text-xs text-slate-200 mb-1">Weekly Target ($)</label>
+                <label className="block text-xs text-stone-200 mb-1">Weekly Target ($)</label>
                 <input
                   type="number"
                   value={editingGoal === 'weekly' ? goalInput : (weeklyGoal?.toString() ?? '')}
                   onChange={e => { setEditingGoal('weekly'); setGoalInput(e.target.value) }}
                   onFocus={() => setEditingGoal('weekly')}
                   placeholder="e.g. 5000"
-                  className="w-full bg-slate-900 border border-slate-600 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50"
+                  className="w-full bg-stone-900 border border-stone-600 px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:border-amber-500/50"
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-slate-200 mb-1">Monthly Target ($)</label>
+                <label className="block text-xs text-stone-200 mb-1">Monthly Target ($)</label>
                 <input
                   type="number"
                   value={editingGoal === 'monthly' ? goalInput : (monthlyGoal?.toString() ?? '')}
                   onChange={e => { setEditingGoal('monthly'); setGoalInput(e.target.value) }}
                   onFocus={() => setEditingGoal('monthly')}
                   placeholder="e.g. 20000"
-                  className="w-full bg-slate-900 border border-slate-600 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-teal-500/50"
+                  className="w-full bg-stone-900 border border-stone-600 px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:border-amber-500/50"
                 />
               </div>
               <div className="flex items-end gap-2">
@@ -262,11 +264,11 @@ export default function DashboardView() {
                     else setMonthlyGoal(isNaN(v) || v <= 0 ? null : v)
                     setEditingGoal(null)
                   }}
-                  className="px-3 py-1.5 bg-teal-500 text-slate-900 text-xs font-semibold hover:bg-teal-400"
+                  className="px-3 py-1.5 bg-amber-500 text-stone-900 text-xs font-semibold hover:bg-amber-400"
                 >
                   Save
                 </button>
-                <button onClick={() => setEditingGoal(null)} className="px-3 py-1.5 text-xs text-slate-200 hover:text-slate-200">
+                <button onClick={() => setEditingGoal(null)} className="px-3 py-1.5 text-xs text-stone-200 hover:text-stone-200">
                   Cancel
                 </button>
               </div>
@@ -279,20 +281,20 @@ export default function DashboardView() {
                 const pace = period === 'weekly' ? goalProgress.weekPace : goalProgress.monthPace
                 const pct = goal ? Math.min(100, (revenue / goal) * 100) : 0
                 const hit = goal != null && revenue >= goal
-                const barColor = hit ? 'bg-emerald-500' : pct >= 80 ? 'bg-amber-400' : 'bg-teal-500'
+                const barColor = hit ? 'bg-emerald-500' : pct >= 80 ? 'bg-amber-400' : 'bg-amber-500'
                 return (
                   <div key={period}>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-slate-200 capitalize">{period}</span>
+                      <span className="text-xs text-stone-200 capitalize">{period}</span>
                       {goal != null ? (
-                        <span className={`text-xs font-mono font-semibold ${hit ? 'text-emerald-400' : 'text-slate-100'}`}>
+                        <span className={`text-xs font-mono font-semibold ${hit ? 'text-emerald-400' : 'text-stone-100'}`}>
                           {formatCurrency(revenue)} / {formatCurrency(goal)}
                           {hit && ' ✓'}
                         </span>
                       ) : (
                         <button
                           onClick={() => { setEditingGoal(period); setGoalInput('') }}
-                          className="text-xs text-slate-200 hover:text-teal-400"
+                          className="text-xs text-stone-200 hover:text-amber-400"
                         >
                           + Set goal
                         </button>
@@ -306,12 +308,12 @@ export default function DashboardView() {
                           aria-valuemin={0}
                           aria-valuemax={100}
                           aria-label={`${period === 'weekly' ? 'Weekly' : 'Monthly'} goal: ${Math.round(pct)}% complete`}
-                          className="h-1.5 bg-slate-700/60 rounded-full overflow-hidden"
+                          className="h-1.5 bg-stone-700/60 rounded-full overflow-hidden"
                         >
                           <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }} />
                         </div>
                         {pace != null && !hit && (
-                          <p className="text-[10px] text-slate-200 mt-1">
+                          <p className="text-[10px] text-stone-200 mt-1">
                             On pace for {formatCurrency(pace)} this {period === 'weekly' ? 'week' : 'month'}
                           </p>
                         )}
@@ -331,42 +333,42 @@ export default function DashboardView() {
       />
 
       {insights && (
-        <div className="border border-slate-700/50 bg-slate-800/25 px-5 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-teal-400 mb-3">Quick Insights</p>
+        <div className="border border-stone-700/50 bg-stone-800/25 px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400 mb-3">Quick Insights</p>
           <ul className="space-y-1.5 text-sm">
-            <li className="text-slate-100">
+            <li className="text-stone-100">
               Best day:{' '}
-              <span className="text-slate-200">
+              <span className="text-stone-200">
                 {format(insights.bestDay.date, 'EEE, MMM d')} — {formatCurrency(insights.bestDay.revenue)}
               </span>
             </li>
             {insights.topProduct && (
-              <li className="text-slate-100">
+              <li className="text-stone-100">
                 Top seller:{' '}
-                <span className="text-slate-200">
+                <span className="text-stone-200">
                   {insights.topProduct.name} ({formatNumber(insights.topProduct.totalUnitsSold)} units,{' '}
                   {formatCurrency(insights.topProduct.totalRevenue)})
                 </span>
               </li>
             )}
             {insights.slowProduct && (
-              <li className="text-slate-100">
+              <li className="text-stone-100">
                 Slow mover:{' '}
                 <span className="text-amber-400">{insights.slowProduct.name}</span>
                 {' '}— no sales in {Math.floor((Date.now() - insights.slowProduct.lastSoldDate.getTime()) / 86_400_000)} days
               </li>
             )}
             {insights.topStaff && insights.topStaff.name !== 'Unknown' && (
-              <li className="text-slate-100">
+              <li className="text-stone-100">
                 Top staff:{' '}
-                <span className="text-slate-200">
+                <span className="text-stone-200">
                   {insights.topStaff.name} — {formatCurrency(insights.topStaff.totalSales)} across{' '}
                   {formatNumber(insights.topStaff.transactionCount)} transactions
                 </span>
               </li>
             )}
             {hasRefunds && (
-              <li className="text-slate-100">
+              <li className="text-stone-100">
                 Refunds:{' '}
                 <span className="text-amber-400">- {formatCurrency(totalRefunds)}</span>
                 {' '}— net revenue {formatCurrency(netRevenue)}
