@@ -121,7 +121,7 @@ export default function App() {
           <NavLink to="/dashboard" className="font-display text-[16px] font-800 text-stone-100 tracking-tight shrink-0 hover:text-white transition-colors">
             Square Analytics
           </NavLink>
-          <div className="hidden lg:flex min-w-0 overflow-x-auto">
+          <div className="hidden lg:flex min-w-0">
             <TopNav onSearch={() => setPaletteOpen(true)} />
           </div>
         </div>
