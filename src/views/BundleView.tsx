@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useProductBundles, useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { StatCard } from '../components/ui/StatCard'
@@ -173,10 +174,11 @@ export default function BundleView() {
     [productStats],
   )
 
-  const pairs = useMemo(
+  const { value: pairsRaw, loading: computing } = useDeferredCompute(
     () => buildPairs(allTransactions, priceByName, categoryByName),
     [allTransactions, priceByName, categoryByName],
   )
+  const pairs = pairsRaw ?? []
 
   const multiItemTxCount = useMemo(
     () => allTransactions.filter(tx => new Set(parseProductItems(tx.itemDescription).map(i => i.name)).size >= 2).length,
@@ -214,6 +216,18 @@ export default function BundleView() {
 
   if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import transaction data to see bundle opportunities." />
+  }
+
+  if (computing && !pairsRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Bundle & Cross-Sell</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
+    )
   }
 
   return (

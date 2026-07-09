@@ -4,6 +4,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { useStoreEvents, useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { db } from '../db/database'
@@ -161,10 +162,11 @@ export default function SeasonalView() {
   const events = useStoreEvents()
   const [showAdd, setShowAdd] = useState(false)
   const [editingEvent, setEditingEvent] = useState<StoreEvent | null>(null)
-  const impacts = useMemo(
+  const { value: impactsRaw, loading: computing } = useDeferredCompute(
     () => events.map(e => computeImpact(e, allTransactions)),
     [events, allTransactions],
   )
+  const impacts = impactsRaw ?? []
 
   const chartData = useMemo(
     () => dailyRevenue.map(d => ({ date: format(d.date, 'MMM d'), revenue: d.revenue, ts: d.date.getTime() })),
@@ -185,6 +187,18 @@ export default function SeasonalView() {
 
   if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import sales data to see seasonal analysis." />
+  }
+
+  if (computing && !impactsRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Seasonal & Events</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
+    )
   }
 
   return (

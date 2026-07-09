@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useRestockLogs, useCatalogueProducts, useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { StatCard } from '../components/ui/StatCard'
@@ -202,10 +203,11 @@ export default function RestockView() {
   const catalogueProducts = useCatalogueProducts()
   const [productToRestock, setProductToRestock] = useState<string | null>(null)
 
-  const alerts = useMemo(
+  const { value: alertsRaw, loading: computing } = useDeferredCompute(
     () => computeAlerts(transactions, restockLogs, catalogueProducts),
     [transactions, restockLogs, catalogueProducts],
   )
+  const alerts = alertsRaw ?? []
 
   const outOfStockCount = useMemo(() => alerts.filter(a => a.urgency === 'outOfStock').length, [alerts])
   const criticalCount = useMemo(() => alerts.filter(a => a.urgency === 'critical').length, [alerts])
@@ -217,6 +219,18 @@ export default function RestockView() {
 
   if (transactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import CSV sales data to see restock alerts." />
+  }
+
+  if (computing && !alertsRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Restock Alerts & Forecasting</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
+    )
   }
 
   return (

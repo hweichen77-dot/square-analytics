@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { ComposedChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { useAllTransactions } from '../db/useTransactions'
@@ -92,7 +93,8 @@ export default function PriceOptimizationView() {
   const [simPrice, setSimPrice] = useState('')
   const [productSearch, setProductSearch] = useState('')
 
-  const changes = useMemo(() => buildPriceChanges(allTransactions), [allTransactions])
+  const { value: changesRaw, loading: computing } = useDeferredCompute(() => buildPriceChanges(allTransactions), [allTransactions])
+  const changes = changesRaw ?? []
   const productNames = useMemo(() => productStats.map(p => p.name).sort(), [productStats])
   const avgPriceByProduct = useMemo(
     () => Object.fromEntries(productStats.map(p => [p.name, p.avgPrice])),
@@ -149,6 +151,18 @@ export default function PriceOptimizationView() {
 
   if (allTransactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import sales data to detect price changes." />
+  }
+
+  if (computing && !changesRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Price Optimization</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing price history…
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useProductCostData, useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
@@ -194,10 +195,11 @@ export default function DeadStockView() {
   const transactions = useAllTransactions()
   const costData = useProductCostData()
 
-  const items = useMemo(
+  const { value: itemsRaw, loading: computing } = useDeferredCompute(
     () => buildDeadStockItems(transactions, costData),
     [transactions, costData],
   )
+  const items = itemsRaw ?? []
 
   const deadItems = useMemo(() => items.filter(i => i.tier === 'Dead'), [items])
   const dyingItems = useMemo(() => items.filter(i => i.tier === 'Dying'), [items])
@@ -211,6 +213,18 @@ export default function DeadStockView() {
 
   if (transactions.length === 0) {
     return <EmptyState title="No data" subtitle="Import transaction data to detect dead stock." />
+  }
+
+  if (computing && !itemsRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dead Stock Detector</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -4,6 +4,7 @@ import {
 } from 'recharts'
 import { chart } from '../lib/chartTheme'
 import { useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeForecast } from '../engine/forecastEngine'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -24,10 +25,10 @@ function TrendBadge({ label }: { label: string }) {
 export default function ForecastView() {
   const transactions = useAllTransactions()
   const navigate = useNavigate()
-  const forecast = useMemo(() => computeForecast(transactions), [transactions])
+  const { value: forecast, loading: computing } = useDeferredCompute(() => computeForecast(transactions), [transactions])
 
   const accuracyData = useMemo(() => {
-    if (!forecast.hasEnoughData) return null
+    if (!forecast || !forecast.hasEnoughData) return null
     const elapsedDays = forecast.thisWeek.days.filter(d => d.actualRevenue !== null)
     if (elapsedDays.length === 0) return null
     const totalProjected = elapsedDays.reduce((s, d) => s + d.projectedRevenue, 0)
@@ -38,9 +39,9 @@ export default function ForecastView() {
   }, [forecast])
 
   const topProducts = useMemo(() => {
-    if (transactions.length === 0) return []
+    if (computing || transactions.length === 0) return []
     return computeProductStats(transactions).slice(0, 5)
-  }, [transactions])
+  }, [transactions, computing])
 
   if (transactions.length === 0) {
     return (
@@ -49,6 +50,18 @@ export default function ForecastView() {
         subtitle="Import transactions first to generate sales forecasts."
         action={{ label: 'Go to Import', onClick: () => navigate('/import') }}
       />
+    )
+  }
+
+  if (!forecast) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Sales Forecast</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
     )
   }
 

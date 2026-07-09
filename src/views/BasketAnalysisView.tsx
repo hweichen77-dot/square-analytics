@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeBasketAnalysis } from '../engine/basketEngine'
 import type { BasketPair } from '../engine/basketEngine'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -58,7 +59,8 @@ export default function BasketAnalysisView() {
   const [sortKey, setSortKey] = useState<SortKey>('coOccurrences')
   const [search, setSearch] = useState('')
 
-  const result = useMemo(() => computeBasketAnalysis(transactions), [transactions])
+  const { value: resultRaw, loading: computing } = useDeferredCompute(() => computeBasketAnalysis(transactions), [transactions])
+  const result = resultRaw ?? { pairs: [], totalTransactions: 0, multiItemTransactions: 0 }
 
   const sorted = useMemo(() => {
     return [...result.pairs].sort((a, b) => b[sortKey] - a[sortKey])
@@ -77,6 +79,18 @@ export default function BasketAnalysisView() {
         subtitle="Import transactions to see basket analysis."
         action={{ label: 'Go to Import', onClick: () => navigate('/import') }}
       />
+    )
+  }
+
+  if (computing && !resultRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Basket Analysis</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing baskets…
+        </div>
+      </div>
     )
   }
 

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAllTransactions, useCatalogueProducts, useStoreEvents } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { generatePurchaseOrder } from '../engine/purchaseOrderEngine'
 import { computeProductStats, productVelocity } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -105,7 +106,7 @@ export default function PurchaseOrderView() {
 
   const overrides = useMemo(() => ({}), [])
 
-  const { velocityPreview, totalProductCount } = useMemo(() => {
+  const { value: previewRaw, loading: computing } = useDeferredCompute(() => {
     const stats = computeProductStats(transactions)
     const sorted = [...stats].sort((a, b) => productVelocity(b) - productVelocity(a))
     return {
@@ -117,6 +118,7 @@ export default function PurchaseOrderView() {
       })),
     }
   }, [transactions])
+  const { velocityPreview, totalProductCount } = previewRaw ?? { velocityPreview: [], totalProductCount: 0 }
 
   const orderItems = useMemo(
     () => generated ? generatePurchaseOrder(transactions, events, [], overrides, selectedWeeks) : [],
@@ -180,6 +182,18 @@ export default function PurchaseOrderView() {
 
   if (transactions.length === 0) {
     return <EmptyState title="No transaction data" subtitle="Import your sales data to generate purchase recommendations." />
+  }
+
+  if (computing && !previewRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Purchase Order</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Loading…
+        </div>
+      </div>
+    )
   }
 
   return (

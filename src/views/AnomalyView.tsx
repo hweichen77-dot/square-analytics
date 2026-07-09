@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useAllTransactions } from '../db/useTransactions'
+import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeAnomalies } from '../engine/forecastEngine'
 import type { AnomalyDay } from '../engine/forecastEngine'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -43,7 +44,8 @@ export default function AnomalyView() {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<Filter>('all')
 
-  const anomalies = useMemo(() => computeAnomalies(transactions), [transactions])
+  const { value: anomaliesRaw, loading: computing } = useDeferredCompute(() => computeAnomalies(transactions), [transactions])
+  const anomalies = anomaliesRaw ?? []
 
   const filtered = useMemo(
     () => filter === 'all' ? anomalies : anomalies.filter(a => a.direction === filter),
@@ -60,6 +62,18 @@ export default function AnomalyView() {
         subtitle="Import transactions to detect anomalous days."
         action={{ label: 'Go to Import', onClick: () => navigate('/import') }}
       />
+    )
+  }
+
+  if (computing && !anomaliesRaw) {
+    return (
+      <div className="space-y-6">
+        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Anomaly Alerts</h1>
+        <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
+          <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+          Analyzing…
+        </div>
+      </div>
     )
   }
 
