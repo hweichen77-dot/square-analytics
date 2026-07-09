@@ -2,7 +2,7 @@ import { useAuthStore } from '../store/authStore'
 
 const SQUARE_OAUTH_URL = 'https://connect.squareup.com/oauth2/authorize'
 const SQUARE_TOKEN_URL = 'https://connect.squareup.com/oauth2/token'
-const SCOPES = 'MERCHANT_PROFILE_READ ORDERS_READ PAYMENTS_READ ITEMS_READ INVENTORY_READ TEAM_MEMBERS_READ CUSTOMERS_READ'
+const SCOPES = 'MERCHANT_PROFILE_READ ORDERS_READ PAYMENTS_READ ITEMS_READ INVENTORY_READ TEAM_MEMBERS_READ TIMECARDS_READ CUSTOMERS_READ'
 
 const LOCALHOST_REDIRECT_URI = 'http://localhost:7329/square/callback'
 

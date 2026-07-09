@@ -110,6 +110,7 @@ export interface SquareCatalogItem {
       item_variation_data?: {
         name: string
         price_money?: { amount: number; currency: string }
+        default_unit_cost?: { amount: number; currency: string }
         sku?: string
         item_id?: string
       }
@@ -395,6 +396,63 @@ export async function fetchShifts(
   } while (cursor)
 
   return shifts
+}
+
+export interface SquareInventoryChange {
+  catalogObjectId: string
+  quantity: number
+  fromState?: string
+  toState?: string
+  occurredAt: string
+}
+
+export async function fetchInventoryChanges(
+  token: string,
+  locationID: string,
+  beginTime: string,
+  endTime: string,
+): Promise<SquareInventoryChange[]> {
+  const changes: SquareInventoryChange[] = []
+  let cursor: string | undefined
+
+  do {
+    const body: Record<string, unknown> = {
+      location_ids: [locationID],
+      types: ['ADJUSTMENT'],
+      updated_after: beginTime,
+      updated_before: endTime,
+      limit: 1000,
+    }
+    if (cursor) body.cursor = cursor
+
+    const data = await squareRequest(token, 'POST', `${BASE}/inventory/changes/batch-retrieve`, body) as {
+      changes?: Array<{
+        type?: string
+        adjustment?: {
+          catalog_object_id?: string
+          from_state?: string
+          to_state?: string
+          quantity?: string
+          occurred_at?: string
+        }
+      }>
+      cursor?: string
+    }
+    for (const c of data.changes ?? []) {
+      const adj = c.adjustment
+      if (!adj?.catalog_object_id) continue
+      changes.push({
+        catalogObjectId: adj.catalog_object_id,
+        quantity: parseFloat(adj.quantity ?? '0') || 0,
+        fromState: adj.from_state,
+        toState: adj.to_state,
+        occurredAt: adj.occurred_at ?? '',
+      })
+    }
+    cursor = data.cursor
+  } while (cursor)
+
+  return changes
 }
 
 export async function fetchInventory(token: string, locationID: string): Promise<SquareInventoryCount[]> {

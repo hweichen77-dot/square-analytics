@@ -88,6 +88,41 @@ export async function upsertProductCosts(costs: Omit<ProductCostData, 'id'>[]): 
   })
 }
 
+export async function mergeSquareProductCosts(costs: Array<{ productName: string; unitCost: number; lastUpdated: Date }>): Promise<number> {
+  if (costs.length === 0) return 0
+  let written = 0
+  await db.transaction('rw', db.productCostData, async () => {
+    for (const c of costs) {
+      if (!(c.unitCost > 0)) continue
+      const existing = await db.productCostData.where('productName').equals(c.productName).first()
+      if (existing) {
+        await db.productCostData.update(existing.id!, { unitCost: c.unitCost, lastUpdated: c.lastUpdated })
+      } else {
+        await db.productCostData.add({ productName: c.productName, unitCost: c.unitCost, casePrice: 0, unitsPerCase: 0, lastUpdated: c.lastUpdated })
+      }
+      written++
+    }
+  })
+  return written
+}
+
+export async function upsertRestockLogs(logs: Omit<RestockLog, 'id'>[]): Promise<number> {
+  if (logs.length === 0) return 0
+  const existing = await db.restockLogs.toArray()
+  const seen = new Set(existing.map(l => `${l.productName}|${l.date.getTime()}|${l.quantity}`))
+  let added = 0
+  await db.transaction('rw', db.restockLogs, async () => {
+    for (const l of logs) {
+      const key = `${l.productName}|${l.date.getTime()}|${l.quantity}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      await db.restockLogs.add(l)
+      added++
+    }
+  })
+  return added
+}
+
 export async function removeCsvDuplicates(): Promise<number> {
   const apiTxs = await db.salesTransactions.filter(t => t.source === 'api').toArray()
   if (apiTxs.length === 0) return 0

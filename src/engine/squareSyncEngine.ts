@@ -1,9 +1,9 @@
 import { subDays } from 'date-fns'
 import { useAuthStore } from '../store/authStore'
 import { refreshAccessToken } from './squareAuth'
-import { fetchOrders, fetchCatalogue, fetchInventory, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts } from './squareAPIClient'
+import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts } from './squareAPIClient'
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
-import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts } from '../db/dbUtils'
+import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs } from '../db/dbUtils'
 import type { SalesTransaction, CatalogueProduct, TransactionLineItem } from '../types/models'
 import { parseProductItems, splitItemVariation } from '../types/models'
 
@@ -114,6 +114,24 @@ function catalogueToProduct(
       price: priceCents != null ? priceCents / 100 : null,
       squareItemID: variation.id,
     }
+  })
+}
+
+function catalogueToCosts(item: SquareCatalogItem): Array<{ productName: string; unitCost: number; lastUpdated: Date }> {
+  const data = item.item_data
+  if (!data?.name) return []
+  const name = data.name.trim()
+  if (!name) return []
+  const variations = data.variations ?? []
+  const now = new Date()
+  return variations.flatMap(variation => {
+    const varData = variation.item_variation_data
+    const costCents = varData?.default_unit_cost?.amount
+    if (costCents == null) return []
+    const variantLabel = varData?.name ?? 'Regular'
+    const variationName = variantLabel.toLowerCase() === 'regular' || variations.length === 1 ? 'Regular' : variantLabel
+    const displayName = variationName !== 'Regular' ? `${name} (${variationName})` : name
+    return [{ productName: displayName, unitCost: costCents / 100, lastUpdated: now }]
   })
 }
 
@@ -250,6 +268,12 @@ async function _runSyncImpl(
   const products = productItems.flatMap(item => catalogueToProduct(item, categoryMap))
   await upsertCatalogueProducts(products)
 
+  try {
+    const costRows = productItems.flatMap(catalogueToCosts)
+    await mergeSquareProductCosts(costRows)
+  } catch {
+  }
+
   onStatus({ phase: 'inventory', message: 'Fetching inventory...', ordersAdded, productsAdded: products.length })
   const invCounts = await fetchInventory(accessToken, locationID)
   const invMap = new Map(invCounts.map(c => [c.catalog_object_id, parseInt(c.quantity, 10)]))
@@ -259,6 +283,21 @@ async function _runSyncImpl(
     if (qty != null) product.quantity = qty
   }
   await upsertCatalogueProducts(products)
+
+  try {
+    const changes = await fetchInventoryChanges(accessToken, locationID, startDate.toISOString(), endDate.toISOString())
+    const nameByVarId = new Map(products.map(p => [p.squareItemID, p.name]))
+    const restocks = changes.flatMap(c => {
+      if (!(c.quantity > 0) || c.toState !== 'IN_STOCK' || c.fromState === 'IN_STOCK') return []
+      const productName = nameByVarId.get(c.catalogObjectId)
+      if (!productName) return []
+      const date = new Date(c.occurredAt)
+      if (isNaN(date.getTime())) return []
+      return [{ productName, date, quantity: c.quantity, notes: 'Square inventory' }]
+    })
+    await upsertRestockLogs(restocks)
+  } catch {
+  }
 
   useAuthStore.getState().setCredentials({
     lastSyncDate: new Date().toISOString(),
