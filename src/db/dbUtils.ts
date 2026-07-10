@@ -45,21 +45,32 @@ export async function upsertShifts(shifts: Omit<StoredShift, 'id'>[]): Promise<n
 export async function upsertTransactions(transactions: Omit<SalesTransaction, 'id'>[]): Promise<number> {
   if (transactions.length === 0) return 0
   const ids = transactions.map(t => t.transactionID)
-  const existing = new Set(
-    (await db.salesTransactions.where('transactionID').anyOf(ids).toArray()).map(t => t.transactionID)
+  const existingById = new Map(
+    (await db.salesTransactions.where('transactionID').anyOf(ids).toArray()).map(t => [t.transactionID, t])
   )
-  const toAdd = transactions.filter(t => !existing.has(t.transactionID))
-  if (toAdd.length === 0) return 0
-  try {
-    await db.salesTransactions.bulkAdd(toAdd)
-  } catch {
-    let added = 0
-    for (const tx of toAdd) {
-      try { await db.salesTransactions.add(tx); added++ } catch {  }
+  const toAdd: Omit<SalesTransaction, 'id'>[] = []
+  let added = 0
+  await db.transaction('rw', db.salesTransactions, async () => {
+    for (const t of transactions) {
+      const ex = existingById.get(t.transactionID)
+      if (ex) {
+        await db.salesTransactions.update(ex.id!, t)
+      } else {
+        toAdd.push(t)
+      }
     }
-    return added
-  }
-  return toAdd.length
+    if (toAdd.length > 0) {
+      try {
+        await db.salesTransactions.bulkAdd(toAdd)
+        added = toAdd.length
+      } catch {
+        for (const tx of toAdd) {
+          try { await db.salesTransactions.add(tx); added++ } catch {  }
+        }
+      }
+    }
+  })
+  return added
 }
 
 export async function upsertCatalogueProducts(products: Omit<CatalogueProduct, 'id'>[]): Promise<void> {
@@ -126,15 +137,22 @@ export async function upsertRestockLogs(logs: Omit<RestockLog, 'id'>[]): Promise
 export async function removeCsvDuplicates(): Promise<number> {
   const apiTxs = await db.salesTransactions.filter(t => t.source === 'api').toArray()
   if (apiTxs.length === 0) return 0
-  const apiKeys = new Set(
-    apiTxs.map(t => `${t.date.toDateString()}|${t.netSales.toFixed(2)}|${t.staffName}`)
-  )
+  const key = (t: SalesTransaction) => `${t.date.toDateString()}|${t.netSales.toFixed(2)}`
+  const counts = new Map<string, number>()
+  for (const t of apiTxs) counts.set(key(t), (counts.get(key(t)) ?? 0) + 1)
+
   const csvTxs = await db.salesTransactions.filter(t => t.source === 'csv').toArray()
-  const toDelete = csvTxs.filter(t =>
-    apiKeys.has(`${t.date.toDateString()}|${t.netSales.toFixed(2)}|${t.staffName}`)
-  )
+  const toDelete: number[] = []
+  for (const t of csvTxs) {
+    const k = key(t)
+    const remaining = counts.get(k) ?? 0
+    if (remaining > 0) {
+      counts.set(k, remaining - 1)
+      if (t.id != null) toDelete.push(t.id)
+    }
+  }
   if (toDelete.length === 0) return 0
-  await db.salesTransactions.bulkDelete(toDelete.map(t => t.id!))
+  await db.salesTransactions.bulkDelete(toDelete)
   return toDelete.length
 }
 

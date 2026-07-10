@@ -41,3 +41,10 @@ AGENTS.md
 .codex/
 .claude-mem/
 .aider*
+
+# AI tool files
+.impeccable.md
+.claude/
+CLAUDE.md
+.cursor/
+AGENTS.md

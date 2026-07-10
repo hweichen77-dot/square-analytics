@@ -201,22 +201,27 @@ export interface SquareTeamMember {
 }
 
 export async function fetchTeamMembers(token: string): Promise<SquareTeamMember[]> {
-  const members: SquareTeamMember[] = []
-  let cursor: string | undefined
+  const byId = new Map<string, SquareTeamMember>()
 
-  do {
-    const body: Record<string, unknown> = { limit: 200 }
-    if (cursor) body.cursor = cursor
+  for (const status of ['ACTIVE', 'INACTIVE'] as const) {
+    let cursor: string | undefined
+    do {
+      const body: Record<string, unknown> = {
+        limit: 200,
+        query: { filter: { status } },
+      }
+      if (cursor) body.cursor = cursor
 
-    const data = await squareRequest(token, 'POST', `${BASE}/team-members/search`, body) as {
-      team_members?: SquareTeamMember[]
-      cursor?: string
-    }
-    members.push(...(data.team_members ?? []))
-    cursor = data.cursor
-  } while (cursor)
+      const data = await squareRequest(token, 'POST', `${BASE}/team-members/search`, body) as {
+        team_members?: SquareTeamMember[]
+        cursor?: string
+      }
+      for (const m of data.team_members ?? []) byId.set(m.id, m)
+      cursor = data.cursor
+    } while (cursor)
+  }
 
-  return members
+  return [...byId.values()]
 }
 
 export interface SquareCustomer {
@@ -245,12 +250,41 @@ export async function fetchCustomersByIds(token: string, ids: string[]): Promise
 export interface SquarePayment {
   id: string
   orderId?: string
+  teamMemberId?: string
   amountMoney: { amount: number; currency: string }
   processingFee?: Array<{ amountMoney: { amount: number } }>
   status: string
   sourceType: string
   cardDetails?: { card?: { cardBrand?: string; last4?: string } }
   createdAt: string
+}
+
+interface RawSquarePayment {
+  id: string
+  order_id?: string
+  team_member_id?: string
+  amount_money?: { amount: number; currency: string }
+  processing_fee?: Array<{ amount_money?: { amount: number } }>
+  status?: string
+  source_type?: string
+  card_details?: { card?: { card_brand?: string; last_4?: string } }
+  created_at?: string
+}
+
+function mapPayment(p: RawSquarePayment): SquarePayment {
+  return {
+    id: p.id,
+    orderId: p.order_id,
+    teamMemberId: p.team_member_id,
+    amountMoney: p.amount_money ?? { amount: 0, currency: 'USD' },
+    processingFee: (p.processing_fee ?? []).map(f => ({ amountMoney: { amount: f.amount_money?.amount ?? 0 } })),
+    status: p.status ?? '',
+    sourceType: p.source_type ?? '',
+    cardDetails: p.card_details
+      ? { card: { cardBrand: p.card_details.card?.card_brand, last4: p.card_details.card?.last_4 } }
+      : undefined,
+    createdAt: p.created_at ?? '',
+  }
 }
 
 export async function fetchPayments(
@@ -271,10 +305,10 @@ export async function fetchPayments(
     if (cursor) url.searchParams.set('cursor', cursor)
 
     const data = await squareRequest(accessToken, 'GET', url.toString()) as {
-      payments?: SquarePayment[]
+      payments?: RawSquarePayment[]
       cursor?: string
     }
-    if (data.payments) payments.push(...data.payments)
+    for (const p of data.payments ?? []) payments.push(mapPayment(p))
     cursor = data.cursor
   } while (cursor)
 

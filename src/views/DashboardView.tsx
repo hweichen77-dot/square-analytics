@@ -10,6 +10,7 @@ import {
   computeWeeklyRevenue,
   computeMonthlyRevenue,
   isSlowMover,
+  UNCATEGORIZED,
 } from '../engine/analyticsEngine'
 import { computeGrossProfit } from '../engine/reportEngine'
 import { useAnalytics } from '../context/AnalyticsContext'
@@ -55,7 +56,7 @@ export default function DashboardView() {
   const insights = useMemo(() => {
     if (!daily.length) return null
     const bestDay = daily.reduce((a, b) => b.revenue > a.revenue ? b : a, daily[0])
-    const topProduct = stats[0] ?? null
+    const topProduct = stats.find(s => s.name !== UNCATEGORIZED) ?? null
     const slowProduct = stats.find(s => isSlowMover(s)) ?? null
     const topStaff = staffStats[0] ?? null
     return { bestDay, topProduct, slowProduct, topStaff }
@@ -78,7 +79,8 @@ export default function DashboardView() {
   const netRevenue = totalRevenue - totalRefunds
 
   const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
-  const uniqueProducts = stats.length
+  const uniqueProducts = stats.filter(s => s.name !== UNCATEGORIZED).length
+  const unitsSold = stats.reduce((s, p) => s + p.totalUnitsSold, 0)
 
   const { grossProfit, marginPct } = useMemo(
     () => computeGrossProfit(stats, costData, totalRevenue),
@@ -196,8 +198,8 @@ export default function DashboardView() {
           trendUp={avgTrend?.up}
         />
         <StatCard
-          label="Products Sold"
-          value={formatNumber(uniqueProducts)}
+          label="Units Sold"
+          value={formatNumber(unitsSold)}
           trend={productsTrend?.label}
           trendUp={productsTrend?.up}
         />

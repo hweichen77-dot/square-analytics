@@ -2,7 +2,7 @@ import { useState, useMemo, Fragment } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCategoryOverrides } from '../db/useTransactions'
 import { db } from '../db/database'
-import { productTrend, isSlowMover } from '../engine/analyticsEngine'
+import { productTrend, isSlowMover, UNCATEGORIZED } from '../engine/analyticsEngine'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { ALL_CATEGORY_NAMES } from '../engine/categoryClassifier'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -130,7 +130,7 @@ export default function InventoryView() {
     })
   }, [itemGroups, search, categoryFilter])
 
-  const topItem       = itemGroups[0]
+  const topItem       = itemGroups.find(g => g.itemName !== UNCATEGORIZED) ?? itemGroups[0]
   const totalRevenue  = stats.reduce((s, p) => s + p.totalRevenue, 0)
   const totalUnits    = stats.reduce((s, p) => s + p.totalUnitsSold, 0)
   const growingCount  = itemGroups.filter(g => g.trend === 'Growing').length

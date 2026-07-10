@@ -41,16 +41,17 @@ export function exportCatalogueToXLSX(
     'Archived',
   ]
 
+  const s = (v: string): string => (/^[=+\-@\t\r]/.test(v) ? `'${v}` : v)
   const rows: (string | number)[][] = products.map(p => {
     return [
-      p.squareItemID ?? '',
-      p.itemName || p.name,
-      p.variationName || 'Regular',
-      p.sku ?? '',
+      s(p.squareItemID ?? ''),
+      s(p.itemName || p.name),
+      s(p.variationName || 'Regular'),
+      s(p.sku ?? ''),
       '',
       '',
-      p.category ?? '',
-      p.category ?? '',
+      s(p.category ?? ''),
+      s(p.category ?? ''),
       bool(p.taxable),
       bool(p.enabled),
       p.quantity ?? '',

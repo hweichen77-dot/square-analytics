@@ -42,7 +42,7 @@ function orderToTransaction(order: SquareOrder, employeeMap: Record<string, stri
   const descParts: string[] = []
 
   for (const li of rawLineItems) {
-    const qty = parseInt(li.quantity, 10) || 1
+    const qty = parseFloat(li.quantity) || 1
     const varName = (li.variation_name ?? '').trim()
     const isDefault = !varName || varName.toLowerCase() === 'regular'
     const fullName = isDefault ? li.name : `${li.name} (${varName})`
@@ -210,6 +210,9 @@ async function _runSyncImpl(
       tx.processingFee = payment.processingFee?.[0]?.amountMoney?.amount ?? 0
       tx.cardBrand = payment.cardDetails?.card?.cardBrand
       tx.cardLastFour = payment.cardDetails?.card?.last4
+      if (payment.teamMemberId) {
+        tx.staffName = employeeMap[payment.teamMemberId] ?? payment.teamMemberId
+      }
     }
   } catch {
   }
@@ -276,7 +279,7 @@ async function _runSyncImpl(
 
   onStatus({ phase: 'inventory', message: 'Fetching inventory...', ordersAdded, productsAdded: products.length })
   const invCounts = await fetchInventory(accessToken, locationID)
-  const invMap = new Map(invCounts.map(c => [c.catalog_object_id, parseInt(c.quantity, 10)]))
+  const invMap = new Map(invCounts.map(c => [c.catalog_object_id, parseFloat(c.quantity)]))
 
   for (const product of products) {
     const qty = invMap.get(product.squareItemID)
@@ -288,7 +291,8 @@ async function _runSyncImpl(
     const changes = await fetchInventoryChanges(accessToken, locationID, startDate.toISOString(), endDate.toISOString())
     const nameByVarId = new Map(products.map(p => [p.squareItemID, p.name]))
     const restocks = changes.flatMap(c => {
-      if (!(c.quantity > 0) || c.toState !== 'IN_STOCK' || c.fromState === 'IN_STOCK') return []
+      const isReceiving = c.fromState == null || c.fromState === 'NONE'
+      if (!(c.quantity > 0) || c.toState !== 'IN_STOCK' || !isReceiving) return []
       const productName = nameByVarId.get(c.catalogObjectId)
       if (!productName) return []
       const date = new Date(c.occurredAt)
@@ -300,7 +304,7 @@ async function _runSyncImpl(
   }
 
   useAuthStore.getState().setCredentials({
-    lastSyncDate: new Date().toISOString(),
+    lastSyncDate: endDate.toISOString(),
     lastSyncCount: ordersAdded,
   })
 

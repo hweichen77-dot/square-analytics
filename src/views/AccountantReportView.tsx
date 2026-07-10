@@ -113,7 +113,12 @@ export default function AccountantReportView() {
       .sort((a, b) => b.revenue - a.revenue)
 
     const hasCostData = costMap.size > 0
-    let totalCOGS: number | null = hasCostData ? 0 : null
+    const totalCOGS: number | null = hasCostData
+      ? productStats.reduce((sum, p) => {
+          const costPerUnit = costMap.get(p.name)
+          return costPerUnit != null ? sum + costPerUnit * p.totalUnitsSold : sum
+        }, 0)
+      : null
 
     const topProducts: AccountantProductRow[] = productStats.slice(0, 20).map(p => {
       const costPerUnit = costMap.get(p.name) ?? null
@@ -122,7 +127,6 @@ export default function AccountantReportView() {
       const marginPct = grossProfit !== null && p.totalRevenue > 0
         ? (grossProfit / p.totalRevenue) * 100
         : null
-      if (hasCostData && totalCost !== null && totalCOGS !== null) totalCOGS += totalCost
       return { name: p.name, revenue: p.totalRevenue, units: p.totalUnitsSold, costPerUnit, totalCost, grossProfit, marginPct }
     })
 

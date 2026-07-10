@@ -337,10 +337,19 @@ export default function SquareSyncView() {
           <div className="flex items-center gap-3">
             <button onClick={() => store.setCredentials({ daysBack: Math.max(7, store.daysBack - 7) })}
               className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-600 text-lg font-bold flex items-center justify-center">−</button>
-            <span className="w-24 text-center font-medium">{store.daysBack} days</span>
-            <button onClick={() => store.setCredentials({ daysBack: Math.min(365, store.daysBack + 7) })}
+            <span className="w-28 text-center font-medium">{store.daysBack >= 3650 ? 'All history' : `${store.daysBack} days`}</span>
+            <button onClick={() => store.setCredentials({ daysBack: Math.min(3650, store.daysBack + 7) })}
               className="w-8 h-8 rounded-full bg-stone-800 hover:bg-stone-600 text-lg font-bold flex items-center justify-center">+</button>
           </div>
+          <div className="flex flex-wrap gap-2">
+            {[{ l: '90 days', d: 90 }, { l: '1 year', d: 365 }, { l: '2 years', d: 730 }, { l: 'All history', d: 3650 }].map(p => (
+              <button key={p.d} onClick={() => store.setCredentials({ daysBack: p.d })}
+                className={`px-3 py-1.5 text-sm rounded ${store.daysBack === p.d ? 'bg-emerald-700 text-white' : 'bg-stone-800 hover:bg-stone-700 text-stone-300'}`}>
+                {p.l}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-stone-500">First "All history" sync can take several minutes and pulls every order Square has for this location.</p>
         </div>
       )}
 

@@ -152,6 +152,11 @@ async fn proxy_square_api(
     url: String,
     body: Option<String>,
 ) -> Result<String, String> {
+    let parsed = reqwest::Url::parse(&url).map_err(|_| "Invalid URL".to_string())?;
+    if parsed.scheme() != "https" || parsed.host_str() != Some("connect.squareup.com") {
+        return Err("Blocked: proxy only allows https://connect.squareup.com".to_string());
+    }
+
     let client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()

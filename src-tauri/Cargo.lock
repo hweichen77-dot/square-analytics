@@ -4821,7 +4821,7 @@ dependencies = [
 
 [[package]]
 name = "walleys-analytics"
-version = "1.10.0"
+version = "1.10.3"
 dependencies = [
  "reqwest 0.12.28",
  "serde",

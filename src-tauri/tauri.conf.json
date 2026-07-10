@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Square Analytics",
-  "version": "1.10.0",
+  "version": "1.10.3",
   "identifier": "com.walleys.analytics",
   "build": {
     "frontendDist": "../dist",

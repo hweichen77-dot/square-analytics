@@ -2,6 +2,8 @@ import { startOfDay, startOfWeek, startOfMonth, format } from 'date-fns'
 import type { SalesTransaction } from '../types/models'
 import { parseProductItems } from '../types/models'
 
+export const UNCATEGORIZED = 'Uncategorized (non-itemized sales)'
+
 function allocateRevenue(tx: SalesTransaction): Map<string, number> {
   const result = new Map<string, number>()
   const items = parseProductItems(tx.itemDescription)
@@ -127,9 +129,11 @@ export function computeProductStats(
     const monthKey = format(tx.date, 'yyyy-MM')
     const dayKey = format(tx.date, 'yyyy-MM-dd')
 
+    let attributed = 0
     for (const item of items) {
       const existing = statsMap.get(item.name)
       const itemRevenue = revenueMap.get(item.name) ?? 0
+      attributed += itemRevenue
       if (existing) {
         existing.totalUnitsSold += item.qty
         existing.totalRevenue += itemRevenue
@@ -149,6 +153,28 @@ export function computeProductStats(
           lastSoldDate: tx.date,
           monthlySales: { [monthKey]: item.qty },
           dailySales: { [dayKey]: item.qty },
+        })
+      }
+    }
+
+    const leftover = tx.netSales - attributed
+    if (leftover > 0.005) {
+      const u = statsMap.get(UNCATEGORIZED)
+      if (u) {
+        u.totalRevenue += leftover
+        if (tx.date < u.firstSoldDate) u.firstSoldDate = tx.date
+        if (tx.date > u.lastSoldDate) u.lastSoldDate = tx.date
+      } else {
+        statsMap.set(UNCATEGORIZED, {
+          name: UNCATEGORIZED,
+          category: 'Other',
+          totalUnitsSold: 0,
+          totalRevenue: leftover,
+          avgPrice: 0,
+          firstSoldDate: tx.date,
+          lastSoldDate: tx.date,
+          monthlySales: {},
+          dailySales: {},
         })
       }
     }
