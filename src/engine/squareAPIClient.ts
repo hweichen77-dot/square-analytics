@@ -105,6 +105,9 @@ export interface SquareCatalogItem {
   type: string
   item_data?: {
     name: string
+    description?: string
+    description_plaintext?: string
+    product_type?: string
     variations?: {
       id: string
       item_variation_data?: {
@@ -112,7 +115,21 @@ export interface SquareCatalogItem {
         price_money?: { amount: number; currency: string }
         default_unit_cost?: { amount: number; currency: string }
         sku?: string
+        upc?: string
         item_id?: string
+        track_inventory?: boolean
+        sellable?: boolean
+        stockable?: boolean
+        inventory_alert_type?: string
+        inventory_alert_threshold?: number
+        measurement_unit_id?: string
+        item_variation_vendor_infos?: {
+          item_variation_vendor_info_data?: {
+            vendor_id?: string
+            sku?: string
+            price_money?: { amount: number; currency: string }
+          }
+        }[]
       }
     }[]
     category_id?: string
@@ -122,6 +139,44 @@ export interface SquareCatalogItem {
   category_data?: {
     name: string
   }
+  measurement_unit_data?: {
+    measurement_unit?: {
+      custom_unit?: { name?: string; abbreviation?: string }
+      area_unit?: string
+      length_unit?: string
+      volume_unit?: string
+      weight_unit?: string
+      generic_unit?: string
+      time_unit?: string
+      type?: string
+    }
+  }
+}
+
+export interface SquareVendor {
+  id: string
+  name?: string
+  account_number?: string
+  status?: string
+}
+
+export async function fetchVendors(token: string): Promise<SquareVendor[]> {
+  const vendors: SquareVendor[] = []
+  let cursor: string | undefined
+
+  do {
+    const body: Record<string, unknown> = { limit: 100 }
+    if (cursor) body.cursor = cursor
+
+    const data = await squareRequest(token, 'POST', `${BASE}/vendors/search`, body) as {
+      vendors?: SquareVendor[]
+      cursor?: string
+    }
+    vendors.push(...(data.vendors ?? []))
+    cursor = data.cursor
+  } while (cursor)
+
+  return vendors
 }
 
 export interface SquareInventoryCount {
@@ -179,7 +234,7 @@ export async function fetchCatalogue(token: string): Promise<SquareCatalogItem[]
 
   do {
     const url = new URL(`${BASE}/catalog/list`)
-    url.searchParams.set('types', 'ITEM,CATEGORY')
+    url.searchParams.set('types', 'ITEM,CATEGORY,MEASUREMENT_UNIT')
     if (cursor) url.searchParams.set('cursor', cursor)
 
     const data = await squareRequest(token, 'GET', url.toString()) as {
@@ -250,6 +305,7 @@ export async function fetchCustomersByIds(token: string, ids: string[]): Promise
 export interface SquarePayment {
   id: string
   orderId?: string
+  customerId?: string
   teamMemberId?: string
   amountMoney: { amount: number; currency: string }
   processingFee?: Array<{ amountMoney: { amount: number } }>
@@ -262,6 +318,7 @@ export interface SquarePayment {
 interface RawSquarePayment {
   id: string
   order_id?: string
+  customer_id?: string
   team_member_id?: string
   amount_money?: { amount: number; currency: string }
   processing_fee?: Array<{ amount_money?: { amount: number } }>
@@ -275,6 +332,7 @@ function mapPayment(p: RawSquarePayment): SquarePayment {
   return {
     id: p.id,
     orderId: p.order_id,
+    customerId: p.customer_id,
     teamMemberId: p.team_member_id,
     amountMoney: p.amount_money ?? { amount: 0, currency: 'USD' },
     processingFee: (p.processing_fee ?? []).map(f => ({ amountMoney: { amount: f.amount_money?.amount ?? 0 } })),
@@ -433,11 +491,29 @@ export async function fetchShifts(
 }
 
 export interface SquareInventoryChange {
+  id: string
+  type: 'ADJUSTMENT' | 'PHYSICAL_COUNT' | 'TRANSFER'
   catalogObjectId: string
   quantity: number
   fromState?: string
   toState?: string
   occurredAt: string
+  source?: string
+  teamMemberId?: string
+}
+
+interface RawInventoryDetail {
+  id?: string
+  catalog_object_id?: string
+  from_state?: string
+  to_state?: string
+  state?: string
+  quantity?: string
+  occurred_at?: string
+  created_at?: string
+  source?: { name?: string; application_id?: string }
+  team_member_id?: string
+  employee_id?: string
 }
 
 export async function fetchInventoryChanges(
@@ -452,7 +528,7 @@ export async function fetchInventoryChanges(
   do {
     const body: Record<string, unknown> = {
       location_ids: [locationID],
-      types: ['ADJUSTMENT'],
+      types: ['ADJUSTMENT', 'PHYSICAL_COUNT', 'TRANSFER'],
       updated_after: beginTime,
       updated_before: endTime,
       limit: 1000,
@@ -462,25 +538,29 @@ export async function fetchInventoryChanges(
     const data = await squareRequest(token, 'POST', `${BASE}/inventory/changes/batch-retrieve`, body) as {
       changes?: Array<{
         type?: string
-        adjustment?: {
-          catalog_object_id?: string
-          from_state?: string
-          to_state?: string
-          quantity?: string
-          occurred_at?: string
-        }
+        adjustment?: RawInventoryDetail
+        physical_count?: RawInventoryDetail
+        transfer?: RawInventoryDetail
       }>
       cursor?: string
     }
+
     for (const c of data.changes ?? []) {
-      const adj = c.adjustment
-      if (!adj?.catalog_object_id) continue
+      const type = c.type as SquareInventoryChange['type'] | undefined
+      const detail = c.adjustment ?? c.physical_count ?? c.transfer
+      if (!type || !detail?.catalog_object_id) continue
+      const occurredAt = detail.occurred_at ?? detail.created_at ?? ''
+      if (!occurredAt) continue
       changes.push({
-        catalogObjectId: adj.catalog_object_id,
-        quantity: parseFloat(adj.quantity ?? '0') || 0,
-        fromState: adj.from_state,
-        toState: adj.to_state,
-        occurredAt: adj.occurred_at ?? '',
+        id: detail.id ?? `${detail.catalog_object_id}|${occurredAt}|${detail.quantity ?? '0'}`,
+        type,
+        catalogObjectId: detail.catalog_object_id,
+        quantity: parseFloat(detail.quantity ?? '0') || 0,
+        fromState: detail.from_state,
+        toState: detail.to_state ?? detail.state,
+        occurredAt,
+        source: detail.source?.name,
+        teamMemberId: detail.team_member_id ?? detail.employee_id,
       })
     }
     cursor = data.cursor

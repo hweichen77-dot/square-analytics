@@ -66,6 +66,16 @@ export function parseXLSXCatalogue(buffer: ArrayBuffer): XLSXCatalogueResult {
   const enabledIdx   = archivedIdx === null ? col(['enabled', 'active', 'sellable']) : null
   const quantityIdx  = col(['current quantity', 'quantity', 'stock', 'on hand'])
   const unitCostIdx  = col(['default unit cost', 'unit cost', 'cost'])
+  const vendorIdx      = col(['default vendor name', 'vendor name', 'vendor'])
+  const vendorCodeIdx  = col(['default vendor code', 'vendor code'])
+  const descriptionIdx = col(['description'])
+  const gtinIdx        = col(['gtin', 'upc'])
+  const sellableIdx    = col(['sellable'])
+  const stockableIdx   = col(['stockable'])
+  const alertEnabledIdx = col(['stock alert enabled'])
+  const alertCountIdx   = col(['stock alert count'])
+  const itemTypeIdx     = col(['item type'])
+  const unitTypeIdx     = col(['unit and precision', 'unit type', 'unit'])
 
   const products: Omit<CatalogueProduct, 'id'>[] = []
   const costs: Omit<ProductCostData, 'id'>[] = []
@@ -95,6 +105,11 @@ export function parseXLSXCatalogue(buffer: ArrayBuffer): XLSXCatalogueResult {
 
     const { itemName, variationName } = splitItemVariation(name)
 
+    const text = (idx: number | null): string | undefined =>
+      idx !== null ? String(row[idx] ?? '').trim() : undefined
+    const flag = (idx: number | null): boolean | undefined =>
+      idx !== null ? parseBool(row[idx]) : undefined
+
     products.push({
       name,
       itemName,
@@ -107,6 +122,18 @@ export function parseXLSXCatalogue(buffer: ArrayBuffer): XLSXCatalogueResult {
       quantity,
       importedAt: now,
       squareItemID: token,
+      unitCost: unitCost ?? undefined,
+      vendorName: text(vendorIdx),
+      vendorCode: text(vendorCodeIdx),
+      description: text(descriptionIdx),
+      gtin: text(gtinIdx),
+      sellable: flag(sellableIdx),
+      stockable: flag(stockableIdx),
+      stockAlertEnabled: flag(alertEnabledIdx),
+      stockAlertCount: alertCountIdx !== null ? parseQuantity(row[alertCountIdx]) : undefined,
+      itemType: text(itemTypeIdx),
+      unitType: text(unitTypeIdx),
+      lastSyncedAt: now,
     })
 
     if (unitCost !== null && unitCost > 0) {

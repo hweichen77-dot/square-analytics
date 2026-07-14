@@ -1,10 +1,11 @@
 import { subDays } from 'date-fns'
 import { useAuthStore } from '../store/authStore'
 import { refreshAccessToken } from './squareAuth'
-import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts } from './squareAPIClient'
+import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts, fetchVendors } from './squareAPIClient'
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
-import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs } from '../db/dbUtils'
-import type { SalesTransaction, CatalogueProduct, TransactionLineItem } from '../types/models'
+import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs, upsertStockMovements } from '../db/dbUtils'
+import { db } from '../db/database'
+import type { SalesTransaction, CatalogueProduct, TransactionLineItem, StockMovement } from '../types/models'
 import { parseProductItems, splitItemVariation } from '../types/models'
 
 export interface SyncStatus {
@@ -76,6 +77,8 @@ function orderToTransaction(order: SquareOrder, employeeMap: Record<string, stri
 function catalogueToProduct(
   item: SquareCatalogItem,
   categoryMap: Record<string, string>,
+  vendorMap: Record<string, string>,
+  unitMap: Record<string, string>,
 ): Omit<CatalogueProduct, 'id'>[] {
   const data = item.item_data
   if (!data?.name) return []
@@ -84,12 +87,17 @@ function catalogueToProduct(
 
   const variations = data.variations ?? []
   const category = data.category_id ? (categoryMap[data.category_id] ?? '') : ''
+  const now = new Date()
   const common = {
     category,
     taxable: data.is_taxable ?? false,
     enabled: !(data.is_archived ?? false),
     quantity: null as number | null,
-    importedAt: new Date(),
+    importedAt: now,
+    lastSyncedAt: now,
+    description: data.description_plaintext ?? data.description ?? undefined,
+    itemType: data.product_type ?? undefined,
+    squareParentItemID: item.id,
   }
 
   if (variations.length === 0) {
@@ -99,22 +107,49 @@ function catalogueToProduct(
   return variations.map(variation => {
     const varData = variation.item_variation_data
     const priceCents = varData?.price_money?.amount
+    const costCents = varData?.default_unit_cost?.amount
     const variantLabel = varData?.name ?? 'Regular'
     const variationName = variantLabel.toLowerCase() === 'regular' || variations.length === 1
       ? 'Regular'
       : variantLabel
     const displayName = variationName !== 'Regular' ? `${name} (${variationName})` : name
     const { itemName } = splitItemVariation(displayName)
+    const vendorInfo = varData?.item_variation_vendor_infos?.[0]?.item_variation_vendor_info_data
+    const alertType = varData?.inventory_alert_type ?? 'NONE'
     return {
       ...common,
       name: displayName,
       itemName,
       variationName,
       sku: varData?.sku ?? '',
+      gtin: varData?.upc ?? undefined,
       price: priceCents != null ? priceCents / 100 : null,
+      unitCost: costCents != null ? costCents / 100 : undefined,
+      vendorName: vendorInfo?.vendor_id ? vendorMap[vendorInfo.vendor_id] : undefined,
+      vendorCode: vendorInfo?.sku ?? undefined,
+      trackInventory: varData?.track_inventory ?? true,
+      sellable: varData?.sellable ?? true,
+      stockable: varData?.stockable ?? true,
+      stockAlertEnabled: alertType === 'LOW_QUANTITY',
+      stockAlertCount: varData?.inventory_alert_threshold ?? null,
+      unitType: varData?.measurement_unit_id ? unitMap[varData.measurement_unit_id] : undefined,
       squareItemID: variation.id,
     }
   })
+}
+
+function measurementUnitLabel(item: SquareCatalogItem): string {
+  const u = item.measurement_unit_data?.measurement_unit
+  if (!u) return ''
+  return u.custom_unit?.abbreviation
+    ?? u.custom_unit?.name
+    ?? u.weight_unit
+    ?? u.volume_unit
+    ?? u.length_unit
+    ?? u.area_unit
+    ?? u.generic_unit
+    ?? u.time_unit
+    ?? ''
 }
 
 function catalogueToCosts(item: SquareCatalogItem): Array<{ productName: string; unitCost: number; lastUpdated: Date }> {
@@ -132,6 +167,58 @@ function catalogueToCosts(item: SquareCatalogItem): Array<{ productName: string;
     const variationName = variantLabel.toLowerCase() === 'regular' || variations.length === 1 ? 'Regular' : variantLabel
     const displayName = variationName !== 'Regular' ? `${name} (${variationName})` : name
     return [{ productName: displayName, unitCost: costCents / 100, lastUpdated: now }]
+  })
+}
+
+async function fetchCustomerNames(accessToken: string, ids: string[]): Promise<Record<string, string>> {
+  const map: Record<string, string> = {}
+  if (ids.length === 0) return map
+  try {
+    const customers = await fetchCustomersByIds(accessToken, ids)
+    for (const c of customers) {
+      const name = [c.given_name, c.family_name].filter(Boolean).join(' ')
+      if (name) map[c.id] = name
+    }
+  } catch {
+  }
+  return map
+}
+
+async function backfillCustomerLinks(
+  accessToken: string,
+  locationID: string,
+  windowStart: Date,
+  windowEnd: Date,
+): Promise<void> {
+  const payments = await fetchPayments(
+    accessToken,
+    locationID,
+    windowStart.toISOString(),
+    windowEnd.toISOString(),
+  )
+  const customerByOrderId = new Map(
+    payments
+      .filter(p => p.orderId && p.customerId)
+      .map(p => [p.orderId!, p.customerId!]),
+  )
+  if (customerByOrderId.size === 0) return
+
+  const stored = await db.salesTransactions
+    .filter(t => !t.customerID && customerByOrderId.has(t.transactionID))
+    .toArray()
+  if (stored.length === 0) return
+
+  const ids = [...new Set(stored.map(t => customerByOrderId.get(t.transactionID)!))]
+  const names = await fetchCustomerNames(accessToken, ids)
+
+  await db.transaction('rw', db.salesTransactions, async () => {
+    for (const tx of stored) {
+      const customerID = customerByOrderId.get(tx.transactionID)!
+      await db.salesTransactions.update(tx.id!, {
+        customerID,
+        customerName: names[customerID] ?? tx.customerName,
+      })
+    }
   })
 }
 
@@ -177,22 +264,6 @@ async function _runSyncImpl(
     return tx ? [tx] : []
   })
 
-  const customerIDsToFetch = [...new Set(txRows.map(t => t.customerID).filter((id): id is string => !!id))]
-  const customerMap: Record<string, string> = {}
-  try {
-    const customers = await fetchCustomersByIds(accessToken, customerIDsToFetch)
-    for (const c of customers) {
-      const name = [c.given_name, c.family_name].filter(Boolean).join(' ')
-      if (name) customerMap[c.id] = name
-    }
-  } catch {
-  }
-  for (const tx of txRows) {
-    if (tx.customerID && customerMap[tx.customerID]) {
-      tx.customerName = customerMap[tx.customerID]
-    }
-  }
-
   try {
     const payments = await fetchPayments(
       accessToken,
@@ -210,11 +281,22 @@ async function _runSyncImpl(
       tx.processingFee = payment.processingFee?.[0]?.amountMoney?.amount ?? 0
       tx.cardBrand = payment.cardDetails?.card?.cardBrand
       tx.cardLastFour = payment.cardDetails?.card?.last4
+      if (!tx.customerID && payment.customerId) {
+        tx.customerID = payment.customerId
+      }
       if (payment.teamMemberId) {
         tx.staffName = employeeMap[payment.teamMemberId] ?? payment.teamMemberId
       }
     }
   } catch {
+  }
+
+  const customerIDsToFetch = [...new Set(txRows.map(t => t.customerID).filter((id): id is string => !!id))]
+  const customerMap = await fetchCustomerNames(accessToken, customerIDsToFetch)
+  for (const tx of txRows) {
+    if (tx.customerID && customerMap[tx.customerID]) {
+      tx.customerName = customerMap[tx.customerID]
+    }
   }
 
   try {
@@ -257,18 +339,39 @@ async function _runSyncImpl(
 
   const ordersAdded = await upsertTransactions(txRows)
 
+  if (!useAuthStore.getState().customerBackfillDone) {
+    try {
+      await backfillCustomerLinks(accessToken, locationID, daysBackStart, endDate)
+      useAuthStore.getState().setCredentials({ customerBackfillDone: true })
+    } catch {
+    }
+  }
+
   onStatus({ phase: 'catalogue', message: 'Fetching catalogue...', ordersAdded, productsAdded: 0 })
   const catObjects = await fetchCatalogue(accessToken)
 
   const categoryMap: Record<string, string> = {}
+  const unitMap: Record<string, string> = {}
   for (const obj of catObjects) {
     if (obj.type === 'CATEGORY' && obj.category_data?.name) {
       categoryMap[obj.id] = obj.category_data.name
     }
+    if (obj.type === 'MEASUREMENT_UNIT') {
+      const label = measurementUnitLabel(obj)
+      if (label) unitMap[obj.id] = label
+    }
+  }
+
+  const vendorMap: Record<string, string> = {}
+  try {
+    for (const v of await fetchVendors(accessToken)) {
+      if (v.name) vendorMap[v.id] = v.name
+    }
+  } catch {
   }
 
   const productItems = catObjects.filter(obj => obj.type === 'ITEM')
-  const products = productItems.flatMap(item => catalogueToProduct(item, categoryMap))
+  const products = productItems.flatMap(item => catalogueToProduct(item, categoryMap, vendorMap, unitMap))
   await upsertCatalogueProducts(products)
 
   try {
@@ -290,7 +393,9 @@ async function _runSyncImpl(
   try {
     const changes = await fetchInventoryChanges(accessToken, locationID, startDate.toISOString(), endDate.toISOString())
     const nameByVarId = new Map(products.map(p => [p.squareItemID, p.name]))
+
     const restocks = changes.flatMap(c => {
+      if (c.type !== 'ADJUSTMENT') return []
       const isReceiving = c.fromState == null || c.fromState === 'NONE'
       if (!(c.quantity > 0) || c.toState !== 'IN_STOCK' || !isReceiving) return []
       const productName = nameByVarId.get(c.catalogObjectId)
@@ -300,6 +405,26 @@ async function _runSyncImpl(
       return [{ productName, date, quantity: c.quantity, notes: 'Square inventory' }]
     })
     await upsertRestockLogs(restocks)
+
+    const movements = changes.flatMap((c): Omit<StockMovement, 'id'>[] => {
+      const productName = nameByVarId.get(c.catalogObjectId)
+      if (!productName) return []
+      const occurredAt = new Date(c.occurredAt)
+      if (isNaN(occurredAt.getTime())) return []
+      return [{
+        changeId: c.id,
+        productName,
+        catalogObjectId: c.catalogObjectId,
+        type: c.type,
+        fromState: c.fromState,
+        toState: c.toState,
+        quantity: c.quantity,
+        occurredAt,
+        source: c.source,
+        staffName: c.teamMemberId ? (employeeMap[c.teamMemberId] ?? '') : '',
+      }]
+    })
+    await upsertStockMovements(movements)
   } catch {
   }
 

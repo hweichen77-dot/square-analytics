@@ -77,6 +77,27 @@ export function useCatalogueProducts() {
   return useLiveQuery(() => db.catalogueProducts.toArray(), []) ?? []
 }
 
+export function useCatalogueProduct(name: string) {
+  return useLiveQuery(
+    () => db.catalogueProducts.where('name').equals(name).first(),
+    [name],
+  )
+}
+
+export function useStockMovements(productName: string) {
+  const raw = useLiveQuery(
+    () => db.stockMovements.where('productName').equals(productName).toArray(),
+    [productName],
+  ) ?? []
+  return useMemo(
+    () => [...raw]
+      .map(m => ({ ...m, occurredAt: m.occurredAt instanceof Date ? m.occurredAt : new Date(m.occurredAt as unknown as string) }))
+      .filter(m => !isNaN(m.occurredAt.getTime()))
+      .sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime()),
+    [raw],
+  )
+}
+
 export function useRefunds() {
   return useLiveQuery(() => db.refunds.toArray(), []) ?? []
 }

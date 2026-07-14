@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { format, startOfMonth, subMonths } from 'date-fns'
+import { format, startOfMonth, subMonths, subDays } from 'date-fns'
 import {
   BarChart, Bar, Cell, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid, Line, ComposedChart, Area,
 } from 'recharts'
-import { useAllTransactions, useOverridesMap } from '../db/useTransactions'
+import { useAllTransactions, useOverridesMap, useCatalogueProduct, useStockMovements } from '../db/useTransactions'
+import { stockMovementLabel } from '../types/models'
 import {
   computeProductStats,
   computeProductTimeSeries,
@@ -52,6 +53,8 @@ export default function ProductDetailView() {
   const productName = decodeURIComponent(name ?? '')
   const transactions = useAllTransactions()
   const overrides = useOverridesMap()
+  const catalogueProduct = useCatalogueProduct(productName)
+  const movements = useStockMovements(productName)
   const navigate = useNavigate()
   const [showAllTx, setShowAllTx] = useState(false)
   const [granularity, setGranularity] = useState<TimeGranularity>('Monthly')
@@ -146,7 +149,20 @@ export default function ProductDetailView() {
 
   const trend = stats ? productTrend(stats) : null
 
-  if (!stats) {
+  const dailyUnits = useMemo(() => {
+    const cutoff = subDays(new Date(), 30)
+    const units = txRows.filter(r => r.date >= cutoff).reduce((s, r) => s + r.qty, 0)
+    return units / 30
+  }, [txRows])
+
+  const onHand = catalogueProduct?.quantity ?? null
+  const unitCost = catalogueProduct?.unitCost ?? null
+  const price = catalogueProduct?.price ?? null
+  const margin = price != null && price > 0 && unitCost != null ? ((price - unitCost) / price) * 100 : null
+  const stockValue = onHand != null && unitCost != null ? onHand * unitCost : null
+  const daysOfSupply = onHand != null && dailyUnits > 0 ? onHand / dailyUnits : null
+
+  if (!stats && !catalogueProduct) {
     return (
       <div className="py-20 text-center text-stone-400">
         <p>Product not found.</p>
@@ -155,13 +171,14 @@ export default function ProductDetailView() {
     )
   }
 
-  const col = categoryColor(stats.category)
+  const category = stats?.category ?? catalogueProduct?.category ?? 'Other'
+  const col = categoryColor(category)
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/inventory')} className="text-amber-400 text-sm hover:underline">← Back</button>
+          <button onClick={() => navigate(-1)} className="text-amber-400 text-sm hover:underline">← Back</button>
         </div>
         <div className="flex items-baseline gap-3 flex-wrap">
           <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">{productName}</h1>
@@ -169,10 +186,114 @@ export default function ProductDetailView() {
             className="px-3 py-1 rounded-full text-sm font-medium"
             style={{ background: `${col}22`, color: col, border: `1px solid ${col}44` }}
           >
-            {stats.category}
+            {category}
           </span>
+          {catalogueProduct && !catalogueProduct.enabled && (
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-stone-700 text-stone-200">Archived</span>
+          )}
         </div>
 
+        {catalogueProduct && (
+          <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold text-stone-100">Inventory &amp; Cost</h2>
+              {catalogueProduct.lastSyncedAt && (
+                <span className="text-xs text-stone-500">
+                  synced {format(new Date(catalogueProduct.lastSyncedAt), 'MMM d, yyyy')}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatCard
+                label="On Hand"
+                value={onHand != null ? formatNumber(onHand) : '—'}
+                sub={catalogueProduct.stockAlertEnabled && catalogueProduct.stockAlertCount != null
+                  ? `alert at ${catalogueProduct.stockAlertCount}`
+                  : undefined}
+              />
+              <StatCard label="Stock Value" value={stockValue != null ? formatCurrency(stockValue) : '—'} sub={unitCost != null ? `${formatCurrency(unitCost)} / unit cost` : 'no cost set'} />
+              <StatCard label="Margin" value={margin != null ? `${margin.toFixed(0)}%` : '—'} sub={price != null ? `${formatCurrency(price)} price` : undefined} />
+              <StatCard
+                label="Days of Supply"
+                value={daysOfSupply != null ? Math.round(daysOfSupply).toString() : '—'}
+                sub={dailyUnits > 0 ? `${dailyUnits.toFixed(1)} units/day` : 'no recent sales'}
+              />
+            </div>
+
+            <dl className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 text-sm border-t border-stone-700/40 pt-4">
+              <DetailField label="Vendor" value={catalogueProduct.vendorName} />
+              <DetailField label="Vendor Code" value={catalogueProduct.vendorCode} mono />
+              <DetailField label="SKU" value={catalogueProduct.sku} mono />
+              <DetailField label="GTIN" value={catalogueProduct.gtin} mono />
+              <DetailField label="Variation" value={catalogueProduct.variationName} />
+              <DetailField label="Unit Type" value={catalogueProduct.unitType} />
+              <DetailField label="Taxable" value={catalogueProduct.taxable ? 'Yes' : 'No'} />
+              <DetailField
+                label="Tracking"
+                value={catalogueProduct.trackInventory === false ? 'Not tracked' : 'Tracked'}
+              />
+            </dl>
+
+            {catalogueProduct.description && (
+              <p className="text-sm text-stone-400 border-t border-stone-700/40 pt-4">{catalogueProduct.description}</p>
+            )}
+          </div>
+        )}
+
+        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+          <div className="px-4 py-3 border-b border-stone-700/50 flex items-center justify-between">
+            <h2 className="font-semibold text-stone-100">Stock History</h2>
+            <span className="text-xs text-stone-400">{movements.length} updates</span>
+          </div>
+          {movements.length === 0 ? (
+            <div className="py-10 text-center text-stone-400 text-sm">
+              No stock updates recorded. Sync with Square to pull inventory history.
+            </div>
+          ) : (
+            <div className="overflow-x-auto max-h-80">
+              <table className="w-full text-sm">
+                <thead className="sticky top-0 bg-stone-900 text-stone-400 uppercase text-xs">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Date</th>
+                    <th className="px-4 py-2 text-left">Update</th>
+                    <th className="px-4 py-2 text-right">Change</th>
+                    <th className="px-4 py-2 text-right">Qty</th>
+                    <th className="px-4 py-2 text-left">Staff</th>
+                    <th className="px-4 py-2 text-left">Source</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-700/40">
+                  {movements.map(m => {
+                    const { label, delta } = stockMovementLabel(m)
+                    return (
+                      <tr key={m.id ?? m.changeId} className="hover:bg-stone-700/40">
+                        <td className="px-4 py-2 text-stone-400 tabular-nums whitespace-nowrap">
+                          {format(m.occurredAt, 'MMM d, yyyy h:mm a')}
+                        </td>
+                        <td className="px-4 py-2 text-stone-100">{label}</td>
+                        <td className={`px-4 py-2 text-right tabular-nums font-medium ${delta > 0 ? 'text-emerald-400' : delta < 0 ? 'text-red-400' : 'text-stone-400'}`}>
+                          {delta > 0 ? `+${delta}` : delta < 0 ? String(delta) : '—'}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-stone-400">{m.quantity}</td>
+                        <td className="px-4 py-2 text-stone-400">{m.staffName || '—'}</td>
+                        <td className="px-4 py-2 text-stone-400">{m.source || '—'}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {!stats && (
+          <div className="bg-stone-800/30 border border-stone-700/40 py-10 text-center text-stone-400 text-sm">
+            No sales recorded for this product yet.
+          </div>
+        )}
+
+        {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 cf-stagger">
           <StatCard
             label="Units Sold"
@@ -202,8 +323,11 @@ export default function ProductDetailView() {
             trendUp={monthOverMonth !== null ? monthOverMonth >= 0 : undefined}
           />
         </div>
+        )}
       </div>
 
+      {stats && (
+      <>
       <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-stone-100">Revenue & Units Over Time</h2>
@@ -347,6 +471,17 @@ export default function ProductDetailView() {
           </div>
         )}
       </div>
+      </>
+      )}
+    </div>
+  )
+}
+
+function DetailField({ label, value, mono }: { label: string; value?: string | null; mono?: boolean }) {
+  return (
+    <div>
+      <dt className="text-xs text-stone-400">{label}</dt>
+      <dd className={`text-stone-100 mt-0.5 ${mono ? 'font-mono text-xs' : ''}`}>{value || '—'}</dd>
     </div>
   )
 }

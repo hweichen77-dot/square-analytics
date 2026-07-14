@@ -128,6 +128,68 @@ export interface CatalogueProduct {
   quantity: number | null
   importedAt: Date
   squareItemID: string
+  unitCost?: number | null
+  vendorName?: string
+  vendorCode?: string
+  description?: string
+  gtin?: string
+  trackInventory?: boolean
+  sellable?: boolean
+  stockable?: boolean
+  stockAlertEnabled?: boolean
+  stockAlertCount?: number | null
+  itemType?: string
+  unitType?: string
+  squareParentItemID?: string
+  lastSyncedAt?: Date
+}
+
+export type StockMovementType = 'ADJUSTMENT' | 'PHYSICAL_COUNT' | 'TRANSFER'
+
+export interface StockMovement {
+  id?: number
+  changeId: string
+  productName: string
+  catalogObjectId: string
+  type: StockMovementType
+  fromState?: string
+  toState?: string
+  quantity: number
+  occurredAt: Date
+  source?: string
+  staffName?: string
+}
+
+export function stockMovementLabel(m: StockMovement): { label: string; delta: number } {
+  if (m.type === 'PHYSICAL_COUNT') return { label: 'Recount', delta: 0 }
+  if (m.type === 'TRANSFER') return { label: 'Transfer', delta: 0 }
+
+  const from = m.fromState ?? 'NONE'
+  const to = m.toState ?? 'NONE'
+  const incoming = to === 'IN_STOCK'
+  const outgoing = from === 'IN_STOCK'
+
+  const OUT_LABELS: Record<string, string> = {
+    SOLD: 'Sold',
+    SOLD_ONLINE: 'Sold online',
+    WASTE: 'Waste',
+    IN_TRANSIT_TO: 'Transferred out',
+    RESERVED_FOR_SALE: 'Reserved',
+    NONE: 'Removed',
+  }
+  const IN_LABELS: Record<string, string> = {
+    NONE: 'Received',
+    RECEIVED_FROM_VENDOR: 'Received',
+    ORDERED_FROM_VENDOR: 'Received',
+    RETURNED_BY_CUSTOMER: 'Customer return',
+    UNLINKED_RETURN: 'Customer return',
+    IN_TRANSIT_TO: 'Transferred in',
+    WASTE: 'Waste reversed',
+  }
+
+  if (incoming && !outgoing) return { label: IN_LABELS[from] ?? 'Stock in', delta: m.quantity }
+  if (outgoing && !incoming) return { label: OUT_LABELS[to] ?? 'Stock out', delta: -m.quantity }
+  return { label: 'Adjustment', delta: 0 }
 }
 
 export function splitItemVariation(name: string): { itemName: string; variationName: string } {

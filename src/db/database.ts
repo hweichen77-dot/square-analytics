@@ -11,6 +11,7 @@ import type {
   StaffWage,
   StoredRefund,
   StoredShift,
+  StockMovement,
 } from '../types/models'
 import { splitItemVariation } from '../types/models'
 
@@ -26,6 +27,7 @@ class WalleysDB extends Dexie {
   staffWages!: Dexie.Table<StaffWage, number>
   refunds!: Dexie.Table<StoredRefund, number>
   shifts!: Dexie.Table<StoredShift, number>
+  stockMovements!: Dexie.Table<StockMovement, number>
 
   constructor() {
     super('WalleysDB')
@@ -126,6 +128,21 @@ class WalleysDB extends Dexie {
       staffWages: '++id, &staffName',
       refunds: '++id, &refundId, paymentId, createdAt',
       shifts: '++id, &shiftId, teamMemberId, staffName, startAt',
+    })
+
+    this.version(8).stores({
+      salesTransactions: '++id, &transactionID, date, staffName, paymentMethod, dayOfWeek, hour',
+      categoryOverrides: '++id, &productName',
+      restockLogs: '++id, productName, date',
+      productCostData: '++id, &productName',
+      storeEvents: '++id, startDate, endDate',
+      productBundles: '++id, name',
+      catalogueProducts: '++id, &name, itemName, variationName, sku, category, enabled',
+      opexEntries: '++id, month, category',
+      staffWages: '++id, &staffName',
+      refunds: '++id, &refundId, paymentId, createdAt',
+      shifts: '++id, &shiftId, teamMemberId, staffName, startAt',
+      stockMovements: '++id, &changeId, productName, catalogObjectId, occurredAt',
     })
   }
 }

@@ -14,6 +14,7 @@ interface AuthStore {
   lastSyncCount: number
   autoSyncEnabled: boolean
   syncIntervalMinutes: number
+  customerBackfillDone: boolean
 
   setCredentials: (creds: Partial<AuthStore>) => void
   clearAuth: () => void
@@ -34,11 +35,13 @@ export const useAuthStore = create<AuthStore>()(
       lastSyncCount: 0,
       autoSyncEnabled: false,
       syncIntervalMinutes: 30,
+      customerBackfillDone: false,
 
       setCredentials: creds => set(s => ({ ...s, ...creds })),
       clearAuth: () => set({
         accessToken: '', refreshToken: '', merchantID: '',
         tokenExpiresAt: null, locationID: '', lastSyncDate: null, lastSyncCount: 0,
+        customerBackfillDone: false,
       }),
     }),
     { name: 'walleys-auth' }

@@ -1,5 +1,5 @@
 import { db } from './database'
-import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StoreEvent, ProductBundle, StaffWage, StoredRefund, StoredShift } from '../types/models'
+import type { SalesTransaction, CatalogueProduct, ProductCostData, CategoryOverride, OpexEntry, RestockLog, StoreEvent, ProductBundle, StaffWage, StoredRefund, StoredShift, StockMovement } from '../types/models'
 
 export async function upsertStaffWage(staffName: string, hourlyWage: number): Promise<void> {
   const existing = await db.staffWages.where('staffName').equals(staffName).first()
@@ -73,17 +73,50 @@ export async function upsertTransactions(transactions: Omit<SalesTransaction, 'i
   return added
 }
 
+function definedOnly<T extends object>(obj: T): Partial<T> {
+  const out: Partial<T> = {}
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) (out as Record<string, unknown>)[k] = v
+  }
+  return out
+}
+
 export async function upsertCatalogueProducts(products: Omit<CatalogueProduct, 'id'>[]): Promise<void> {
   await db.transaction('rw', db.catalogueProducts, async () => {
     for (const p of products) {
       const existing = await db.catalogueProducts.where('name').equals(p.name).first()
       if (existing) {
-        await db.catalogueProducts.update(existing.id!, p)
+        await db.catalogueProducts.update(existing.id!, definedOnly(p))
       } else {
         await db.catalogueProducts.add(p)
       }
     }
   })
+}
+
+export async function upsertStockMovements(movements: Omit<StockMovement, 'id'>[]): Promise<number> {
+  if (movements.length === 0) return 0
+  const ids = movements.map(m => m.changeId)
+  const existing = new Set(
+    (await db.stockMovements.where('changeId').anyOf(ids).toArray()).map(m => m.changeId)
+  )
+  const seen = new Set<string>()
+  const toAdd = movements.filter(m => {
+    if (existing.has(m.changeId) || seen.has(m.changeId)) return false
+    seen.add(m.changeId)
+    return true
+  })
+  if (toAdd.length === 0) return 0
+  try {
+    await db.stockMovements.bulkAdd(toAdd as StockMovement[])
+    return toAdd.length
+  } catch {
+    let added = 0
+    for (const m of toAdd) {
+      try { await db.stockMovements.add(m as StockMovement); added++ } catch {  }
+    }
+    return added
+  }
 }
 
 export async function upsertProductCosts(costs: Omit<ProductCostData, 'id'>[]): Promise<void> {
@@ -160,7 +193,7 @@ export async function clearAllData(): Promise<void> {
   await db.transaction('rw',
     [db.salesTransactions, db.categoryOverrides, db.restockLogs,
     db.productCostData, db.storeEvents, db.productBundles, db.catalogueProducts,
-    db.opexEntries, db.staffWages],
+    db.opexEntries, db.staffWages, db.stockMovements],
     async () => {
       await Promise.all([
         db.salesTransactions.clear(),
@@ -172,13 +205,14 @@ export async function clearAllData(): Promise<void> {
         db.catalogueProducts.clear(),
         db.opexEntries.clear(),
         db.staffWages.clear(),
+        db.stockMovements.clear(),
       ])
     }
   )
 }
 
 export async function exportAllData(): Promise<string> {
-  const [transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages] = await Promise.all([
+  const [transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, stockMovements] = await Promise.all([
     db.salesTransactions.toArray(),
     db.catalogueProducts.toArray(),
     db.productCostData.toArray(),
@@ -188,11 +222,12 @@ export async function exportAllData(): Promise<string> {
     db.storeEvents.toArray(),
     db.productBundles.toArray(),
     db.staffWages.toArray(),
+    db.stockMovements.toArray(),
   ])
   return JSON.stringify({
-    version: 2,
+    version: 3,
     exportedAt: new Date().toISOString(),
-    data: { transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages },
+    data: { transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, stockMovements },
   })
 }
 
@@ -209,6 +244,7 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
       storeEvents?: Record<string, unknown>[]
       productBundles?: Record<string, unknown>[]
       staffWages?: Record<string, unknown>[]
+      stockMovements?: Record<string, unknown>[]
       salesTransactions?: Record<string, unknown>[]
       catalogueProducts?: Record<string, unknown>[]
       productCostData?: Record<string, unknown>[]
@@ -270,10 +306,15 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     ...stripId(r),
     createdDate: r.createdDate ? new Date(r.createdDate as string) : new Date(),
   }))
+  const movementsToAdd = (d.stockMovements ?? []).map(r => ({
+    ...stripId(r),
+    occurredAt: r.occurredAt ? new Date(r.occurredAt as string) : new Date(),
+  }))
 
   await db.transaction('rw', [
     db.salesTransactions, db.catalogueProducts, db.productCostData, db.categoryOverrides,
     db.opexEntries, db.restockLogs, db.storeEvents, db.productBundles, db.staffWages,
+    db.stockMovements,
   ], async () => {
     await Promise.all([
       db.salesTransactions.clear(),
@@ -285,6 +326,7 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
       db.storeEvents.clear(),
       db.productBundles.clear(),
       db.staffWages.clear(),
+      db.stockMovements.clear(),
     ])
     if (txToAdd.length) await db.salesTransactions.bulkPut(txToAdd as unknown as SalesTransaction[])
     if (catToAdd.length) await db.catalogueProducts.bulkPut(catToAdd as unknown as CatalogueProduct[])
@@ -295,6 +337,7 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     if (eventsToAdd.length) await db.storeEvents.bulkAdd(eventsToAdd as unknown as StoreEvent[])
     if (bundlesToAdd.length) await db.productBundles.bulkAdd(bundlesToAdd as unknown as ProductBundle[])
     if (d.staffWages?.length) await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
+    if (movementsToAdd.length) await db.stockMovements.bulkAdd(movementsToAdd as unknown as StockMovement[])
   })
 
   return { transactions: txRaw.length, catalogue: catRaw.length }

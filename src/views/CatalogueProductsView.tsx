@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -314,6 +315,7 @@ function Chevron({ open }: { open: boolean }) {
 export default function CatalogueProductsView() {
   const catalogue  = useLiveQuery(() => db.catalogueProducts.orderBy('name').toArray(), []) ?? []
   const showToast  = useToastStore(s => s.show)
+  const navigate   = useNavigate()
   const [search, setSearch]                 = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
   const [showArchived, setShowArchived]     = useState(false)
@@ -352,6 +354,10 @@ export default function CatalogueProductsView() {
   const archivedVars  = catalogue.filter(c => !c.enabled).length
   const totalStock    = catalogue.reduce((s, c) => s + (c.quantity ?? 0), 0)
   const multiVarItems = allGroups.filter(g => g.variations.length > 1).length
+
+  function openDetail(productName: string) {
+    navigate(`/inventory/${encodeURIComponent(productName)}`)
+  }
 
   function toggleExpand(itemName: string) {
     setExpandedItems(prev => {
@@ -536,8 +542,8 @@ export default function CatalogueProductsView() {
                   <>
                     <tr
                       key={`item-${group.itemName}`}
-                      onClick={() => varCount > 1 && toggleExpand(group.itemName)}
-                      className={`border-b border-stone-700/40 transition-colors ${varCount > 1 ? 'cursor-pointer hover:bg-stone-700/40' : 'hover:bg-stone-700/20'} ${isOpen ? 'bg-stone-700/20' : ''}`}
+                      onClick={() => varCount > 1 ? toggleExpand(group.itemName) : group.variations[0] && openDetail(group.variations[0].name)}
+                      className={`border-b border-stone-700/40 transition-colors cursor-pointer hover:bg-stone-700/40 ${isOpen ? 'bg-stone-700/20' : ''}`}
                     >
                       <td className="px-4 py-3 text-stone-400">
                         {varCount > 1
@@ -616,7 +622,8 @@ export default function CatalogueProductsView() {
                     {isOpen && group.variations.map((v, vi) => (
                       <tr
                         key={`var-${v.id ?? v.name}`}
-                        className={`border-b border-stone-700/20 bg-stone-900/60 hover:bg-stone-700/30 transition-colors ${!v.enabled ? 'opacity-50' : ''}`}
+                        onClick={() => openDetail(v.name)}
+                        className={`border-b border-stone-700/20 bg-stone-900/60 hover:bg-stone-700/30 transition-colors cursor-pointer ${!v.enabled ? 'opacity-50' : ''}`}
                       >
                         <td className="px-4 py-2.5" />
 
@@ -656,7 +663,7 @@ export default function CatalogueProductsView() {
                           </span>
                         </td>
 
-                        <td className="px-4 py-2.5 text-right">
+                        <td className="px-4 py-2.5 text-right" onClick={e => e.stopPropagation()}>
                           <button
                             onClick={() => openEdit(v)}
                             className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer"
