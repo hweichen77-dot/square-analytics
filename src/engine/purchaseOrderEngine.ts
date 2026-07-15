@@ -1,16 +1,34 @@
 import { differenceInDays } from 'date-fns'
-import type { SalesTransaction, StoreEvent, RestockLog } from '../types/models'
-import { computeProductStats } from './analyticsEngine'
+import type { SalesTransaction, StoreEvent, RestockLog, CatalogueProduct } from '../types/models'
+import { computeProductStats, trailingWeeklyVelocity } from './analyticsEngine'
+
+const HIGH_DEMAND_EVENTS = ['Big Game', 'Holiday', 'Long Weekend', 'Payday', 'Local Event']
+
+const LEAD_TIME_DAYS = 3
 
 export interface PurchaseOrderItem {
   productName: string
   category: string
   avgDailyVelocity: number
+  onHand: number | null
   recommendedQty: number
   estimatedRevenue: number
   avgPrice: number
   lastSoldDate: Date
   reasoning: string
+}
+
+function buildOnHandLookup(catalogue: CatalogueProduct[]): (name: string) => number | undefined {
+  const byName: Record<string, number> = {}
+  for (const p of catalogue) {
+    if (p.quantity !== null) byName[p.name.toLowerCase().trim()] = p.quantity
+  }
+  return (name: string) => {
+    const lower = name.toLowerCase().trim()
+    if (byName[lower] !== undefined) return byName[lower]
+    const base = lower.replace(/\s*\([^)]*\)\s*$/, '').trim()
+    return byName[base]
+  }
 }
 
 export function generatePurchaseOrder(
@@ -19,10 +37,12 @@ export function generatePurchaseOrder(
   _restockLogs: RestockLog[],
   overrides: Record<string, string> = {},
   weeksAhead = 2,
+  catalogueProducts: CatalogueProduct[] = [],
 ): PurchaseOrderItem[] {
   const reorderDays = weeksAhead * 7
   const stats = computeProductStats(transactions, overrides)
   const today = new Date()
+  const lookupOnHand = buildOnHandLookup(catalogueProducts)
 
   const upcomingEvents = events.filter(e => {
     const daysUntil = differenceInDays(e.startDate, today)
@@ -32,33 +52,35 @@ export function generatePurchaseOrder(
   const items: PurchaseOrderItem[] = []
 
   for (const product of stats) {
-    const spanDays = (Date.now() - product.firstSoldDate.getTime()) / 86_400_000
-    const weeksIntroduced = Math.max(1, spanDays / 7)
-    const weeklyVelocity = product.totalUnitsSold / weeksIntroduced
+    const weeklyVelocity = trailingWeeklyVelocity(product)
     const dailyVelocity = weeklyVelocity / 7
     if (dailyVelocity <= 0) continue
 
     let multiplier = 1.0
 
     if (upcomingEvents.length > 0) {
-      const isHighDemandEvent = upcomingEvents.some(e =>
-        ['Spirit Week', 'Homecoming', 'Back to School', 'Sports Game'].includes(e.eventType)
-      )
+      const isHighDemandEvent = upcomingEvents.some(e => HIGH_DEMAND_EVENTS.includes(e.eventType))
       multiplier = isHighDemandEvent ? 1.5 : 1.2
     }
 
-    const recommendedQty = Math.ceil(dailyVelocity * reorderDays * multiplier)
+    const onHandQty = lookupOnHand(product.name)
+    const onHand = onHandQty ?? null
+    const targetStock = dailyVelocity * (reorderDays + LEAD_TIME_DAYS) * multiplier
+    const recommendedQty = Math.max(0, Math.ceil(targetStock - (onHandQty ?? 0)))
+    if (recommendedQty <= 0) continue
     const estimatedRevenue = recommendedQty * product.avgPrice
 
-    let reasoning = `${weeklyVelocity.toFixed(1)} units/wk over ${Math.round(weeksIntroduced)}w since intro`
+    let reasoning = `${weeklyVelocity.toFixed(1)} units/wk (last 8w)`
+    if (onHand !== null) reasoning += ` · ${onHand} on hand`
     if (multiplier > 1) {
-      reasoning += ` · ${Math.round((multiplier - 1) * 100)}% boost for upcoming event`
+      reasoning += ` · ${Math.round((multiplier - 1) * 100)}% event boost`
     }
 
     items.push({
       productName: product.name,
       category: product.category,
       avgDailyVelocity: dailyVelocity,
+      onHand,
       recommendedQty,
       estimatedRevenue,
       avgPrice: product.avgPrice,

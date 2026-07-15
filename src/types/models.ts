@@ -289,18 +289,17 @@ export interface StaffWage {
 }
 
 export const EVENT_TYPES = [
-  'Spirit Week', 'Homecoming', 'Finals', 'Back to School',
-  'Holiday', 'Sports Game', 'Custom',
+  'Big Game', 'Holiday', 'Long Weekend', 'Payday', 'Local Event', 'Promotion', 'Custom',
 ] as const
 
 export function eventColor(type: string): string {
   const map: Record<string, string> = {
-    'Spirit Week': 'purple',
-    'Homecoming': 'orange',
-    'Finals': 'red',
-    'Back to School': 'blue',
+    'Big Game': 'teal',
     'Holiday': 'green',
-    'Sports Game': 'teal',
+    'Long Weekend': 'blue',
+    'Payday': 'orange',
+    'Local Event': 'purple',
+    'Promotion': 'red',
   }
   return map[type] ?? 'gray'
 }

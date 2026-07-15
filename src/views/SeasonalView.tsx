@@ -36,8 +36,8 @@ const EVENT_TAILWIND_COLOR: Record<string, string> = {
 
 function eventHex(type: string) {
   const map: Record<string, string> = {
-    'Spirit Week': '#f59e0b', 'Homecoming': '#f59e0b', 'Finals': '#ef4444',
-    'Back to School': '#d99a2b', 'Holiday': '#16a34a', 'Sports Game': '#f59e0b',
+    'Big Game': '#14b8a6', 'Holiday': '#16a34a', 'Long Weekend': '#3b82f6',
+    'Payday': '#f59e0b', 'Local Event': '#a855f7', 'Promotion': '#ef4444',
   }
   return map[type] ?? '#a8a29e'
 }
@@ -114,7 +114,7 @@ function EventEditModal({
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Event Name</label>
             <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
-              value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Spirit Week 2025" />
+              value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Super Bowl Weekend" />
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Type</label>

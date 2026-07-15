@@ -17,6 +17,7 @@ const RestockView           = lazy(() => import('./views/RestockView'))
 const ProfitView            = lazy(() => import('./views/ProfitView'))
 const SeasonalView          = lazy(() => import('./views/SeasonalView'))
 const DeadStockView         = lazy(() => import('./views/DeadStockView'))
+const ShrinkView            = lazy(() => import('./views/ShrinkView'))
 const BundleView            = lazy(() => import('./views/BundleView'))
 const PriceOptimizationView = lazy(() => import('./views/PriceOptimizationView'))
 const StaffShiftView        = lazy(() => import('./views/StaffShiftView'))
@@ -152,6 +153,7 @@ export default function App() {
               <Route path="/profit" element={<ProfitView />} />
               <Route path="/seasonal" element={<SeasonalView />} />
               <Route path="/dead-stock" element={<DeadStockView />} />
+              <Route path="/shrink" element={<ShrinkView />} />
               <Route path="/bundles" element={<BundleView />} />
               <Route path="/price-optimization" element={<PriceOptimizationView />} />
               <Route path="/staff-shift" element={<StaffShiftView />} />

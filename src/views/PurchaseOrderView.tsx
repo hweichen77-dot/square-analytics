@@ -20,10 +20,17 @@ const PERIOD_OPTIONS = [
 ]
 
 const CATEGORY_COLORS: Record<string, string> = {
+  Beer:           'bg-amber-600/15 text-amber-300',
+  Wine:           'bg-rose-500/15 text-rose-400',
+  Spirits:        'bg-violet-500/15 text-violet-400',
+  Tobacco:        'bg-orange-600/15 text-orange-400',
+  Vape:           'bg-cyan-500/15 text-cyan-400',
+  Lottery:        'bg-yellow-500/15 text-yellow-400',
   Food:           'bg-amber-500/15 text-amber-400',
-  Drinks:         'bg-amber-500/15 text-amber-400',
+  Drinks:         'bg-sky-500/15 text-sky-400',
   'Ice Cream':    'bg-emerald-500/15 text-emerald-400',
   'Ramen/Hot Food': 'bg-red-500/15 text-red-400',
+  Grocery:        'bg-lime-500/15 text-lime-400',
   Merch:          'bg-stone-700 text-stone-200',
   Other:          'bg-stone-700 text-stone-200',
 }
@@ -33,13 +40,13 @@ function categoryClass(cat: string) {
 }
 
 function seasonLabel(month: number) {
-  if (month >= 8 && month <= 9)   return 'Back to School'
-  if (month >= 10 && month <= 11) return 'Fall'
-  if (month === 12)               return 'Winter Holiday'
-  if (month >= 1 && month <= 2)   return 'Winter'
-  if (month === 3)                return 'Spring'
-  if (month >= 4 && month <= 5)   return 'Spring / Events'
-  return 'Summer'
+  if (month === 12 || month === 1) return 'Holidays / New Year'
+  if (month === 2)                 return 'Big Game Season'
+  if (month >= 3 && month <= 5)    return 'Spring'
+  if (month === 7)                 return 'July 4th / Summer'
+  if (month >= 6 && month <= 8)    return 'Summer'
+  if (month === 10)                return 'Halloween'
+  return 'Fall'
 }
 
 function exportToXLSX(items: PurchaseOrderItem[], qtyOverrides: Record<string, number>) {
@@ -121,8 +128,8 @@ export default function PurchaseOrderView() {
   const { velocityPreview, totalProductCount } = previewRaw ?? { velocityPreview: [], totalProductCount: 0 }
 
   const orderItems = useMemo(
-    () => generated ? generatePurchaseOrder(transactions, events, [], overrides, selectedWeeks) : [],
-    [generated, transactions, events, overrides, selectedWeeks],
+    () => generated ? generatePurchaseOrder(transactions, events, [], overrides, selectedWeeks, catalogueProducts) : [],
+    [generated, transactions, events, overrides, selectedWeeks, catalogueProducts],
   )
 
   const displayItems = useMemo(() => {
@@ -134,11 +141,7 @@ export default function PurchaseOrderView() {
       items = items.filter(item => item.category !== 'Merch' && item.category !== 'Other')
     }
     if (onlyNeedingReorder) {
-      const catQty = Object.fromEntries(catalogueProducts.filter(p => p.quantity !== null).map(p => [p.name, p.quantity!]))
-      items = items.filter(item => {
-        const stock = catQty[item.productName]
-        return stock === undefined || item.recommendedQty > stock
-      })
+      items = items.filter(item => item.onHand !== null)
     }
     return [...items].sort((a, b) => {
       const av = a[sortKey]
@@ -214,8 +217,8 @@ export default function PurchaseOrderView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-6">
         <h2 className="text-sm font-semibold text-stone-100 mb-1">Select time period to order for</h2>
         <p className="text-xs text-stone-400 mb-5">
-          The report will recommend quantities based on sales velocity over your full transaction history,
-          scaled to cover the selected period.
+          Recommended quantities are based on recent (8-week) sales velocity, scaled to cover the
+          selected period plus lead time, minus the stock you already have on hand.
         </p>
 
         <div className="flex flex-wrap gap-2 mb-6">
@@ -375,7 +378,7 @@ export default function PurchaseOrderView() {
                   onChange={e => setOnlyNeedingReorder(e.target.checked)}
                   className="rounded accent-amber-500"
                 />
-                Only show items needing reorder
+                Only items with stock data
               </label>
               <label className="flex items-center gap-2 text-sm text-stone-100 cursor-pointer select-none">
                 <input

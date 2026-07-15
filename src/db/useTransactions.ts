@@ -98,6 +98,16 @@ export function useStockMovements(productName: string) {
   )
 }
 
+export function useAllStockMovements() {
+  const raw = useLiveQuery(() => db.stockMovements.toArray(), []) ?? []
+  return useMemo(
+    () => raw
+      .map(m => ({ ...m, occurredAt: m.occurredAt instanceof Date ? m.occurredAt : new Date(m.occurredAt as unknown as string) }))
+      .filter(m => !isNaN(m.occurredAt.getTime())),
+    [raw],
+  )
+}
+
 export function useRefunds() {
   return useLiveQuery(() => db.refunds.toArray(), []) ?? []
 }

@@ -20,19 +20,35 @@ export function exportQuickBooksPL(data: AccountantReportData): void {
   rows.push(["Total Income", data.netRevenue])
   rows.push([])
 
+  const grossProfit = data.totalCOGS !== null
+    ? (data.grossProfit ?? ((data.coveredRevenue ?? data.netRevenue) - data.totalCOGS))
+    : null
+
   if (data.totalCOGS !== null) {
     rows.push(["COST OF GOODS SOLD", null])
     rows.push(["  Cost of Goods Sold", data.totalCOGS])
     rows.push(["Total COGS", data.totalCOGS])
     rows.push([])
-    rows.push(["GROSS PROFIT", data.grossProfit ?? (data.netRevenue - data.totalCOGS)])
+    rows.push(["GROSS PROFIT", grossProfit])
     if (data.grossMarginPct !== null) {
       rows.push(["Gross Margin %", `${data.grossMarginPct.toFixed(1)}%`])
+    }
+    if (data.coveragePct != null && data.coveragePct < 99) {
+      rows.push(["  Cost coverage", `${data.coveragePct.toFixed(0)}% of revenue`])
     }
     rows.push([])
   }
 
-  rows.push(["NET INCOME", data.grossProfit ?? data.netRevenue])
+  if (data.operatingExpenses != null) {
+    rows.push(["OPERATING EXPENSES", null])
+    rows.push(["  Total Operating Expenses", data.operatingExpenses])
+    rows.push([])
+  }
+
+  const opex = data.operatingExpenses ?? 0
+  const netIncome = data.netOperatingIncome
+    ?? (grossProfit !== null ? grossProfit - opex : data.netRevenue - opex)
+  rows.push(["NET INCOME", netIncome])
   rows.push([])
 
   rows.push(["PAYMENT BREAKDOWN", "Amount", "% of Revenue", "Transactions"])

@@ -25,6 +25,7 @@ const NAV_SECTIONS: { heading?: string; items: NavItem[] }[] = [
     items: [
       { label: 'Restock Alerts', path: '/restock' },
       { label: 'Dead Stock', path: '/dead-stock' },
+      { label: 'Shrink & Loss', path: '/shrink' },
       { label: 'Purchase Order', path: '/purchase-order' },
     ],
   },

@@ -98,10 +98,17 @@ export function productTrend(stats: ProductStats): SalesTrend {
   return 'Stable'
 }
 
+export function trailingWeeklyVelocity(stats: ProductStats, windowDays = 56): number {
+  const cutoff = Date.now() - windowDays * 86_400_000
+  let units = 0
+  for (const [day, qty] of Object.entries(stats.dailySales)) {
+    if (new Date(day + 'T00:00:00').getTime() >= cutoff) units += qty
+  }
+  return units / (windowDays / 7)
+}
+
 export function productVelocity(stats: ProductStats): number {
-  const spanDays = (Date.now() - stats.firstSoldDate.getTime()) / 86_400_000
-  const totalWeeks = Math.max(1, spanDays / 7)
-  return (stats.totalUnitsSold / totalWeeks) / 7
+  return trailingWeeklyVelocity(stats) / 7
 }
 
 export function isSlowMover(stats: ProductStats): boolean {

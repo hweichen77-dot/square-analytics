@@ -202,7 +202,7 @@ export function computeAnomalies(transactions: SalesTransaction[]): AnomalyDay[]
   const dowStats = dowEntries.map(entries => {
     if (entries.length < 3) return { mean: 0, std: 0 }
     const mean = entries.reduce((s, e) => s + e.revenue, 0) / entries.length
-    const variance = entries.reduce((s, e) => s + (e.revenue - mean) ** 2, 0) / entries.length
+    const variance = entries.reduce((s, e) => s + (e.revenue - mean) ** 2, 0) / (entries.length - 1)
     return { mean, std: Math.sqrt(variance) }
   })
 

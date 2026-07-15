@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
-import { useProductCostData, useAllTransactions } from '../db/useTransactions'
+import { useProductCostData, useAllTransactions, useCatalogueProducts } from '../db/useTransactions'
 import { useDeferredCompute } from '../hooks/useDeferredCompute'
 import { computeProductStats } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
 import { chart } from '../lib/chartTheme'
 import { parseProductItems } from '../types/models'
-import type { SalesTransaction, ProductCostData } from '../types/models'
+import type { SalesTransaction, ProductCostData, CatalogueProduct } from '../types/models'
 import { effectiveUnitCost } from '../types/models'
 import { format, startOfDay, differenceInDays } from 'date-fns'
 
@@ -36,11 +36,22 @@ function tierColor(tier: Tier) {
 function buildDeadStockItems(
   transactions: SalesTransaction[],
   costData: ProductCostData[],
+  catalogueProducts: CatalogueProduct[] = [],
 ): DeadStockItem[] {
   if (!transactions.length) return []
 
   const costByName: Record<string, number> = {}
   for (const c of costData) costByName[c.productName] = effectiveUnitCost(c)
+
+  const onHandByName: Record<string, number> = {}
+  for (const p of catalogueProducts) {
+    if (p.quantity !== null) onHandByName[p.name.toLowerCase().trim()] = p.quantity
+  }
+  function lookupOnHand(name: string): number | undefined {
+    const lower = name.toLowerCase().trim()
+    if (onHandByName[lower] !== undefined) return onHandByName[lower]
+    return onHandByName[lower.replace(/\s*\([^)]*\)\s*$/, '').trim()]
+  }
 
   const activeDaySet = new Set(transactions.map(tx => startOfDay(tx.date).getTime()))
   const activeDaysSorted = Array.from(activeDaySet).sort((a, b) => b - a)
@@ -91,8 +102,10 @@ function buildDeadStockItems(
     if (!tier) continue
 
     const unitCost = costByName[raw.name] ?? null
-    const capitalTiedUp =
-      unitCost !== null ? Math.max(0, raw.prior30 * 0.5) * unitCost : null
+    const onHand = lookupOnHand(raw.name)
+    const capitalTiedUp = unitCost === null
+      ? null
+      : (onHand !== undefined ? onHand : Math.max(0, raw.prior30 * 0.5)) * unitCost
 
     let recommendation: string
     if (raw.last30 === 0 && raw.prior30 > 10) recommendation = 'Markdown 30% to clear — was popular, now stalled'
@@ -194,10 +207,11 @@ function TierSection({
 export default function DeadStockView() {
   const transactions = useAllTransactions()
   const costData = useProductCostData()
+  const catalogueProducts = useCatalogueProducts()
 
   const { value: itemsRaw, loading: computing } = useDeferredCompute(
-    () => buildDeadStockItems(transactions, costData),
-    [transactions, costData],
+    () => buildDeadStockItems(transactions, costData, catalogueProducts),
+    [transactions, costData, catalogueProducts],
   )
   const items = itemsRaw ?? []
 

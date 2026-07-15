@@ -677,6 +677,10 @@ export interface AccountantReportData {
   totalCOGS: number | null
   grossProfit: number | null
   grossMarginPct: number | null
+  coveredRevenue?: number
+  coveragePct?: number
+  operatingExpenses?: number
+  netOperatingIncome?: number
   paymentBreakdown: AccountantPaymentRow[]
   topProducts: AccountantProductRow[]
 }
@@ -716,8 +720,17 @@ export function exportAccountantPDF(data: AccountantReportData): void {
     revRows.push(
       ['Cost of Goods Sold',  formatCurrency(data.totalCOGS!)],
       ['Gross Profit',        formatCurrency(data.grossProfit!)],
-      ['Gross Margin',        `${data.grossMarginPct!.toFixed(1)}%`],
+      ['Gross Margin',        `${data.grossMarginPct!.toFixed(1)}% on costed items`],
     )
+    if (data.coveragePct != null && data.coveragePct < 99) {
+      revRows.push(['Cost coverage', `${data.coveragePct.toFixed(0)}% of revenue`])
+    }
+    if (data.operatingExpenses != null) {
+      revRows.push(
+        ['Operating Expenses',   `(${formatCurrency(data.operatingExpenses)})`],
+        ['Net Operating Income', formatCurrency(data.netOperatingIncome ?? (data.grossProfit! - data.operatingExpenses))],
+      )
+    }
   }
 
   autoTable(doc, {

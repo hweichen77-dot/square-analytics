@@ -67,7 +67,10 @@ export default function AccountantReportView() {
 
   const dates = useMemo(() => {
     if (quick !== 'custom') return getQuickDates(quick)!
-    return { start: fromDateInput(customStart), end: fromDateInput(customEnd) }
+    const start = fromDateInput(customStart)
+    const end = fromDateInput(customEnd)
+    end.setHours(23, 59, 59, 999)
+    return { start, end }
   }, [quick, customStart, customEnd])
 
   const transactions = useLiveQuery(async () => {
@@ -113,12 +116,16 @@ export default function AccountantReportView() {
       .sort((a, b) => b.revenue - a.revenue)
 
     const hasCostData = costMap.size > 0
+    let coveredRevenue = 0
     const totalCOGS: number | null = hasCostData
       ? productStats.reduce((sum, p) => {
           const costPerUnit = costMap.get(p.name)
-          return costPerUnit != null ? sum + costPerUnit * p.totalUnitsSold : sum
+          if (costPerUnit == null) return sum
+          coveredRevenue += p.totalRevenue
+          return sum + costPerUnit * p.totalUnitsSold
         }, 0)
       : null
+    const coveragePct = totalRevenue > 0 ? (coveredRevenue / totalRevenue) * 100 : 0
 
     const topProducts: AccountantProductRow[] = productStats.slice(0, 20).map(p => {
       const costPerUnit = costMap.get(p.name) ?? null
@@ -130,9 +137,9 @@ export default function AccountantReportView() {
       return { name: p.name, revenue: p.totalRevenue, units: p.totalUnitsSold, costPerUnit, totalCost, grossProfit, marginPct }
     })
 
-    const grossProfit = totalCOGS !== null ? netRevenue - totalCOGS : null
-    const grossMarginPct = grossProfit !== null && netRevenue > 0
-      ? (grossProfit / netRevenue) * 100
+    const grossProfit = totalCOGS !== null ? coveredRevenue - totalCOGS : null
+    const grossMarginPct = grossProfit !== null && coveredRevenue > 0
+      ? (grossProfit / coveredRevenue) * 100
       : null
 
     const dateRange = `${format(dates.start, 'MMM d, yyyy')} — ${format(dates.end, 'MMM d, yyyy')}`
@@ -140,20 +147,21 @@ export default function AccountantReportView() {
     return {
       dateRange, totalRevenue, totalTransactions, avgTransaction,
       refundRevenue, refundCount: refunds.length, netRevenue,
-      totalCOGS, grossProfit, grossMarginPct, paymentBreakdown, topProducts,
+      totalCOGS, grossProfit, grossMarginPct, coveredRevenue, coveragePct,
+      paymentBreakdown, topProducts,
     }
   }, [transactions, productStats, costMap, dates])
 
   function handleExport() {
     if (transactions.length === 0) { show('No transactions in selected period', 'error'); return }
-    exportAccountantPDF(report)
+    exportAccountantPDF(exportData)
     show('PDF downloaded', 'success')
   }
 
   function handleExportXLSX() {
     if (transactions.length === 0) { show('No transactions in selected period', 'error'); return }
     try {
-      exportQuickBooksPL(report)
+      exportQuickBooksPL(exportData)
       show('QuickBooks P&L XLSX downloaded', 'success')
     } catch (e) {
       show(`XLSX export failed: ${(e as Error).message}`, 'error')
@@ -217,11 +225,28 @@ export default function AccountantReportView() {
 
   const opexTotal = useLiveQuery(async () => {
     const entries = await db.opexEntries.toArray()
-    const startMonth = format(dates.start, 'yyyy-MM')
-    const endMonth = format(dates.end, 'yyyy-MM')
-    const periodEntries = entries.filter(e => e.month >= startMonth && e.month <= endMonth)
-    return periodEntries.reduce((s, e) => s + e.amount, 0)
+    const { start, end } = dates
+    let total = 0
+    for (const e of entries) {
+      const [y, m] = e.month.split('-').map(Number)
+      if (!y || !m) continue
+      const monthStart = new Date(y, m - 1, 1)
+      const monthEnd = new Date(y, m, 0, 23, 59, 59, 999)
+      const overlapStart = start > monthStart ? start : monthStart
+      const overlapEnd = end < monthEnd ? end : monthEnd
+      if (overlapEnd < overlapStart) continue
+      const daysInMonth = new Date(y, m, 0).getDate()
+      const overlapDays = Math.floor((overlapEnd.getTime() - overlapStart.getTime()) / 86_400_000) + 1
+      total += e.amount * Math.min(1, overlapDays / daysInMonth)
+    }
+    return total
   }, [dates.start.getTime(), dates.end.getTime()]) ?? 0
+
+  const exportData = useMemo((): AccountantReportData => ({
+    ...report,
+    operatingExpenses: opexTotal > 0 ? opexTotal : undefined,
+    netOperatingIncome: report.grossProfit !== null ? report.grossProfit - opexTotal : undefined,
+  }), [report, opexTotal])
 
   return (
     <div className="space-y-6">
@@ -323,9 +348,14 @@ export default function AccountantReportView() {
                   <MetricRow
                     label="Gross Profit"
                     value={formatCurrency(report.grossProfit!)}
-                    sub={`${report.grossMarginPct!.toFixed(1)}% margin`}
+                    sub={`${report.grossMarginPct!.toFixed(1)}% margin on costed items`}
                     highlight
                   />
+                  {(report.coveragePct ?? 100) < 99 && (
+                    <p className="text-xs text-amber-400/80 mt-2">
+                      Margin covers {(report.coveragePct ?? 0).toFixed(0)}% of revenue — {formatCurrency(report.coveredRevenue ?? 0)} of {formatCurrency(report.totalRevenue)} has cost data entered. Add costs for the rest to see full-store margin.
+                    </p>
+                  )}
                 </>
               )}
               {!hasCOGS && (
@@ -391,7 +421,7 @@ export default function AccountantReportView() {
               <MetricRow
                 label="Net Operating Income"
                 value={formatCurrency(report.grossProfit! - opexTotal)}
-                sub={`${((report.grossProfit! - opexTotal) / report.netRevenue * 100).toFixed(1)}% net margin`}
+                sub={(report.coveredRevenue ?? 0) > 0 ? `${((report.grossProfit! - opexTotal) / (report.coveredRevenue ?? 1) * 100).toFixed(1)}% net margin` : undefined}
                 highlight
               />
             </div>

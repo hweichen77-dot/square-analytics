@@ -8,6 +8,7 @@ import { StatCard } from '../components/ui/StatCard'
 import { formatCurrency } from '../utils/format'
 import { chart } from '../lib/chartTheme'
 import { parseProductItems } from '../types/models'
+import { trailingWeeklyVelocity } from '../engine/analyticsEngine'
 import type { SalesTransaction } from '../types/models'
 import { format } from 'date-fns'
 
@@ -30,6 +31,14 @@ function buildPriceChanges(transactions: SalesTransaction[]): PriceChange[] {
   const productPriceHistory: Record<string, { date: Date; price: number; qty: number }[]> = {}
 
   for (const tx of transactions) {
+    if (tx.lineItems && tx.lineItems.length > 0) {
+      for (const li of tx.lineItems) {
+        if (li.qty <= 0 || li.unitPrice <= 0) continue
+        if (!productPriceHistory[li.name]) productPriceHistory[li.name] = []
+        productPriceHistory[li.name].push({ date: tx.date, price: li.unitPrice, qty: li.qty })
+      }
+      continue
+    }
     const items = parseProductItems(tx.itemDescription)
     const totalQty = items.reduce((s, i) => s + i.qty, 0)
     if (!totalQty) continue
@@ -102,14 +111,7 @@ export default function PriceOptimizationView() {
   )
   const velocityByProduct = useMemo(() => {
     const map: Record<string, number> = {}
-    for (const p of productStats) {
-      const spanDays = Math.max(
-        (p.lastSoldDate.getTime() - p.firstSoldDate.getTime()) / 86_400_000 + 1,
-        7,
-      )
-      const calendarWeeks = spanDays / 7
-      map[p.name] = calendarWeeks > 0 ? p.totalUnitsSold / calendarWeeks : 0
-    }
+    for (const p of productStats) map[p.name] = trailingWeeklyVelocity(p)
     return map
   }, [productStats])
 
@@ -221,7 +223,7 @@ export default function PriceOptimizationView() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-stone-700 text-left">
-                  {['Product', 'Date', 'Old $', 'New $', 'Price Δ', 'Unit Δ (30d)', 'Revenue Δ', 'Elasticity'].map(h => (
+                  {['Product', 'Date', 'Old $', 'New $', 'Price Δ', 'Unit Δ (30 sales)', 'Revenue Δ', 'Elasticity'].map(h => (
                     <th key={h} className="pb-2 font-semibold text-stone-400 pr-4">{h}</th>
                   ))}
                 </tr>
@@ -275,8 +277,8 @@ export default function PriceOptimizationView() {
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: chart.axis }} />
               <YAxis tickFormatter={v => `$${v.toFixed(0)}`} tick={{ fontSize: 11, fill: chart.axis }} />
               <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
-              <Line type="linear" dataKey="before" stroke={chart.line} dot strokeWidth={2} name="Before (30d)" />
-              <Line type="linear" dataKey="after" stroke={chart.positive} dot strokeWidth={2} name="After (30d)" />
+              <Line type="linear" dataKey="before" stroke={chart.line} dot strokeWidth={2} name="Before (30 sales)" />
+              <Line type="linear" dataKey="after" stroke={chart.positive} dot strokeWidth={2} name="After (30 sales)" />
             </ComposedChart>
           </ResponsiveContainer>
         )}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useRestockLogs, useCatalogueProducts, useAllTransactions } from '../db/useTransactions'
 import { useDeferredCompute } from '../hooks/useDeferredCompute'
-import { computeProductStats } from '../engine/analyticsEngine'
+import { computeProductStats, trailingWeeklyVelocity } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { StatCard } from '../components/ui/StatCard'
 import { db } from '../db/database'
@@ -74,9 +74,7 @@ function computeAlerts(
   const alerts: RestockAlert[] = []
 
   for (const product of stats) {
-    const spanDays = (today.getTime() - product.firstSoldDate.getTime()) / 86_400_000
-    const weeksSpan = Math.max(1, spanDays / 7)
-    const weeklyVelocity = product.totalUnitsSold / weeksSpan
+    const weeklyVelocity = trailingWeeklyVelocity(product)
     const dailyVelocity = weeklyVelocity / 7
 
     let stockRemaining: number | null = null
@@ -128,7 +126,7 @@ function computeAlerts(
       lastRestockedDate,
       lastRestockedQuantity,
       urgency,
-      recommendedRestockQty: Math.ceil(weeklyVelocity * 3),
+      recommendedRestockQty: Math.max(0, Math.ceil(weeklyVelocity * 3 - (stockRemaining ?? 0))),
     })
   }
 

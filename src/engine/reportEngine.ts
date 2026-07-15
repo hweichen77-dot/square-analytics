@@ -413,7 +413,7 @@ export function buildMonthlyDetailReport(
     } else {
       const positiveSales = txs.filter(t => t.netSales >= 0).reduce((s, t) => s + t.netSales, 0)
       const refundTotal   = Math.abs(txs.filter(t => t.netSales < 0).reduce((s, t) => s + t.netSales, 0))
-      grossSales     = positiveSales + refundTotal
+      grossSales     = positiveSales
       returns        = refundTotal
       discounts      = 0
       netSales       = txs.reduce((s, t) => s + t.netSales, 0)
@@ -433,9 +433,9 @@ export function buildMonthlyDetailReport(
       }
     }
 
-    const grossMargin    = cogs !== null ? netRevenue - cogs : null
-    const grossMarginPct = grossMargin !== null && netRevenue > 0
-      ? (grossMargin / netRevenue) * 100 : null
+    const grossMargin    = cogs !== null ? netSales - cogs : null
+    const grossMarginPct = grossMargin !== null && netSales > 0
+      ? (grossMargin / netSales) * 100 : null
 
     const monthOpex = opexByMonth.get(month) ?? []
     const opexByCategory: Record<string, number> = {}
@@ -445,9 +445,9 @@ export function buildMonthlyDetailReport(
     const opexManualTotal = Object.values(opexByCategory).reduce((s, v) => s + v, 0)
     const opexTotal = opexManualTotal + fees
 
-    const netProfit    = grossMargin !== null ? grossMargin - opexManualTotal : null
-    const netProfitPct = netProfit !== null && netRevenue > 0
-      ? (netProfit / netRevenue) * 100 : null
+    const netProfit    = grossMargin !== null ? grossMargin - opexTotal : null
+    const netProfitPct = netProfit !== null && netSales > 0
+      ? (netProfit / netSales) * 100 : null
 
     const top = productStats[0] ?? null
 
