@@ -342,7 +342,7 @@ export default function CatalogueProductsView() {
           if (q && !v.name.toLowerCase().includes(q) && !v.sku.toLowerCase().includes(q)) return false
           return true
         })
-        if (vars.length === 0 && !g.itemName.toLowerCase().includes(q)) return null
+        if (vars.length === 0) return null
         return { ...g, variations: vars }
       })
       .filter((g): g is ItemGroup => g !== null)
