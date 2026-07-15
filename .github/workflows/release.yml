@@ -1,0 +1,75 @@
+name: Release Desktop Installers
+
+# Builds the macOS .dmg (universal Intel + Apple Silicon) and Windows .msi/.exe
+# for a release and attaches them to the matching GitHub Release.
+#
+# Triggers:
+#   - pushing a tag like v1.2.3  -> builds + publishes that tag
+#   - manual run (Actions tab)   -> builds whatever ref you type
+#
+# .msi can ONLY be produced on the windows-latest runner (WiX is Windows-only);
+# that is the whole reason this lives in CI rather than a local mac build.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git tag or branch to build (e.g. v1.12.1)'
+        required: true
+        default: 'v1.12.1'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest      # -> .dmg + .app (universal)
+            rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
+            args: --target universal-apple-darwin
+          - platform: windows-latest    # -> .msi (WiX) + .exe (NSIS)
+            rust-targets: ''
+            args: ''
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Resolve ref
+        id: ref
+        shell: bash
+        run: echo "value=${{ github.event.inputs.ref || github.ref_name }}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ref.outputs.value }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust-targets }}
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build app + publish installers
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ steps.ref.outputs.value }}
+          releaseName: Square Analytics ${{ steps.ref.outputs.value }}
+          releaseBody: 'Desktop installers — .dmg for macOS (universal), .msi/.exe for Windows.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}
