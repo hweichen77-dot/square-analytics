@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { useRestockAlertCount } from '../../hooks/useRestockAlertCount'
+import { useFabsAuditCount } from '../../hooks/useFabsAuditCount'
 
 type NavItem = { label: string; path: string }
 
@@ -43,6 +44,7 @@ const NAV_SECTIONS: { heading?: string; items: NavItem[] }[] = [
   {
     heading: 'Catalogue',
     items: [
+      { label: 'Category & Tax Audit', path: '/category-tax-audit' },
       { label: 'Catalogue Checker', path: '/catalogue-checker' },
       { label: 'Catalogue Products', path: '/catalogue-products' },
     ],
@@ -97,6 +99,7 @@ function NavRow({ item, badge, onClose }: { item: NavItem; badge?: number; onClo
 
 export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
   const restockAlertCount = useRestockAlertCount()
+  const fabsAuditCount = useFabsAuditCount()
 
   return (
     <aside className={[
@@ -135,7 +138,7 @@ export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: (
               <NavRow
                 key={item.path}
                 item={item}
-                badge={item.path === '/restock' ? restockAlertCount : undefined}
+                badge={item.path === '/restock' ? restockAlertCount : item.path === '/category-tax-audit' ? fabsAuditCount : undefined}
                 onClose={onClose}
               />
             ))}

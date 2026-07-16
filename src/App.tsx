@@ -23,6 +23,7 @@ const PriceOptimizationView = lazy(() => import('./views/PriceOptimizationView')
 const StaffShiftView        = lazy(() => import('./views/StaffShiftView'))
 const CustomerView          = lazy(() => import('./views/CustomerView'))
 const CatalogueCheckerView  = lazy(() => import('./views/CatalogueCheckerView'))
+const CategoryTaxAuditView  = lazy(() => import('./views/CategoryTaxAuditView'))
 const CatalogueProductsView = lazy(() => import('./views/CatalogueProductsView'))
 const PurchaseOrderView     = lazy(() => import('./views/PurchaseOrderView'))
 const ImportView            = lazy(() => import('./views/ImportView'))
@@ -159,6 +160,7 @@ export default function App() {
               <Route path="/staff-shift" element={<StaffShiftView />} />
               <Route path="/customers" element={<CustomerView />} />
               <Route path="/catalogue-checker" element={<CatalogueCheckerView />} />
+              <Route path="/category-tax-audit" element={<CategoryTaxAuditView />} />
               <Route path="/catalogue-products" element={<CatalogueProductsView />} />
               <Route path="/purchase-order" element={<PurchaseOrderView />} />
               <Route path="/import" element={<ImportView />} />

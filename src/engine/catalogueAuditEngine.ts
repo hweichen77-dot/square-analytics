@@ -44,11 +44,20 @@ function isRamen(product: CatalogueProduct): boolean {
 }
 
 function isCarbonatedDrink(product: CatalogueProduct): boolean {
+  const cat = (product.category ?? '').toLowerCase()
+  if (cat.includes('carbonated') || cat.includes('soda')) return true
   return carbonatedRe.test(product.name.toLowerCase())
 }
 
-function shouldBeTaxed(product: CatalogueProduct): boolean {
+export function shouldBeTaxed(product: CatalogueProduct): boolean {
   return isMerch(product) || isRamen(product) || isCarbonatedDrink(product)
+}
+
+export const TAXABLE_CATEGORY_LABEL = 'Merchandise, ramen / instant food, and carbonated drinks'
+
+export function isUncategorized(product: CatalogueProduct): boolean {
+  const cat = (product.category ?? '').trim().toLowerCase()
+  return cat === '' || cat === 'uncategorized' || cat === 'non'
 }
 
 const WRONG_PREPARED_LABELS = [
@@ -140,7 +149,7 @@ export function auditCatalogue(
       })
     }
 
-    if (!p.category || p.category.trim() === '' || ['uncategorized', 'non'].includes(p.category.toLowerCase().trim())) {
+    if (isUncategorized(p)) {
       issues.push({
         id: nextId(),
         productId: id,

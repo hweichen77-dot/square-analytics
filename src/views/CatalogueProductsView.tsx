@@ -11,7 +11,7 @@ import { useToastStore } from '../store/toastStore'
 import { splitItemVariation } from '../types/models'
 import type { CatalogueProduct } from '../types/models'
 
-const KNOWN_CATEGORIES = [
+export const KNOWN_CATEGORIES = [
   'Ramen',
   'Carbonated Drinks',
   'Snacks',
