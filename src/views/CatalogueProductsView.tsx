@@ -158,8 +158,8 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div className="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+      <div className="absolute inset-0 z-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 z-10 flex items-center justify-center p-4 pointer-events-none">
       <div className="pointer-events-auto bg-stone-800 border border-stone-700 shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
           <div>

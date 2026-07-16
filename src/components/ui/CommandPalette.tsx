@@ -52,8 +52,8 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div className="absolute inset-0 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
+      <div className="absolute inset-0 z-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 z-10 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
       <div
         className="pointer-events-auto w-full max-w-lg bg-stone-900 border border-stone-700 shadow-2xl overflow-hidden"
       >
