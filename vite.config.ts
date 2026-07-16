@@ -6,7 +6,7 @@ const isTauri = process.env.TAURI_ENV_TARGET_TRIPLE !== undefined
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: isTauri ? './' : '/Walleys-Analytics/',
+  base: isTauri ? './' : '/square-analytics/',
 
   server: {
     port: 5173,
