@@ -37,8 +37,8 @@ export default function CategoryTaxAuditView() {
     const q = search.toLowerCase().trim()
     return enabled
       .filter(p => isUncategorized(p))
-      .filter(p => !q || p.name.toLowerCase().includes(q))
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .filter(p => !q || String(p.name ?? '').toLowerCase().includes(q))
+      .sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? '')))
   }, [enabled, search])
 
   const taxMismatches = useMemo<TaxMismatch[]>(() => {
@@ -54,7 +54,7 @@ export default function CategoryTaxAuditView() {
             : `Marked TAXABLE but is not merch, ramen, or a carbonated drink — should be non-taxable.`,
         }
       })
-      .sort((a, b) => a.product.name.localeCompare(b.product.name))
+      .sort((a, b) => String(a.product.name ?? '').localeCompare(String(b.product.name ?? '')))
   }, [enabled])
 
   const totalUncategorized = enabled.filter(p => isUncategorized(p)).length

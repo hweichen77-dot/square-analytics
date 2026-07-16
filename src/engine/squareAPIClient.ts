@@ -182,6 +182,7 @@ export async function fetchVendors(token: string): Promise<SquareVendor[]> {
 export interface SquareInventoryCount {
   catalog_object_id: string
   quantity: string
+  state?: string
 }
 
 export async function fetchLocations(token: string): Promise<SquareLocation[]> {
@@ -576,6 +577,7 @@ export async function fetchInventory(token: string, locationID: string): Promise
   do {
     const body: Record<string, unknown> = {
       location_ids: [locationID],
+      states: ['IN_STOCK'],
       limit: 1000,
     }
     if (cursor) body.cursor = cursor

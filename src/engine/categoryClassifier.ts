@@ -106,7 +106,7 @@ function hasKeyword(lower: string, keywords: string[]): boolean {
 
 export function classifyProduct(name: string, overrides: Record<string, string> = {}): string {
   if (overrides[name]) return overrides[name]
-  const lower = name.toLowerCase()
+  const lower = String(name ?? '').toLowerCase()
   if (hasKeyword(lower, LOTTERY_KEYWORDS)) return 'Lottery'
   if (hasKeyword(lower, VAPE_KEYWORDS)) return 'Vape'
   if (hasKeyword(lower, TOBACCO_KEYWORDS)) return 'Tobacco'

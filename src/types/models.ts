@@ -193,9 +193,10 @@ export function stockMovementLabel(m: StockMovement): { label: string; delta: nu
 }
 
 export function splitItemVariation(name: string): { itemName: string; variationName: string } {
-  const match = name.match(/^(.+)\s+\((.+)\)$/)
+  const s = String(name ?? '')
+  const match = s.match(/^(.+)\s+\((.+)\)$/)
   if (match) return { itemName: match[1].trim(), variationName: match[2].trim() }
-  return { itemName: name.trim(), variationName: 'Regular' }
+  return { itemName: s.trim(), variationName: 'Regular' }
 }
 
 export interface ProductItem {

@@ -382,7 +382,13 @@ async function _runSyncImpl(
 
   onStatus({ phase: 'inventory', message: 'Fetching inventory...', ordersAdded, productsAdded: products.length })
   const invCounts = await fetchInventory(accessToken, locationID)
-  const invMap = new Map(invCounts.map(c => [c.catalog_object_id, parseFloat(c.quantity)]))
+  const invMap = new Map<string, number>()
+  for (const c of invCounts) {
+    if (c.state != null && c.state !== 'IN_STOCK') continue
+    const qty = parseFloat(c.quantity)
+    if (Number.isNaN(qty)) continue
+    invMap.set(c.catalog_object_id, (invMap.get(c.catalog_object_id) ?? 0) + qty)
+  }
 
   for (const product of products) {
     const qty = invMap.get(product.squareItemID)

@@ -11,6 +11,15 @@ const carbonatedRe = new RegExp(
   '\\b(' + CARBONATED_KEYWORDS.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b',
 )
 
+const NON_CARBONATED_KEYWORDS = [
+  'mogu', 'aloe', 'yakult', 'nata de coco', 'nectar', 'smoothie', 'horchata',
+  'milk tea', 'boba', 'juice', 'lemonade', 'iced tea', 'green tea', 'water',
+  'milk', 'coffee', 'latte', 'kombucha', 'lassi',
+]
+const nonCarbonatedRe = new RegExp(
+  '\\b(' + NON_CARBONATED_KEYWORDS.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b',
+)
+
 export type AuditSeverity = 'error' | 'warning' | 'info'
 
 export interface AuditIssue {
@@ -33,7 +42,7 @@ export type AuditFixType =
 function isMerch(product: CatalogueProduct): boolean {
   const cat = (product.category ?? '').toLowerCase()
   if (cat.includes('merch') || cat.includes('apparel') || cat.includes('clothing')) return true
-  const lower = product.name.toLowerCase()
+  const lower = String(product.name ?? '').toLowerCase()
   return MERCH_KEYWORDS.some(k => lower.includes(k))
 }
 
@@ -44,9 +53,11 @@ function isRamen(product: CatalogueProduct): boolean {
 }
 
 function isCarbonatedDrink(product: CatalogueProduct): boolean {
+  const lowerName = String(product.name ?? '').toLowerCase()
+  if (nonCarbonatedRe.test(lowerName)) return false
   const cat = (product.category ?? '').toLowerCase()
   if (cat.includes('carbonated') || cat.includes('soda')) return true
-  return carbonatedRe.test(product.name.toLowerCase())
+  return carbonatedRe.test(lowerName)
 }
 
 export function shouldBeTaxed(product: CatalogueProduct): boolean {
@@ -96,7 +107,7 @@ export function auditCatalogue(
 
   for (const p of products) {
     const id = p.id
-    const name = p.name
+    const name = String(p.name ?? '')
 
     if (shouldBeTaxed(p) && !p.taxable) {
       issues.push({
