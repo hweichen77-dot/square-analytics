@@ -72,6 +72,7 @@ export default function CatalogueCheckerView() {
   const showToast     = useToastStore(s => s.show)
 
   const [filter, setFilter]         = useState<Filter>('all')
+  const [issueType, setIssueType]   = useState<string>('all')
   const [fixing, setFixing]         = useState(false)
   const [expandedItems, setExpanded] = useState<Set<string>>(new Set())
 
@@ -81,9 +82,18 @@ export default function CatalogueCheckerView() {
     return auditCatalogue(catalogue, salesNames, avgPrices)
   }, [stats, overrides, catalogue])
 
+  const issueTypeCounts = useMemo(() => {
+    const m = new Map<string, number>()
+    for (const i of issues) m.set(i.issue, (m.get(i.issue) ?? 0) + 1)
+    return Array.from(m.entries()).sort((a, b) => b[1] - a[1])
+  }, [issues])
+
   const visibleIssues = useMemo(
-    () => filter === 'all' ? issues : issues.filter(i => i.severity === filter),
-    [issues, filter],
+    () => issues.filter(i =>
+      (filter === 'all' || i.severity === filter) &&
+      (issueType === 'all' || i.issue === issueType),
+    ),
+    [issues, filter, issueType],
   )
 
   const itemGroups = useMemo(() => groupIssuesByItem(visibleIssues), [visibleIssues])
@@ -123,6 +133,14 @@ export default function CatalogueCheckerView() {
       const names = issues
         .filter(i => i.severity === sev)
         .map(i => splitItemVariation(i.productName).itemName)
+      setExpanded(new Set(names))
+    }
+  }
+
+  function selectIssueType(t: string) {
+    setIssueType(t)
+    if (t !== 'all') {
+      const names = issues.filter(i => i.issue === t).map(i => splitItemVariation(i.productName).itemName)
       setExpanded(new Set(names))
     }
   }
@@ -178,6 +196,27 @@ export default function CatalogueCheckerView() {
         </span>
       </div>
 
+      {issues.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-stone-400 mr-1">Issue type:</span>
+          <button
+            onClick={() => selectIssueType('all')}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === 'all' ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-stone-600 text-stone-300 hover:border-amber-500/50'}`}
+          >
+            All ({issues.length})
+          </button>
+          {issueTypeCounts.map(([type, count]) => (
+            <button
+              key={type}
+              onClick={() => selectIssueType(type)}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === type ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-stone-600 text-stone-300 hover:border-amber-500/50'}`}
+            >
+              {type} ({count})
+            </button>
+          ))}
+        </div>
+      )}
+
       {issues.length === 0 && (
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
@@ -192,10 +231,12 @@ export default function CatalogueCheckerView() {
 
       {itemGroups.length > 0 && (
         <div className="space-y-2">
-          {filter !== 'all' && (
+          {(filter !== 'all' || issueType !== 'all') && (
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-stone-400">Showing {filter}s only · {visibleIssues.length} issues across {itemGroups.length} items</p>
-              <button onClick={() => setFilter('all')} className="text-xs text-amber-400 hover:underline cursor-pointer">Show all</button>
+              <p className="text-xs text-stone-400">
+                Showing {issueType !== 'all' ? `"${issueType}"` : `${filter}s`}{filter !== 'all' && issueType !== 'all' ? ` (${filter}s)` : ''} · {visibleIssues.length} issues across {itemGroups.length} items
+              </p>
+              <button onClick={() => { setFilter('all'); setIssueType('all') }} className="text-xs text-amber-400 hover:underline cursor-pointer">Show all</button>
             </div>
           )}
 
@@ -277,8 +318,8 @@ export default function CatalogueCheckerView() {
 
       {visibleIssues.length === 0 && issues.length > 0 && (
         <div className="text-center py-10 text-stone-400 text-sm">
-          No {filter}s found.{' '}
-          <button onClick={() => setFilter('all')} className="text-amber-400 hover:underline cursor-pointer">Show all issues</button>
+          No matching issues.{' '}
+          <button onClick={() => { setFilter('all'); setIssueType('all') }} className="text-amber-400 hover:underline cursor-pointer">Show all issues</button>
         </div>
       )}
     </div>
