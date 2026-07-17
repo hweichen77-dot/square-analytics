@@ -51,11 +51,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 z-0 bg-black/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-      <div className="absolute inset-0 z-10 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 bg-black/80" onClick={onClose}>
       <div
-        className="pointer-events-auto w-full max-w-lg bg-stone-900 border border-stone-700 shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-stone-900 border border-stone-700 shadow-2xl overflow-hidden"
+        onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-700">
           <svg className="w-4 h-4 text-stone-200 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -98,7 +97,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           <span><kbd className="border border-stone-700 px-1">↵</kbd> open</span>
           <span><kbd className="border border-stone-700 px-1">esc</kbd> close</span>
         </div>
-      </div>
       </div>
     </div>
   )

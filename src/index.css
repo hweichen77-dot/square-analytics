@@ -72,7 +72,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.cf-page-enter { animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cf-page-enter { animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .cf-stagger > * { animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
