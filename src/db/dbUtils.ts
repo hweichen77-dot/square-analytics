@@ -124,7 +124,14 @@ export async function upsertProductCosts(costs: Omit<ProductCostData, 'id'>[]): 
     for (const c of costs) {
       const existing = await db.productCostData.where('productName').equals(c.productName).first()
       if (existing) {
-        await db.productCostData.update(existing.id!, c)
+        // A catalogue re-import only carries a flat unit cost, so casePrice/unitsPerCase
+        // arrive as 0. effectiveUnitCost prefers case pricing when set, so blindly writing
+        // the incoming record would wipe hand-entered case costs and silently change COGS.
+        // Only overwrite case fields when the incoming values are real (> 0).
+        const patch: Partial<ProductCostData> = { unitCost: c.unitCost, lastUpdated: c.lastUpdated }
+        if ((c.casePrice ?? 0) > 0) patch.casePrice = c.casePrice
+        if ((c.unitsPerCase ?? 0) > 0) patch.unitsPerCase = c.unitsPerCase
+        await db.productCostData.update(existing.id!, patch)
       } else {
         await db.productCostData.add(c)
       }
@@ -193,7 +200,7 @@ export async function clearAllData(): Promise<void> {
   await db.transaction('rw',
     [db.salesTransactions, db.categoryOverrides, db.restockLogs,
     db.productCostData, db.storeEvents, db.productBundles, db.catalogueProducts,
-    db.opexEntries, db.staffWages, db.stockMovements],
+    db.opexEntries, db.staffWages, db.refunds, db.shifts, db.stockMovements],
     async () => {
       await Promise.all([
         db.salesTransactions.clear(),
@@ -205,6 +212,8 @@ export async function clearAllData(): Promise<void> {
         db.catalogueProducts.clear(),
         db.opexEntries.clear(),
         db.staffWages.clear(),
+        db.refunds.clear(),
+        db.shifts.clear(),
         db.stockMovements.clear(),
       ])
     }
@@ -212,7 +221,7 @@ export async function clearAllData(): Promise<void> {
 }
 
 export async function exportAllData(): Promise<string> {
-  const [transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, stockMovements] = await Promise.all([
+  const [transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, refunds, shifts, stockMovements] = await Promise.all([
     db.salesTransactions.toArray(),
     db.catalogueProducts.toArray(),
     db.productCostData.toArray(),
@@ -222,12 +231,14 @@ export async function exportAllData(): Promise<string> {
     db.storeEvents.toArray(),
     db.productBundles.toArray(),
     db.staffWages.toArray(),
+    db.refunds.toArray(),
+    db.shifts.toArray(),
     db.stockMovements.toArray(),
   ])
   return JSON.stringify({
     version: 3,
     exportedAt: new Date().toISOString(),
-    data: { transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, stockMovements },
+    data: { transactions, catalogue, costData, overrides, opexEntries, restockLogs, storeEvents, productBundles, staffWages, refunds, shifts, stockMovements },
   })
 }
 
@@ -244,6 +255,8 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
       storeEvents?: Record<string, unknown>[]
       productBundles?: Record<string, unknown>[]
       staffWages?: Record<string, unknown>[]
+      refunds?: Record<string, unknown>[]
+      shifts?: Record<string, unknown>[]
       stockMovements?: Record<string, unknown>[]
       salesTransactions?: Record<string, unknown>[]
       catalogueProducts?: Record<string, unknown>[]
@@ -310,11 +323,20 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     ...stripId(r),
     occurredAt: r.occurredAt ? new Date(r.occurredAt as string) : new Date(),
   }))
+  const refundsToAdd = (d.refunds ?? []).map((r, i) => {
+    try { return { ...stripId(r), createdAt: safeDate(r.createdAt, `refunds[${i}].createdAt`) }
+    } catch { return { ...stripId(r), createdAt: new Date() } }
+  })
+  const shiftsToAdd = (d.shifts ?? []).map(r => ({
+    ...stripId(r),
+    startAt: r.startAt ? new Date(r.startAt as string) : new Date(),
+    endAt: r.endAt ? new Date(r.endAt as string) : undefined,
+  }))
 
   await db.transaction('rw', [
     db.salesTransactions, db.catalogueProducts, db.productCostData, db.categoryOverrides,
     db.opexEntries, db.restockLogs, db.storeEvents, db.productBundles, db.staffWages,
-    db.stockMovements,
+    db.refunds, db.shifts, db.stockMovements,
   ], async () => {
     await Promise.all([
       db.salesTransactions.clear(),
@@ -326,6 +348,8 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
       db.storeEvents.clear(),
       db.productBundles.clear(),
       db.staffWages.clear(),
+      db.refunds.clear(),
+      db.shifts.clear(),
       db.stockMovements.clear(),
     ])
     if (txToAdd.length) await db.salesTransactions.bulkPut(txToAdd as unknown as SalesTransaction[])
@@ -337,6 +361,8 @@ export async function restoreAllData(json: string): Promise<{ transactions: numb
     if (eventsToAdd.length) await db.storeEvents.bulkAdd(eventsToAdd as unknown as StoreEvent[])
     if (bundlesToAdd.length) await db.productBundles.bulkAdd(bundlesToAdd as unknown as ProductBundle[])
     if (d.staffWages?.length) await db.staffWages.bulkAdd(d.staffWages.map(stripId) as unknown as StaffWage[])
+    if (refundsToAdd.length) await db.refunds.bulkAdd(refundsToAdd as unknown as StoredRefund[])
+    if (shiftsToAdd.length) await db.shifts.bulkAdd(shiftsToAdd as unknown as StoredShift[])
     if (movementsToAdd.length) await db.stockMovements.bulkAdd(movementsToAdd as unknown as StockMovement[])
   })
 
