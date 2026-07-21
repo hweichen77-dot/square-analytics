@@ -13,7 +13,9 @@ export default function SquareCallbackView() {
     const storedState = sessionStorage.getItem('square_oauth_state')
 
     if (!code) { setError('No authorization code returned by Square.'); return }
-    if (state !== storedState) { setError('OAuth state mismatch — possible CSRF.'); return }
+    if (!state || !storedState || state !== storedState) {
+      setError('OAuth state mismatch — possible CSRF.'); return
+    }
 
     exchangeCodeForToken(code)
       .then(() => navigate('/square-sync'))
