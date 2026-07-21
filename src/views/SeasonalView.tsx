@@ -145,7 +145,7 @@ function EventEditModal({
           <button onClick={onClose} className="text-sm text-stone-400 hover:text-stone-100">Cancel</button>
           <button
             disabled={!name.trim()}
-            onClick={() => { onSave(name, type, new Date(start), new Date(end), notes); onClose() }}
+            onClick={() => { onSave(name, type, new Date(start + 'T00:00:00'), new Date(end + 'T00:00:00'), notes); onClose() }}
             className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-50"
           >
             Save Event
