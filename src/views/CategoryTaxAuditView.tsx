@@ -8,6 +8,10 @@ import { splitItemVariation } from '../types/models'
 import type { CatalogueProduct } from '../types/models'
 import { shouldBeTaxed, isUncategorized, TAXABLE_CATEGORY_LABEL } from '../engine/catalogueAuditEngine'
 import { KNOWN_CATEGORIES } from './CatalogueProductsView'
+import { useAuthStore } from '../store/authStore'
+import { fetchTaxes } from '../engine/squareAPIClient'
+import { buildTaxabilityPushPlan, pushTaxabilityToSquare } from '../engine/squareWriteBack'
+import type { TaxabilityPushPlan } from '../engine/squareWriteBack'
 
 interface TaxMismatch {
   product: CatalogueProduct
@@ -30,8 +34,15 @@ export default function CategoryTaxAuditView() {
   const showToast = useToastStore(s => s.show)
   const [search, setSearch] = useState('')
   const [fixing, setFixing] = useState(false)
+  const accessToken = useAuthStore(s => s.accessToken)
+  const squareTaxIds = useAuthStore(s => s.squareTaxIds)
+  const [plan, setPlan] = useState<TaxabilityPushPlan | null>(null)
+  const [planTaxNames, setPlanTaxNames] = useState<string[]>([])
+  const [previewing, setPreviewing] = useState(false)
+  const [pushing, setPushing] = useState(false)
 
   const enabled = useMemo(() => catalogue.filter(p => p.enabled), [catalogue])
+  const linked = useMemo(() => enabled.filter(p => p.squareParentItemID), [enabled])
 
   const uncategorized = useMemo(() => {
     const q = search.toLowerCase().trim()
@@ -83,6 +94,37 @@ export default function CategoryTaxAuditView() {
     showToast(`Corrected tax status on ${n} item${n !== 1 ? 's' : ''}`, 'success')
   }
 
+  async function previewPush() {
+    setPreviewing(true)
+    try {
+      const [next, taxes] = await Promise.all([
+        buildTaxabilityPushPlan(linked),
+        fetchTaxes(accessToken),
+      ])
+      setPlanTaxNames(taxes.filter(t => squareTaxIds.includes(t.id)).map(t => t.name))
+      setPlan(next)
+    } catch (e) {
+      showToast(`Could not prepare the push: ${(e as Error).message}`, 'error')
+    } finally {
+      setPreviewing(false)
+    }
+  }
+
+  async function confirmPush() {
+    setPushing(true)
+    try {
+      const result = await pushTaxabilityToSquare(accessToken, linked, squareTaxIds)
+      const parts = [`${result.itemsEnabled} taxable`, `${result.itemsDisabled} non-taxable`]
+      if (result.skipped.length > 0) parts.push(`${result.skipped.length} skipped`)
+      showToast(`Square updated: ${parts.join(', ')}`, 'success')
+      setPlan(null)
+    } catch (e) {
+      showToast(`Square update failed: ${(e as Error).message}`, 'error')
+    } finally {
+      setPushing(false)
+    }
+  }
+
   if (catalogue.length === 0) {
     return (
       <EmptyState
@@ -128,6 +170,96 @@ export default function CategoryTaxAuditView() {
           </div>
           <p className="font-semibold text-stone-100 text-lg">Audit-ready</p>
           <p className="text-sm text-stone-400 mt-1">All {enabled.length} active items are categorized and taxed correctly.</p>
+        </div>
+      )}
+
+      {linked.length > 0 && (
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5 space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="font-semibold text-stone-200">Push taxability to Square</h2>
+              <p className="text-xs text-stone-400 mt-0.5">
+                Makes your live Square catalogue match this app for all {linked.length} linked items. Fix everything
+                here first, then push once.
+              </p>
+            </div>
+            <button
+              onClick={previewPush}
+              disabled={!accessToken || squareTaxIds.length === 0 || previewing || pushing}
+              className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors cursor-pointer"
+            >
+              {previewing ? 'Checking…' : 'Review push'}
+            </button>
+          </div>
+
+          {!accessToken && (
+            <p className="text-xs text-stone-300">Connect Square on the Square Sync tab to push changes.</p>
+          )}
+          {accessToken && squareTaxIds.length === 0 && (
+            <p className="text-xs text-amber-400">
+              Pick which tax applies to taxable items on the Square Sync tab before pushing.
+            </p>
+          )}
+
+          {plan && (
+            <div className="border border-amber-500/30 bg-amber-500/5 rounded-lg p-4 space-y-3">
+              <div>
+                <p className="text-sm font-medium text-stone-100">Review before this touches Square</p>
+                <p className="text-xs text-stone-300 mt-1">
+                  Applying {planTaxNames.length > 0 ? planTaxNames.join(', ') : 'the selected tax'} to{' '}
+                  {plan.enable.length} item{plan.enable.length !== 1 ? 's' : ''} and removing it from {plan.disable.length}.
+                  Variations of the same Square item always share one tax setting.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-xs font-medium text-amber-400 mb-1">Taxable ({plan.enable.length})</p>
+                  <div className="max-h-40 overflow-y-auto text-xs text-stone-200 space-y-0.5">
+                    {plan.enable.map(e => <p key={e.itemId} className="truncate">{e.itemName}</p>)}
+                    {plan.enable.length === 0 && <p className="text-stone-400">None</p>}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-stone-100 mb-1">Non-taxable ({plan.disable.length})</p>
+                  <div className="max-h-40 overflow-y-auto text-xs text-stone-200 space-y-0.5">
+                    {plan.disable.map(d => <p key={d.itemId} className="truncate">{d.itemName}</p>)}
+                    {plan.disable.length === 0 && <p className="text-stone-400">None</p>}
+                  </div>
+                </div>
+              </div>
+
+              {plan.skipped.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-red-400 mb-1">Skipped ({plan.skipped.length})</p>
+                  <div className="max-h-32 overflow-y-auto text-xs text-stone-200 space-y-1">
+                    {plan.skipped.map((s, i) => (
+                      <p key={`${s.itemName}-${i}`}>
+                        <span className="text-stone-100">{s.itemName}</span> — {s.reason}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={confirmPush}
+                  disabled={pushing || (plan.enable.length === 0 && plan.disable.length === 0)}
+                  className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors cursor-pointer"
+                >
+                  {pushing ? 'Pushing…' : `Push ${plan.enable.length + plan.disable.length} items`}
+                </button>
+                <button
+                  onClick={() => setPlan(null)}
+                  disabled={pushing}
+                  className="px-4 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 disabled:opacity-40 text-stone-100 text-sm transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

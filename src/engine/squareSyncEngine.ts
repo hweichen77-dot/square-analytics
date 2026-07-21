@@ -90,7 +90,7 @@ function catalogueToProduct(
   const now = new Date()
   const common = {
     category,
-    taxable: data.is_taxable ?? false,
+    taxable: (data.tax_ids?.length ?? 0) > 0,
     enabled: !(data.is_archived ?? false),
     quantity: null as number | null,
     importedAt: now,

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { startOAuthFlow } from '../engine/squareAuth'
-import { fetchLocations } from '../engine/squareAPIClient'
+import { fetchLocations, fetchTaxes } from '../engine/squareAPIClient'
+import type { SquareTax } from '../engine/squareAPIClient'
 import { runSquareSync } from '../engine/squareSyncEngine'
 import type { SyncStatus } from '../engine/squareSyncEngine'
 import { useToastStore } from '../store/toastStore'
@@ -25,6 +26,8 @@ export default function SquareSyncView() {
   const [tokenInput, setTokenInput] = useState('')
   const [showOAuth, setShowOAuth] = useState(false)
   const [locations, setLocations] = useState<{ id: string; name: string }[]>([])
+  const [taxes, setTaxes] = useState<SquareTax[]>([])
+  const [taxesLoading, setTaxesLoading] = useState(false)
   const [syncStatus, setSyncStatus] = useState<SyncStatus | null>(null)
   const [syncing, setSyncing] = useState(false)
   const [syncLog, setSyncLog] = useState<string[]>([])
@@ -71,6 +74,28 @@ export default function SquareSyncView() {
       .then(locs => setLocations(locs))
       .catch(e => show(`Failed to load locations: ${e instanceof Error ? e.message : String(e)}`, 'error'))
   }, [store.accessToken])
+
+  useEffect(() => {
+    if (!store.accessToken) return
+    setTaxesLoading(true)
+    fetchTaxes(store.accessToken)
+      .then(list => {
+        setTaxes(list)
+        const enabled = list.filter(t => t.enabled)
+        if (enabled.length === 1 && store.squareTaxIds.length === 0) {
+          store.setCredentials({ squareTaxIds: [enabled[0].id] })
+        }
+      })
+      .catch(() => setTaxes([]))
+      .finally(() => setTaxesLoading(false))
+  }, [store.accessToken])
+
+  function toggleTax(id: string) {
+    const next = store.squareTaxIds.includes(id)
+      ? store.squareTaxIds.filter(t => t !== id)
+      : [...store.squareTaxIds, id]
+    store.setCredentials({ squareTaxIds: next })
+  }
 
   async function handleConnect() {
     if (!appIDInput.trim()) { show('Enter your Square Application ID first', 'error'); return }
@@ -230,6 +255,13 @@ export default function SquareSyncView() {
         )}
       </div>
 
+      {isConnected && (
+        <p className="text-xs text-stone-400">
+          Pushing taxability to Square needs catalogue edit permission. If a push comes back saying permission was
+          denied, disconnect and connect again to grant it.
+        </p>
+      )}
+
       {!isConnected && (
         <div className="border border-stone-700/50 p-5 space-y-4">
           <div>
@@ -327,6 +359,41 @@ export default function SquareSyncView() {
               <option value="">Select location…</option>
               {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
             </select>
+          )}
+        </div>
+      )}
+
+      {isConnected && (
+        <div className="bg-stone-800/30 border border-stone-700/40 p-5 space-y-3">
+          <h2 className="font-semibold text-stone-100">Sales Tax</h2>
+          <p className="text-xs text-stone-400">
+            Pick the tax that applies to taxable items. The Category &amp; Tax Audit tab uses this when it pushes
+            taxability to Square. Nothing here changes what Square charges until you push.
+          </p>
+          {taxesLoading ? (
+            <p className="text-sm text-stone-300">Loading taxes…</p>
+          ) : taxes.length === 0 ? (
+            <p className="text-sm text-stone-300">No taxes found in this Square account.</p>
+          ) : (
+            <div className="space-y-2">
+              {taxes.map(t => (
+                <label key={t.id} className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={store.squareTaxIds.includes(t.id)}
+                    onChange={() => toggleTax(t.id)}
+                    className="w-4 h-4 rounded accent-amber-500"
+                  />
+                  <span className="text-sm text-stone-100">{t.name}</span>
+                  {!t.enabled && <span className="text-xs text-stone-400">not shown in POS</span>}
+                </label>
+              ))}
+              {store.squareTaxIds.length === 0 && (
+                <p className="text-xs text-amber-400">
+                  Choose which tax applies to taxable items before pushing anything to Square.
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}

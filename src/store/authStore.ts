@@ -9,6 +9,7 @@ interface AuthStore {
   merchantID: string
   tokenExpiresAt: number | null
   locationID: string
+  squareTaxIds: string[]
   daysBack: number
   lastSyncDate: string | null
   lastSyncCount: number
@@ -30,6 +31,7 @@ export const useAuthStore = create<AuthStore>()(
       merchantID: '',
       tokenExpiresAt: null,
       locationID: '',
+      squareTaxIds: [],
       daysBack: 90,
       lastSyncDate: null,
       lastSyncCount: 0,
@@ -40,7 +42,7 @@ export const useAuthStore = create<AuthStore>()(
       setCredentials: creds => set(s => ({ ...s, ...creds })),
       clearAuth: () => set({
         accessToken: '', refreshToken: '', merchantID: '',
-        tokenExpiresAt: null, locationID: '', lastSyncDate: null, lastSyncCount: 0,
+        tokenExpiresAt: null, locationID: '', squareTaxIds: [], lastSyncDate: null, lastSyncCount: 0,
         customerBackfillDone: false,
       }),
     }),

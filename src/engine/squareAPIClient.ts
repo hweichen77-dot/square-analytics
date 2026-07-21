@@ -134,6 +134,7 @@ export interface SquareCatalogItem {
     }[]
     category_id?: string
     is_taxable?: boolean
+    tax_ids?: string[]
     is_archived?: boolean
   }
   category_data?: {
@@ -591,4 +592,43 @@ export async function fetchInventory(token: string, locationID: string): Promise
   } while (cursor)
 
   return counts
+}
+
+export interface SquareTax {
+  id: string
+  name: string
+  enabled: boolean
+}
+
+export async function fetchTaxes(token: string): Promise<SquareTax[]> {
+  const taxes: SquareTax[] = []
+  let cursor: string | undefined
+  do {
+    const qs = new URLSearchParams({ types: 'TAX' })
+    if (cursor) qs.set('cursor', cursor)
+    const data = await squareRequest(token, 'GET', `${BASE}/catalog/list?${qs.toString()}`) as {
+      objects?: { id: string; is_deleted?: boolean; tax_data?: { name?: string; enabled?: boolean } }[]
+      cursor?: string
+    }
+    for (const o of data.objects ?? []) {
+      if (o.is_deleted) continue
+      taxes.push({ id: o.id, name: o.tax_data?.name ?? 'Tax', enabled: o.tax_data?.enabled ?? true })
+    }
+    cursor = data.cursor
+  } while (cursor)
+  return taxes
+}
+
+export async function updateItemTaxes(
+  token: string,
+  itemIds: string[],
+  taxesToEnable: string[],
+  taxesToDisable: string[],
+): Promise<void> {
+  if (itemIds.length === 0) return
+  await squareRequest(token, 'POST', `${BASE}/catalog/update-item-taxes`, {
+    item_ids: itemIds,
+    taxes_to_enable: taxesToEnable,
+    taxes_to_disable: taxesToDisable,
+  })
 }
