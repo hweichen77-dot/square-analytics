@@ -67,9 +67,6 @@ function detectOpexCategory(name: string): OpexCategory {
 }
 
 function excelSerialToYearMonth(serial: number): string {
-  // The serial encodes a calendar date at UTC midnight. Read it back with UTC
-  // getters rather than date-fns' local formatting, otherwise the 1st of a month
-  // rolls into the previous month for any user west of UTC (all of the Americas).
   const date = new Date(Math.round((serial - 25569) * 86400 * 1000))
   const y = date.getUTCFullYear()
   const m = String(date.getUTCMonth() + 1).padStart(2, '0')
@@ -148,10 +145,6 @@ export async function importOpexXLSX(file: File): Promise<ImportResult> {
       month = excelSerialToYearMonth(rawDate)
     } else if (typeof rawDate === 'string' && rawDate.trim()) {
       const s = rawDate.trim()
-      // An ISO date like "2025-01-01" parses as UTC midnight, so date-fns' local
-      // formatting would shift it into the previous month west of UTC. Read the
-      // year-month straight off the string; fall back to Date only for other
-      // formats (e.g. "1/1/2025"), which parse in local time and format correctly.
       const iso = s.match(/^(\d{4})-(\d{2})/)
       if (iso) {
         month = `${iso[1]}-${iso[2]}`
