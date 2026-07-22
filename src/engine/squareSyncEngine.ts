@@ -49,9 +49,14 @@ function orderToTransaction(order: SquareOrder, employeeMap: Record<string, stri
     const fullName = isDefault ? li.name : `${li.name} (${varName})`
     descParts.push(`${qty} x ${fullName}`)
 
-    const grossCents = li.gross_sales_money?.amount ?? li.base_price_money?.amount ?? null
-    if (grossCents != null) {
-      lineItemPrices.push({ name: fullName, qty, unitPrice: grossCents / qty / 100 })
+    // gross_sales_money is the line total (unit price x qty), so divide by qty to
+    // get the per-unit price. base_price_money is already per-unit, so when we fall
+    // back to it we must NOT divide again, otherwise the unit price is understated
+    // by a factor of qty for any multi-unit line.
+    if (li.gross_sales_money?.amount != null) {
+      lineItemPrices.push({ name: fullName, qty, unitPrice: li.gross_sales_money.amount / qty / 100 })
+    } else if (li.base_price_money?.amount != null) {
+      lineItemPrices.push({ name: fullName, qty, unitPrice: li.base_price_money.amount / 100 })
     }
   }
 
