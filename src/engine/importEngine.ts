@@ -67,8 +67,10 @@ function detectOpexCategory(name: string): OpexCategory {
 }
 
 function excelSerialToYearMonth(serial: number): string {
-  const date = new Date((serial - 25569) * 86400 * 1000)
-  return fmtDate(date, 'yyyy-MM')
+  const date = new Date(Math.round((serial - 25569) * 86400 * 1000))
+  const y = date.getUTCFullYear()
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0')
+  return `${y}-${m}`
 }
 
 const OPEX_DATE_HEADERS = ['date', 'month', 'period', 'entry date']
@@ -142,9 +144,15 @@ export async function importOpexXLSX(file: File): Promise<ImportResult> {
     if (typeof rawDate === 'number') {
       month = excelSerialToYearMonth(rawDate)
     } else if (typeof rawDate === 'string' && rawDate.trim()) {
-      const d = new Date(rawDate.trim())
-      if (isNaN(d.getTime())) { skipped++; continue }
-      month = fmtDate(d, 'yyyy-MM')
+      const s = rawDate.trim()
+      const iso = s.match(/^(\d{4})-(\d{2})/)
+      if (iso) {
+        month = `${iso[1]}-${iso[2]}`
+      } else {
+        const d = new Date(s)
+        if (isNaN(d.getTime())) { skipped++; continue }
+        month = fmtDate(d, 'yyyy-MM')
+      }
     } else {
       skipped++; continue
     }

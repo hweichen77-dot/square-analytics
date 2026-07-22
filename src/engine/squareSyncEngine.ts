@@ -49,9 +49,10 @@ function orderToTransaction(order: SquareOrder, employeeMap: Record<string, stri
     const fullName = isDefault ? li.name : `${li.name} (${varName})`
     descParts.push(`${qty} x ${fullName}`)
 
-    const grossCents = li.gross_sales_money?.amount ?? li.base_price_money?.amount ?? null
-    if (grossCents != null) {
-      lineItemPrices.push({ name: fullName, qty, unitPrice: grossCents / qty / 100 })
+    if (li.gross_sales_money?.amount != null) {
+      lineItemPrices.push({ name: fullName, qty, unitPrice: li.gross_sales_money.amount / qty / 100 })
+    } else if (li.base_price_money?.amount != null) {
+      lineItemPrices.push({ name: fullName, qty, unitPrice: li.base_price_money.amount / 100 })
     }
   }
 
