@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import { authStorage } from './tauriStorage'
 
 interface AuthStore {
   appID: string
@@ -46,6 +47,6 @@ export const useAuthStore = create<AuthStore>()(
         customerBackfillDone: false,
       }),
     }),
-    { name: 'walleys-auth' }
+    { name: 'walleys-auth', storage: createJSONStorage(authStorage) }
   )
 )

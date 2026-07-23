@@ -6,6 +6,8 @@ import { ToastContainer } from './components/ui/ToastContainer'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { CommandPalette } from './components/ui/CommandPalette'
 import { useAutoSync } from './hooks/useAutoSync'
+import { useAuthBootstrap } from './hooks/useAuthBootstrap'
+import { checkForAppUpdate } from './lib/appUpdate'
 import { AnalyticsProvider } from './context/AnalyticsContext'
 
 const DashboardView         = lazy(() => import('./views/DashboardView'))
@@ -99,7 +101,11 @@ function useDeepLinkHandler() {
 
 export default function App() {
   useDeepLinkHandler()
+  useAuthBootstrap()
   useAutoSync()
+
+  useEffect(() => { checkForAppUpdate() }, [])
+
   const { pathname } = useLocation()
   const [paletteOpen, setPaletteOpen] = useState(false)
 

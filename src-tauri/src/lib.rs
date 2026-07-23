@@ -1,8 +1,30 @@
 use std::net::TcpListener;
 use std::sync::Mutex;
 use serde_json::Value;
+use tauri::Manager;
 
 struct OAuthListener(Mutex<Option<TcpListener>>);
+
+fn state_path(app: &tauri::AppHandle, key: &str) -> Result<std::path::PathBuf, String> {
+    let dir = app.path().app_config_dir().map_err(|e| e.to_string())?;
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.join(format!("{key}.json")))
+}
+
+#[tauri::command]
+fn save_state(app: tauri::AppHandle, key: String, value: String) -> Result<(), String> {
+    std::fs::write(state_path(&app, &key)?, value).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn load_state(app: tauri::AppHandle, key: String) -> Result<Option<String>, String> {
+    let path = state_path(&app, &key)?;
+    match std::fs::read_to_string(&path) {
+        Ok(s) => Ok(Some(s)),
+        Err(ref e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(e.to_string()),
+    }
+}
 
 #[tauri::command]
 fn prepare_oauth_listener(state: tauri::State<'_, OAuthListener>) -> Result<u16, String> {
@@ -215,12 +237,17 @@ pub fn run() {
         .manage(OAuthListener(Mutex::new(None)))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             prepare_oauth_listener,
             wait_for_oauth_code,
             exchange_square_code,
             refresh_square_token,
             proxy_square_api,
+            save_state,
+            load_state,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application")
