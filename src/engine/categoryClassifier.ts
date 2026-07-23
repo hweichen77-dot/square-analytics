@@ -112,6 +112,7 @@ export function classifyProduct(name: string, overrides: Record<string, string> 
   if (hasKeyword(lower, TOBACCO_KEYWORDS)) return 'Tobacco'
   if (hasKeyword(lower, WINE_KEYWORDS)) return 'Wine'
   if (hasKeyword(lower, SPIRITS_KEYWORDS)) return 'Spirits'
+  if (/\broot beer\b/.test(lower)) return 'Drinks'
   if (hasKeyword(lower, BEER_KEYWORDS)) return 'Beer'
   if (hasKeyword(lower, ICE_CREAM_KEYWORDS)) return 'Ice Cream'
   if (hasKeyword(lower, RAMEN_KEYWORDS)) return 'Ramen/Hot Food'

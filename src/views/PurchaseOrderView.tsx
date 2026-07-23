@@ -49,17 +49,19 @@ function seasonLabel(month: number) {
   return 'Fall'
 }
 
+const sanitizeCell = (v: string): string => (/^[=+\-@\t\r]/.test(v) ? `'${v}` : v)
+
 function exportToXLSX(items: PurchaseOrderItem[], qtyOverrides: Record<string, number>) {
   const rows = items.map(item => {
     const qty = qtyOverrides[item.productName] ?? item.recommendedQty
     return {
-      Product: item.productName,
-      Category: item.category,
+      Product: sanitizeCell(item.productName),
+      Category: sanitizeCell(item.category),
       'Weekly Velocity': (item.avgDailyVelocity * 7).toFixed(2),
       'Recommended Qty': qty,
       'Avg Price': item.avgPrice.toFixed(2),
       'Est. Revenue': (item.avgPrice * qty).toFixed(2),
-      Reasoning: item.reasoning,
+      Reasoning: sanitizeCell(item.reasoning),
     }
   })
   const ws = utils.json_to_sheet(rows)

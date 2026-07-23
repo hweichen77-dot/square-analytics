@@ -698,7 +698,7 @@ export function exportAccountantPDF(data: AccountantReportData): void {
         { label: 'Gross Revenue',  value: formatCurrency(data.totalRevenue) },
         { label: 'Refunds',        value: formatCurrency(data.refundRevenue), sub: `${data.refundCount} refund(s)` },
         { label: 'Net Revenue',    value: formatCurrency(data.netRevenue) },
-        { label: 'Gross Profit',   value: formatCurrency(data.grossProfit!), sub: `${data.grossMarginPct!.toFixed(1)}% margin` },
+        { label: 'Gross Profit',   value: formatCurrency(data.grossProfit!), sub: data.grossMarginPct !== null ? `${data.grossMarginPct.toFixed(1)}% margin` : undefined },
       ]
     : [
         { label: 'Gross Revenue',    value: formatCurrency(data.totalRevenue) },
@@ -720,7 +720,7 @@ export function exportAccountantPDF(data: AccountantReportData): void {
     revRows.push(
       ['Cost of Goods Sold',  formatCurrency(data.totalCOGS!)],
       ['Gross Profit',        formatCurrency(data.grossProfit!)],
-      ['Gross Margin',        `${data.grossMarginPct!.toFixed(1)}% on costed items`],
+      ['Gross Margin',        data.grossMarginPct !== null ? `${data.grossMarginPct.toFixed(1)}% on costed items` : '— (no costed items sold)'],
     )
     if (data.coveragePct != null && data.coveragePct < 99) {
       revRows.push(['Cost coverage', `${data.coveragePct.toFixed(0)}% of revenue`])

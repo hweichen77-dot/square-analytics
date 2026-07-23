@@ -348,7 +348,9 @@ export default function AccountantReportView() {
                   <MetricRow
                     label="Gross Profit"
                     value={formatCurrency(report.grossProfit!)}
-                    sub={`${report.grossMarginPct!.toFixed(1)}% margin on costed items`}
+                    sub={report.grossMarginPct !== null
+                      ? `${report.grossMarginPct.toFixed(1)}% margin on costed items`
+                      : 'No costed items sold in this period'}
                     highlight
                   />
                   {(report.coveragePct ?? 100) < 99 && (
@@ -416,7 +418,7 @@ export default function AccountantReportView() {
               <h2 className="font-semibold text-stone-200 mb-3">Profit & Loss Summary</h2>
               <MetricRow label="Net Revenue" value={formatCurrency(report.netRevenue)} />
               <MetricRow label="Cost of Goods Sold" value={`(${formatCurrency(report.totalCOGS!)})`} />
-              <MetricRow label="Gross Profit" value={formatCurrency(report.grossProfit!)} sub={`${report.grossMarginPct!.toFixed(1)}% margin`} highlight />
+              <MetricRow label="Gross Profit" value={formatCurrency(report.grossProfit!)} sub={report.grossMarginPct !== null ? `${report.grossMarginPct.toFixed(1)}% margin` : undefined} highlight />
               <MetricRow label="Operating Expenses" value={`(${formatCurrency(opexTotal)})`} />
               <MetricRow
                 label="Net Operating Income"
