@@ -202,7 +202,9 @@ export default function CustomerView() {
       <div className="space-y-4">
         <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Customer Frequency</h1>
         <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center">
-          <p className="text-4xl mb-3">🙅</p>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3 text-amber-500/80">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="17" y1="8" x2="23" y2="8" />
+          </svg>
           <h2 className="text-lg font-semibold text-stone-100 mb-2">No Customer IDs Found</h2>
           <p className="text-sm text-stone-300 max-w-md mx-auto">
             Customer IDs are found in Square CSV exports when customers have accounts.

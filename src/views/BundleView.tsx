@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useProductBundles, useAllTransactions } from '../db/useTransactions'
 import { useDeferredCompute } from '../hooks/useDeferredCompute'
@@ -93,7 +94,7 @@ function BundleEditorModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-[500px] max-h-[85vh] flex flex-col">
+      <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-[500px] max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <h2 className="text-base font-semibold">{bundle ? 'Edit Bundle' : 'Create Bundle'}</h2>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl">×</button>
@@ -141,7 +142,7 @@ function BundleEditorModal({
         </div>
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-stone-700/50">
           <button onClick={onClose} className="text-sm text-stone-400 hover:text-stone-100">Cancel</button>
-          <button
+          <Button
             disabled={!name.trim() || selectedProducts.size < 2}
             onClick={() => {
               onSave(name, Array.from(selectedProducts), parseFloat(priceText) || 0, notes)
@@ -150,7 +151,7 @@ function BundleEditorModal({
             className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-50"
           >
             Save Bundle
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -349,12 +350,12 @@ export default function BundleView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-stone-100">Saved Bundles</h2>
-          <button
+          <Button
             onClick={() => setShowCreate(true)}
             className="px-3 py-1.5 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
           >
             + Create Bundle
-          </button>
+          </Button>
         </div>
         {savedBundles.length === 0 ? (
           <p className="text-sm text-stone-400">No bundles created yet.</p>

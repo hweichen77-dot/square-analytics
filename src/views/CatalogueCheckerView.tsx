@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
@@ -159,12 +160,12 @@ export default function CatalogueCheckerView() {
           </p>
         </div>
         {autoFixable.length > 0 && (
-          <button
+          <Button
             onClick={fixAll} disabled={fixing}
             className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
           >
             {fixing ? 'Fixing…' : `Fix All Auto-Fixable (${autoFixable.length})`}
-          </button>
+          </Button>
         )}
       </div>
 

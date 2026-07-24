@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useAllTransactions, useCatalogueProducts, useStoreEvents } from '../db/useTransactions'
 import { useDeferredCompute } from '../hooks/useDeferredCompute'
@@ -22,7 +23,7 @@ const PERIOD_OPTIONS = [
 const CATEGORY_COLORS: Record<string, string> = {
   Beer:           'bg-amber-600/15 text-amber-300',
   Wine:           'bg-rose-500/15 text-rose-400',
-  Spirits:        'bg-violet-500/15 text-violet-400',
+  Spirits:        'bg-amber-800/15 text-amber-300',
   Tobacco:        'bg-orange-600/15 text-orange-400',
   Vape:           'bg-cyan-500/15 text-cyan-400',
   Lottery:        'bg-yellow-500/15 text-yellow-400',
@@ -206,13 +207,13 @@ export default function PurchaseOrderView() {
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Purchase Order</h1>
         {generated && (
-          <button
+          <Button
             onClick={() => exportToXLSX(displayItems, qtyOverrides)}
             disabled={displayItems.length === 0}
             className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-40 font-semibold transition-colors cursor-pointer"
           >
             Export XLSX
-          </button>
+          </Button>
         )}
       </div>
 
@@ -240,12 +241,12 @@ export default function PurchaseOrderView() {
         </div>
 
         <div className="flex items-center gap-4">
-          <button
+          <Button
             onClick={() => { setGenerated(true); setQtyOverrides({}) }}
             className="px-6 py-2.5 bg-amber-500 text-stone-950 rounded-lg text-sm font-bold hover:bg-amber-400 transition-colors cursor-pointer"
           >
             Generate Report
-          </button>
+          </Button>
           <p className="text-xs text-stone-400">
             {selectedWeeks}-week window · {dateRangeLabel}
           </p>

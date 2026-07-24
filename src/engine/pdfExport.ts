@@ -20,10 +20,10 @@ const PAGE_H = 297
 const CW = PAGE_W - MARGIN * 2
 
 const C = {
-  indigo600: [79, 70, 229] as [number, number, number],
-  indigo500: [99, 102, 241] as [number, number, number],
-  indigo50:  [238, 242, 255] as [number, number, number],
-  indigo200: [199, 210, 254] as [number, number, number],
+  amber600:  [184, 115, 30] as [number, number, number],
+  amber500:  [217, 138, 43] as [number, number, number],
+  amber50:   [245, 236, 224] as [number, number, number],
+  amber200:  [230, 205, 165] as [number, number, number],
   gray900:   [17, 24, 39] as [number, number, number],
   gray700:   [55, 65, 81] as [number, number, number],
   gray500:   [107, 114, 128] as [number, number, number],
@@ -58,14 +58,14 @@ function drawHeader(doc: jsPDF, reportLabel: string, dateRange: string): number 
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
-  text(doc, C.indigo600)
+  text(doc, C.amber600)
   doc.text(reportLabel, PAGE_W - MARGIN, y + 6, { align: 'right' })
 
   doc.setFontSize(7.5)
   text(doc, C.gray500)
   doc.text(dateRange, MARGIN, y + 11)
 
-  draw(doc, C.indigo200)
+  draw(doc, C.amber200)
   doc.setLineWidth(0.4)
   doc.line(MARGIN, y + 14, PAGE_W - MARGIN, y + 14)
 
@@ -99,14 +99,14 @@ function drawKPICards(
 
   cards.forEach((card, i) => {
     const cx = MARGIN + i * (cardW + gap)
-    fill(doc, C.indigo50)
-    draw(doc, C.indigo200)
+    fill(doc, C.amber50)
+    draw(doc, C.amber200)
     doc.setLineWidth(0.25)
     doc.rect(cx, y, cardW, cardH, 'FD')
 
     doc.setFontSize(6)
     doc.setFont('helvetica', 'normal')
-    text(doc, C.indigo600)
+    text(doc, C.amber600)
     doc.text(card.label.toUpperCase(), cx + 3.5, y + 5.5)
 
     doc.setFontSize(11)
@@ -168,7 +168,7 @@ function drawBarChart(
     const bh = (d.value / max) * barAreaH
     const bx = MARGIN + i * (barW + gap)
     const by = y + barAreaH - bh
-    fill(doc, C.indigo500)
+    fill(doc, C.amber500)
     if (bh > 0.3) doc.rect(bx, by, barW, bh, 'F')
 
     if (capped.length <= 24) {
@@ -214,7 +214,7 @@ function drawHBarChart(
     doc.text(lbl, MARGIN + 2, ry + 5)
 
     const bw = (d.value / max) * barMaxW
-    fill(doc, C.indigo500)
+    fill(doc, C.amber500)
     if (bw > 0) doc.rect(MARGIN + labelW, ry + 2, bw, 3.5, 'F')
 
     doc.setFontSize(6.5)
@@ -226,7 +226,7 @@ function drawHBarChart(
 }
 
 const TABLE_STYLES = {
-  headStyles: { fillColor: [79, 70, 229] as [number, number, number], textColor: [255, 255, 255] as [number, number, number], fontSize: 8, fontStyle: 'bold' as const },
+  headStyles: { fillColor: [217, 138, 43] as [number, number, number], textColor: [255, 255, 255] as [number, number, number], fontSize: 8, fontStyle: 'bold' as const },
   bodyStyles: { fontSize: 7.5, textColor: [55, 65, 81] as [number, number, number] },
   alternateRowStyles: { fillColor: [249, 250, 251] as [number, number, number] },
   margin: { left: MARGIN, right: MARGIN },

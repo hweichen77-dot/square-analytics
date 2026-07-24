@@ -74,6 +74,33 @@ input[type="number"]::-webkit-outer-spin-button {
 @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .cf-page-enter { animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
+.wa-star-glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
+.wa-star-glow > span {
+  position: absolute;
+  width: 300%;
+  height: 50%;
+  opacity: 0.7;
+  border-radius: 50%;
+}
+.wa-star-glow > .wa-star-top { top: -8px; left: -250%; animation: wa-star-top linear infinite alternate; }
+.wa-star-glow > .wa-star-bottom { bottom: -8px; right: -250%; animation: wa-star-bottom linear infinite alternate; }
+@keyframes wa-star-top { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(100%,0); opacity: 0; } }
+@keyframes wa-star-bottom { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(-100%,0); opacity: 0; } }
+
+.wa-navlink::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 2px;
+  height: 1.5px;
+  background: var(--color-amber-400);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wa-navlink.wa-navlink-active::after { transform: scaleX(1); }
+
 @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .cf-stagger > * { animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .cf-stagger > *:nth-child(1){animation-delay:.02s} .cf-stagger > *:nth-child(2){animation-delay:.06s}

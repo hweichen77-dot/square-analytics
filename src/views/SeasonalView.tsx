@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import {
   ComposedChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
@@ -105,7 +106,7 @@ function EventEditModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-96 p-6">
+      <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-96 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{event ? 'Edit Event' : 'Add Event'}</h2>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl">×</button>
@@ -143,13 +144,13 @@ function EventEditModal({
         </div>
         <div className="flex justify-end gap-3 mt-5">
           <button onClick={onClose} className="text-sm text-stone-400 hover:text-stone-100">Cancel</button>
-          <button
+          <Button
             disabled={!name.trim()}
             onClick={() => { onSave(name, type, new Date(start + 'T00:00:00'), new Date(end + 'T00:00:00'), notes); onClose() }}
             className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600 disabled:opacity-50"
           >
             Save Event
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -205,12 +206,12 @@ export default function SeasonalView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Seasonal & Events</h1>
-        <button
+        <Button
           onClick={() => setShowAdd(true)}
           className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
         >
           + Add Event
-        </button>
+        </Button>
       </div>
 
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">

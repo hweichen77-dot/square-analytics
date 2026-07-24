@@ -73,8 +73,8 @@ export default function TopNav({ onSearch }: { onSearch: () => void }) {
               onMouseEnter={() => { if (open) setOpen(menu.label) }}
               aria-expanded={isOpen}
               aria-haspopup="true"
-              className={`px-3 py-1.5 text-[13px] rounded-sm transition-colors ${
-                active ? 'text-amber-400 font-medium' : isOpen ? 'text-stone-100' : 'text-stone-400 hover:text-stone-100'
+              className={`wa-navlink relative px-3 py-1.5 text-[13px] rounded-sm transition-colors ${
+                active ? 'wa-navlink-active text-amber-400 font-medium' : isOpen ? 'text-stone-100' : 'text-stone-400 hover:text-stone-100'
               }`}
             >
               {menu.label}

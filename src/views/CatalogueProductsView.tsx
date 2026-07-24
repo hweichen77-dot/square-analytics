@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -281,13 +282,13 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
           <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm text-stone-400 hover:text-stone-100 transition-colors cursor-pointer">
             Cancel
           </button>
-          <button
+          <Button
             onClick={handleSave}
             disabled={saving}
             className="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
           >
             {saving ? 'Saving…' : editing ? 'Save Changes' : isAddVariation ? 'Add Variation' : 'Add Item'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -431,10 +432,10 @@ export default function CatalogueProductsView() {
     return (
       <>
         <div className="flex justify-end mb-4">
-          <button onClick={openAdd} className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer">
+          <Button onClick={openAdd} className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
             New Item
-          </button>
+          </Button>
         </div>
         <EmptyState title="No catalogue products" subtitle="Import a Square catalogue XLSX, sync via Square, or add items manually." />
         {showModal && <ItemModal onClose={closeModal} onSave={handleSave} />}
@@ -459,13 +460,13 @@ export default function CatalogueProductsView() {
             </svg>
             {exporting ? 'Exporting…' : 'Export to Square'}
           </button>
-          <button
+          <Button
             onClick={openAdd}
             className="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
             New Item
-          </button>
+          </Button>
         </div>
       </div>
 

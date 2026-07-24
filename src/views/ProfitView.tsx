@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
@@ -185,7 +186,7 @@ function CostManagementModal({
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
+      <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <div>
             <h2 className="text-lg font-bold text-stone-100">Manage Costs</h2>
@@ -264,9 +265,9 @@ function CostManagementModal({
 
         <div className="flex items-center justify-between px-6 py-4 border-t border-stone-700/50">
           <p className="text-xs text-stone-400">Toggle 'Case' to enter bulk pricing.</p>
-          <button onClick={saveAll} className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600">
+          <Button onClick={saveAll} className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600">
             Save All
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -422,12 +423,12 @@ export default function ProfitView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Profit Margins</h1>
-        <button
+        <Button
           onClick={() => setShowCostSheet(true)}
           className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
         >
           Manage Costs
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-5 gap-3 cf-stagger">

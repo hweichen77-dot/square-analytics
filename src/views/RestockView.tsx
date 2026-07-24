@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useRestockLogs, useCatalogueProducts, useAllTransactions } from '../db/useTransactions'
 import { useDeferredCompute } from '../hooks/useDeferredCompute'
@@ -154,7 +155,7 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-      <div className="bg-stone-800 rounded-2xl shadow-2xl border border-stone-700 w-96 p-6">
+      <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-96 p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold text-stone-100">Log Restock</h2>
@@ -186,9 +187,9 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
 
         <div className="flex justify-end gap-3 mt-6">
           <button onClick={onClose} className="px-4 py-2 text-sm text-stone-400 hover:text-stone-100">Cancel</button>
-          <button onClick={save} className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600">
+          <Button onClick={save} className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600">
             Save Restock
-          </button>
+          </Button>
         </div>
       </div>
     </div>

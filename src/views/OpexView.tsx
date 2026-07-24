@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useState, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { format, parseISO } from 'date-fns'
@@ -13,7 +14,7 @@ const CATEGORY_STYLES: Record<string, string> = {
   'Marketing':         'bg-amber-500/15 text-amber-400 border border-amber-500/25',
   'Misc':              'bg-stone-500/15 text-stone-200 border border-stone-500/25',
   'Employee Expenses': 'bg-amber-500/15 text-amber-400 border border-amber-500/25',
-  'Gift Cards':        'bg-pink-500/15 text-pink-400 border border-pink-500/25',
+  'Gift Cards':        'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25',
   'Service Charge':    'bg-amber-500/15 text-amber-400 border border-amber-500/25',
   'Other':             'bg-stone-600/15 text-stone-200 border border-stone-600/25',
 }
@@ -64,7 +65,7 @@ function EntryModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-stone-950/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-stone-800 border border-stone-700 rounded-2xl shadow-2xl w-full max-w-md mx-4">
+      <div className="relative bg-stone-800 border border-stone-700 rounded-lg shadow-lg w-full max-w-md mx-4">
         <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
           <h2 className="font-semibold text-stone-100">{initial ? 'Edit Expense' : 'Add Expense'}</h2>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-100 transition-colors cursor-pointer">
@@ -146,13 +147,13 @@ function EntryModal({
             >
               Cancel
             </button>
-            <button
+            <Button
               type="submit"
               disabled={saving || !form.name.trim() || form.amount <= 0}
               className="flex-1 py-2 text-sm font-semibold bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
             >
               {saving ? 'Saving…' : initial ? 'Save Changes' : 'Add Expense'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
@@ -218,7 +219,7 @@ export default function OpexView() {
           <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Operating Expenses</h1>
           <p className="text-sm text-stone-400 mt-0.5">Track manual OPEX entries that appear in the Monthly Income Statement</p>
         </div>
-        <button
+        <Button
           onClick={() => setModalEntry('new')}
           className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-stone-950 text-sm font-semibold rounded-lg hover:bg-amber-400 transition-colors cursor-pointer"
         >
@@ -226,7 +227,7 @@ export default function OpexView() {
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
           Add Expense
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">

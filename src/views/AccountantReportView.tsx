@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear, subQuarters, endOfQuarter, startOfQuarter, eachWeekOfInterval, endOfWeek } from 'date-fns'
 import { db } from '../db/database'
@@ -265,12 +266,12 @@ export default function AccountantReportView() {
             >
               QuickBooks XLSX
             </button>
-            <button
+            <Button
               onClick={handleExport}
               className="px-5 py-2.5 bg-amber-500 text-stone-950 rounded-lg text-sm font-semibold hover:bg-amber-600 transition-colors"
             >
               Download PDF
-            </button>
+            </Button>
           </div>
         )}
       </div>

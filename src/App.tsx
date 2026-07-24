@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate, NavLink, useLocation } from 'react-router-dom'
+import AppBackground from './components/kit/AppBackground'
 import TopNav from './components/layout/TopNav'
 import { DateRangePicker } from './components/layout/DateRangePicker'
 import { ToastContainer } from './components/ui/ToastContainer'
@@ -122,12 +123,14 @@ export default function App() {
 
   return (
     <AnalyticsProvider>
-    <div className="flex flex-col h-screen bg-stone-950 overflow-hidden">
+    <div className="relative flex flex-col h-screen overflow-hidden">
+      <AppBackground />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      <header className="shrink-0 sticky top-0 z-30 bg-stone-950/95 backdrop-blur border-b border-stone-800/80 h-14 px-6 flex items-center justify-between gap-6">
+      <header className="relative z-30 shrink-0 sticky top-0 bg-stone-950/80 backdrop-blur-md border-b border-amber-500/25 shadow-[0_1px_0_0_oklch(0.72_0.14_78/0.10),0_8px_24px_-12px_oklch(0.09_0.007_55/0.9)] h-14 px-6 flex items-center justify-between gap-6">
         <div className="flex items-center gap-7 min-w-0">
-          <NavLink to="/dashboard" className="font-display text-[16px] font-800 text-stone-100 tracking-tight shrink-0 hover:text-white transition-colors">
-            Square Analytics
+          <NavLink to="/dashboard" className="group flex items-center gap-2.5 shrink-0">
+            <span className="grid place-items-center w-6 h-6 rounded-sm bg-amber-500 text-stone-950 font-display font-800 text-[13px] shadow-[0_0_18px_-2px_oklch(0.72_0.14_78/0.6)]">S</span>
+            <span className="font-display text-[16px] font-800 text-stone-100 tracking-tight group-hover:text-white transition-colors">Square Analytics</span>
           </NavLink>
           <div className="hidden lg:flex min-w-0">
             <TopNav onSearch={() => setPaletteOpen(true)} />
@@ -144,7 +147,7 @@ export default function App() {
           <DateRangePicker />
         </div>
       </header>
-      <main className="flex-1 overflow-y-auto">
+      <main className="relative z-10 flex-1 overflow-y-auto">
         <div className="px-6 lg:px-10 py-8 mx-auto w-full max-w-[1600px]">
           <ErrorBoundary>
           <Suspense fallback={<PageFallback />}>

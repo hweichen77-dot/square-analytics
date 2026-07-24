@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useState, useRef } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
@@ -212,13 +213,13 @@ export default function ImportView() {
             <h2 className="font-semibold text-stone-100">Shopify Orders</h2>
           </div>
           <p className="text-sm text-stone-400 mb-3">Import from Shopify Admin → Orders → Export as CSV.</p>
-          <button
+          <Button
             onClick={() => shopifyRef.current?.click()}
             className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
             disabled={importing}
           >
             {importing ? 'Importing…' : 'Select Shopify CSV'}
-          </button>
+          </Button>
           <input ref={shopifyRef} type="file" accept=".csv" className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) handleShopify(f); e.target.value = '' }} />
         </div>
@@ -229,13 +230,13 @@ export default function ImportView() {
             <h2 className="font-semibold text-stone-100">Etsy Orders</h2>
           </div>
           <p className="text-sm text-stone-400 mb-3">Import from Etsy Shop Manager → Orders → Download CSV.</p>
-          <button
+          <Button
             onClick={() => etsyRef.current?.click()}
             className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
             disabled={importing}
           >
             {importing ? 'Importing…' : 'Select Etsy CSV'}
-          </button>
+          </Button>
           <input ref={etsyRef} type="file" accept=".csv" className="hidden"
             onChange={e => { const f = e.target.files?.[0]; if (f) handleEtsy(f); e.target.value = '' }} />
         </div>
@@ -247,13 +248,13 @@ export default function ImportView() {
           <h2 className="font-semibold text-stone-100">Operating Expenses (XLSX)</h2>
         </div>
         <p className="text-sm text-stone-400 mb-3">Import the Walley's Ops spreadsheet to bulk-load operating expenses.</p>
-        <button
+        <Button
           onClick={() => opexRef.current?.click()}
           className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
           disabled={importing}
         >
           {importing ? 'Importing…' : 'Select Ops XLSX'}
-        </button>
+        </Button>
         <input ref={opexRef} type="file" accept=".xlsx" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleOpex(f); e.target.value = '' }} />
       </div>
@@ -261,13 +262,13 @@ export default function ImportView() {
       <div className="bg-stone-800/30 border border-stone-700/40 p-5">
         <h2 className="font-semibold text-stone-100 mb-3">Catalogue Import (XLSX)</h2>
         <p className="text-sm text-stone-400 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
-        <button
+        <Button
           onClick={() => xlsxRef.current?.click()}
           className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-medium hover:bg-amber-600 disabled:opacity-50"
           disabled={importing}
         >
           {importing ? 'Importing…' : 'Select XLSX file'}
-        </button>
+        </Button>
         <input ref={xlsxRef} type="file" accept=".xlsx" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleXLSX(f); e.target.value = '' }} />
       </div>
@@ -276,12 +277,12 @@ export default function ImportView() {
         <h2 className="font-semibold text-stone-100 mb-1">Data Backup</h2>
         <p className="text-sm text-stone-400 mb-4">Export all your data to a backup file. Restore it after reinstalling or on a new machine.</p>
         <div className="flex flex-wrap gap-3">
-          <button
+          <Button
             onClick={handleExportBackup}
             className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-medium hover:bg-amber-600"
           >
             Export Backup (.json)
-          </button>
+          </Button>
           <button
             onClick={() => backupRef.current?.click()}
             disabled={importing}

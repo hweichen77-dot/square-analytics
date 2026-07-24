@@ -104,8 +104,8 @@ export default function StaffView() {
   }
 
   const AVATAR_COLORS = [
-    'bg-amber-500/100', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500',
-    'bg-amber-500', 'bg-amber-500', 'bg-pink-500', 'bg-amber-500',
+    'bg-amber-500', 'bg-emerald-500', 'bg-amber-600', 'bg-red-500',
+    'bg-amber-500', 'bg-emerald-600', 'bg-amber-700', 'bg-stone-500',
   ]
 
   return (

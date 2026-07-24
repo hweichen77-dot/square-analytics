@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, getDaysInMonth, getDay } from 'date-fns'
@@ -144,7 +145,9 @@ export default function DashboardView() {
     ]
     return (
       <div className="max-w-2xl pt-10">
-        <p className="font-mono text-xs uppercase tracking-[0.22em] text-amber-500/80">Walley&apos;s · Store Ledger</p>
+        <p className="text-sm font-medium text-amber-400">
+          Walley&apos;s Store Ledger
+        </p>
         <h1 className="font-display text-4xl font-700 text-stone-100 tracking-tight mt-3 leading-[1.06]">
           No numbers yet.<br />Let&apos;s bring your sales in.
         </h1>
@@ -177,7 +180,7 @@ export default function DashboardView() {
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dashboard</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="cf-stagger grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard
           label="Total Revenue"
           value={formatCurrency(totalRevenue)}
@@ -259,7 +262,7 @@ export default function DashboardView() {
                 />
               </div>
               <div className="flex items-end gap-2">
-                <button
+                <Button
                   onClick={() => {
                     const v = parseFloat(goalInput)
                     if (editingGoal === 'weekly') setWeeklyGoal(isNaN(v) || v <= 0 ? null : v)
@@ -269,7 +272,7 @@ export default function DashboardView() {
                   className="px-3 py-1.5 bg-amber-500 text-stone-900 text-xs font-semibold hover:bg-amber-400"
                 >
                   Save
-                </button>
+                </Button>
                 <button onClick={() => setEditingGoal(null)} className="px-3 py-1.5 text-xs text-stone-200 hover:text-stone-200">
                   Cancel
                 </button>

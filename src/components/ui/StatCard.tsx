@@ -15,7 +15,8 @@ export function StatCard({ label, value, trend, trendUp, sub, countTo, format }:
   const animated = useCountUp(countTo ?? 0)
   const display = countTo != null && format ? format(animated) : value
   return (
-    <div className="py-5 px-4 border border-stone-700/40 bg-stone-800/20 hover:bg-stone-800/40 transition-colors duration-200 group">
+    <div
+      className="py-5 px-4 border border-stone-700/50 border-t-2 border-t-amber-500/50 bg-stone-900/85 hover:bg-stone-900/95 hover:border-t-amber-400/80 transition-colors duration-200 group">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400 mb-2.5">{label}</p>
       <p className="text-[2.1rem] font-semibold text-stone-100 font-mono tabular-nums leading-none">{display}</p>
       {trend && (

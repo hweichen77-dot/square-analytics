@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/database'
@@ -183,13 +184,13 @@ export default function CategoryTaxAuditView() {
                 here first, then push once.
               </p>
             </div>
-            <button
+            <Button
               onClick={previewPush}
               disabled={!accessToken || squareTaxIds.length === 0 || previewing || pushing}
               className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors cursor-pointer"
             >
               {previewing ? 'Checking…' : 'Review push'}
-            </button>
+            </Button>
           </div>
 
           {!accessToken && (
@@ -243,13 +244,13 @@ export default function CategoryTaxAuditView() {
               )}
 
               <div className="flex gap-2 pt-1">
-                <button
+                <Button
                   onClick={confirmPush}
                   disabled={pushing || (plan.enable.length === 0 && plan.disable.length === 0)}
                   className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium transition-colors cursor-pointer"
                 >
                   {pushing ? 'Pushing…' : `Push ${plan.enable.length + plan.disable.length} items`}
-                </button>
+                </Button>
                 <button
                   onClick={() => setPlan(null)}
                   disabled={pushing}
@@ -314,13 +315,13 @@ export default function CategoryTaxAuditView() {
               <h2 className="font-semibold text-stone-200">Tax mismatches</h2>
               <p className="text-xs text-stone-400 mt-0.5">{taxMismatches.length} item{taxMismatches.length !== 1 ? 's' : ''} taxed incorrectly</p>
             </div>
-            <button
+            <Button
               onClick={fixAllTax}
               disabled={fixing}
               className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-sm font-medium transition-colors cursor-pointer"
             >
               {fixing ? 'Fixing…' : `Fix all (${taxMismatches.length})`}
-            </button>
+            </Button>
           </div>
           <div className="divide-y divide-stone-700/30 max-h-[32rem] overflow-y-auto">
             {taxMismatches.map(m => (

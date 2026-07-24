@@ -1,3 +1,4 @@
+import Button from '../components/ui/Button'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
@@ -287,12 +288,14 @@ export default function SquareSyncView() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <button
+              <Button
+                glow
+                spark
                 onClick={handleTokenConnect}
                 className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-semibold hover:bg-amber-400"
               >
                 Connect
-              </button>
+              </Button>
               <button
                 onClick={() => setShowOAuth(v => !v)}
                 className="text-xs text-stone-400 hover:text-stone-200 underline"
@@ -384,7 +387,9 @@ export default function SquareSyncView() {
                     onChange={() => toggleTax(t.id)}
                     className="w-4 h-4 rounded accent-amber-500"
                   />
-                  <span className="text-sm text-stone-100">{t.name}</span>
+                  <span className="text-sm text-stone-100">
+                    {t.name}{t.percentage ? ` · ${t.percentage}%` : ''}
+                  </span>
                   {!t.enabled && <span className="text-xs text-stone-400">not shown in POS</span>}
                 </label>
               ))}
@@ -532,13 +537,13 @@ export default function SquareSyncView() {
                 Square CSV uses payment IDs; the API uses order IDs. The same sale can appear twice if you imported CSV data
                 and then synced via API for the same date range. Click below to remove CSV transactions that overlap with API data.
               </p>
-              <button
+              <Button
                 onClick={handleDedup}
                 disabled={deduping}
                 className="px-4 py-2 bg-amber-500 text-stone-950 rounded-lg text-sm font-semibold hover:bg-amber-400 disabled:opacity-50"
               >
                 {deduping ? 'Removing duplicates…' : 'Remove CSV Duplicates'}
-              </button>
+              </Button>
             </div>
           )}
         </div>
