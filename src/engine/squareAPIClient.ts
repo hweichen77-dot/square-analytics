@@ -598,25 +598,37 @@ export interface SquareTax {
   id: string
   name: string
   enabled: boolean
+  percentage?: string
 }
 
 export async function fetchTaxes(token: string): Promise<SquareTax[]> {
-  const taxes: SquareTax[] = []
+  const seenIds = new Set<string>()
+  const byContent = new Map<string, SquareTax>()
   let cursor: string | undefined
   do {
     const qs = new URLSearchParams({ types: 'TAX' })
     if (cursor) qs.set('cursor', cursor)
     const data = await squareRequest(token, 'GET', `${BASE}/catalog/list?${qs.toString()}`) as {
-      objects?: { id: string; is_deleted?: boolean; tax_data?: { name?: string; enabled?: boolean } }[]
+      objects?: { id: string; is_deleted?: boolean; tax_data?: { name?: string; enabled?: boolean; percentage?: string } }[]
       cursor?: string
     }
     for (const o of data.objects ?? []) {
       if (o.is_deleted) continue
-      taxes.push({ id: o.id, name: o.tax_data?.name ?? 'Tax', enabled: o.tax_data?.enabled ?? true })
+      if (seenIds.has(o.id)) continue
+      seenIds.add(o.id)
+      const tax: SquareTax = {
+        id: o.id,
+        name: o.tax_data?.name ?? 'Tax',
+        enabled: o.tax_data?.enabled ?? true,
+        percentage: o.tax_data?.percentage,
+      }
+      const contentKey = `${tax.name}::${tax.percentage ?? ''}`
+      const existing = byContent.get(contentKey)
+      if (!existing || (!existing.enabled && tax.enabled)) byContent.set(contentKey, tax)
     }
     cursor = data.cursor
   } while (cursor)
-  return taxes
+  return [...byContent.values()]
 }
 
 export async function updateItemTaxes(
