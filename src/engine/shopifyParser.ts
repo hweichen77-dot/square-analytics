@@ -60,7 +60,11 @@ export function parseShopifyCSV(content: string): CSVParseResult {
     const date = parseDateTime(dateStr)
     if (!date) { skipped++; continue }
 
-    const netSales = parseCurrency(first['Total'] || first['Subtotal'] || '')
+    // Square's net sales are pre-tax and pre-shipping (merchandise after discounts).
+    // Shopify's "Subtotal" is that same figure, while "Total" adds tax and shipping,
+    // so prefer Subtotal and only fall back to Total when Subtotal is absent. Using
+    // Total here inflated revenue by tax + shipping and broke parity with Square data.
+    const netSales = parseCurrency(first['Subtotal'] || first['Total'] || '')
     if (netSales <= 0) { skipped++; continue }
 
     const items = orderRows
