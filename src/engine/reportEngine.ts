@@ -18,16 +18,19 @@ export interface GrossProfitResult {
 export function computeGrossProfit(
   productStats: ProductStats[],
   costData: ProductCostData[],
-  totalRevenue: number,
 ): GrossProfitResult {
   if (!costData.length) return { grossProfit: null, marginPct: null, cogs: 0 }
   let cogs = 0
+  let coveredRevenue = 0
   for (const s of productStats) {
     const unitCost = lookupUnitCost(s.name, costData)
-    if (unitCost != null) cogs += unitCost * s.totalUnitsSold
+    if (unitCost != null) {
+      cogs += unitCost * s.totalUnitsSold
+      coveredRevenue += s.totalRevenue
+    }
   }
-  const grossProfit = totalRevenue - cogs
-  const marginPct = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : null
+  const grossProfit = coveredRevenue - cogs
+  const marginPct = coveredRevenue > 0 ? (grossProfit / coveredRevenue) * 100 : null
   return { grossProfit, marginPct, cogs }
 }
 
