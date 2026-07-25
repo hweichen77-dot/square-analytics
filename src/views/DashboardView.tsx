@@ -84,8 +84,8 @@ export default function DashboardView() {
   const unitsSold = stats.reduce((s, p) => s + p.totalUnitsSold, 0)
 
   const { grossProfit, marginPct } = useMemo(
-    () => computeGrossProfit(stats, costData, totalRevenue),
-    [stats, costData, totalRevenue],
+    () => computeGrossProfit(stats, costData),
+    [stats, costData],
   )
 
   const goalProgress = useMemo(() => {

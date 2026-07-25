@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
   ScatterChart, Scatter, PieChart, Pie, Legend,
 } from 'recharts'
-import { useProductCostData, useCatalogueProducts, useRefunds } from '../db/useTransactions'
+import { useProductCostData, useRefunds } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
 import { EmptyState } from '../components/ui/EmptyState'
 import { StatCard } from '../components/ui/StatCard'
@@ -277,7 +277,6 @@ function CostManagementModal({
 export default function ProfitView() {
   const { transactions, productStats: cachedStats, totalRevenue } = useAnalytics()
   const costData = useProductCostData()
-  const catalogueProducts = useCatalogueProducts()
   const refunds = useRefunds()
   const [showCostSheet, setShowCostSheet] = useState(false)
   const [sortKey, setSortKey] = useState<keyof ProfitRow>('totalProfit')
@@ -287,22 +286,6 @@ export default function ProfitView() {
     const stats = cachedStats
     const byName = Object.fromEntries(costData.map((c: ProductCostData) => [c.productName, c]))
     const byNameLower = Object.fromEntries(costData.map((c: ProductCostData) => [c.productName.toLowerCase().trim(), c]))
-    const catPriceLower: Record<string, number> = {}
-    for (const cp of catalogueProducts) {
-      if (cp.price !== null && cp.price > 0) {
-        catPriceLower[cp.name.toLowerCase().trim()] = cp.price
-      }
-    }
-    function lookupCataloguePrice(name: string): number | null {
-      const lower = name.toLowerCase().trim()
-      if (catPriceLower[lower] !== undefined) return catPriceLower[lower]
-      const stripped = lower.startsWith('*') ? lower.slice(1).trim() : lower
-      if (catPriceLower[stripped] !== undefined) return catPriceLower[stripped]
-      const base = lower.replace(/\s*\([^)]*\)\s*$/, '').trim()
-      if (catPriceLower[base] !== undefined) return catPriceLower[base]
-      const strippedBase = stripped.replace(/\s*\([^)]*\)\s*$/, '').trim()
-      return catPriceLower[strippedBase] ?? null
-    }
     function stripStar(n: string) { return n.startsWith('*') ? n.slice(1).trim() : n }
     function normalizeForLookup(n: string): string[] {
       const clean = stripStar(n).trim()
@@ -322,27 +305,25 @@ export default function ProfitView() {
     }
     const rows: ProfitRow[] = stats.map(p => {
       const c = lookupCost(p.name)
-      const sellingPrice = lookupCataloguePrice(p.name) ?? p.avgPrice
       if (c) {
         const euc = effectiveUnitCost(c)
-        const gp = sellingPrice - euc
-        const margin = sellingPrice > 0 ? (gp / sellingPrice) * 100 : 0
         const tc = euc * p.totalUnitsSold
-        const tp = gp * p.totalUnitsSold
+        const tp = p.totalRevenue - tc
+        const margin = p.totalRevenue > 0 ? (tp / p.totalRevenue) * 100 : 0
         return {
-          name: p.name, category: p.category, unitCost: euc, avgPrice: sellingPrice,
+          name: p.name, category: p.category, unitCost: euc, avgPrice: p.avgPrice,
           marginPercent: margin, unitsSold: p.totalUnitsSold, totalRevenue: p.totalRevenue,
           totalCost: tc, totalProfit: tp, hasCostData: true,
         }
       }
       return {
-        name: p.name, category: p.category, unitCost: null, avgPrice: sellingPrice,
+        name: p.name, category: p.category, unitCost: null, avgPrice: p.avgPrice,
         marginPercent: null, unitsSold: p.totalUnitsSold, totalRevenue: p.totalRevenue,
         totalCost: null, totalProfit: null, hasCostData: false,
       }
     })
     return { rawStats: stats, profitRows: rows }
-  }, [cachedStats, costData, catalogueProducts])
+  }, [cachedStats, costData])
 
   const sortedRows = useMemo(() => {
     return [...profitRows].sort((a, b) => {
@@ -362,8 +343,8 @@ export default function ProfitView() {
   const coveredRevenue = useMemo(() => profitRows.filter(r => r.hasCostData).reduce((s, r) => s + r.totalRevenue, 0), [profitRows])
   const overallMargin = coveredRevenue > 0 ? (totalProfit / coveredRevenue) * 100 : 0
   const sharedGP = useMemo(
-    () => computeGrossProfit(cachedStats, costData, totalRevenue),
-    [cachedStats, costData, totalRevenue],
+    () => computeGrossProfit(cachedStats, costData),
+    [cachedStats, costData],
   )
   const totalProcessingFees = useMemo(
     () => transactions.reduce((s, t) => s + (t.processingFee ?? 0), 0) / 100,
