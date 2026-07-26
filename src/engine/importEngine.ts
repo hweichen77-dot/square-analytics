@@ -157,7 +157,13 @@ export async function importOpexXLSX(file: File): Promise<ImportResult> {
       skipped++; continue
     }
 
-    const amt = typeof amount === 'number' ? amount : parseFloat(String(amount ?? ''))
+    // A text-formatted amount cell can carry a currency symbol and thousands
+    // separators (e.g. "$1,234.50"). parseFloat alone stops at the comma and
+    // reads 1, or returns NaN when a "$" leads, silently corrupting or dropping
+    // the expense. Strip the formatting first, matching the catalogue parser.
+    const amt = typeof amount === 'number'
+      ? amount
+      : parseFloat(String(amount ?? '').replace(/[$,\s]/g, ''))
     if (isNaN(amt) || amt <= 0) { skipped++; continue }
 
     const name = typeof rawName === 'string' ? rawName.trim() : String(rawName ?? '').trim()

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useStaffWages, useShifts } from '../db/useTransactions'
 import { useAnalytics } from '../context/AnalyticsContext'
+import { useDateRangeStore } from '../store/dateRangeStore'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency, formatNumber } from '../utils/format'
 import { StatCard } from '../components/ui/StatCard'
@@ -38,22 +39,37 @@ function realShiftHours(shifts: StoredShift[]): number {
 
 export default function StaffView() {
   const { transactions, staffStats } = useAnalytics()
+  const { range } = useDateRangeStore()
   const [expandedStaff, setExpandedStaff] = useState<string | null>(null)
   const [editingWage, setEditingWage] = useState<string | null>(null)
   const [wageInput, setWageInput] = useState('')
   const wages = useStaffWages()
   const shifts = useShifts()
   const wageMap = useMemo(() => new Map(wages.map(w => [w.staffName, w.hourlyWage])), [wages])
+  // Revenue (staffStats/transactions) is scoped to the selected date range, so shift
+  // hours must be scoped to the same window. Otherwise the real-hours path sums every
+  // shift in the database against range-limited revenue, producing wildly wrong ROI.
+  const shiftsInRange = useMemo(() => {
+    const startMs = range.start ? range.start.getTime() : null
+    const endMs = range.end ? range.end.getTime() : null
+    if (startMs === null && endMs === null) return shifts
+    return shifts.filter(s => {
+      const ms = s.startAt.getTime()
+      if (startMs !== null && ms < startMs) return false
+      if (endMs !== null && ms > endMs) return false
+      return true
+    })
+  }, [shifts, range])
   const shiftsByStaff = useMemo(() => {
     const map: Record<string, StoredShift[]> = {}
-    for (const s of shifts) {
+    for (const s of shiftsInRange) {
       const name = (s.staffName ?? '').trim()
       if (!name) continue
       if (!map[name]) map[name] = []
       map[name].push(s)
     }
     return map
-  }, [shifts])
+  }, [shiftsInRange])
   const totalRevenue = useMemo(() => staffStats.reduce((s, x) => s + x.totalSales, 0), [staffStats])
   const hasAnyRealHours = useMemo(
     () => staffStats.some(s => (shiftsByStaff[s.name] ?? []).some(sh => sh.endAt)),
