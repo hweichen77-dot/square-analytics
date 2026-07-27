@@ -1,5 +1,5 @@
 import type { CatalogueProduct } from '../types/models'
-import { MERCH_KEYWORDS, classifyProduct } from './categoryClassifier'
+import { MERCH_KEYWORDS, classifyProduct, hasKeyword } from './categoryClassifier'
 
 const CARBONATED_KEYWORDS = [
   'soda', 'cola', 'coke', 'pepsi', 'sprite', 'fanta', 'dr pepper', 'dr. pepper',
@@ -43,7 +43,7 @@ function isMerch(product: CatalogueProduct): boolean {
   const cat = (product.category ?? '').toLowerCase()
   if (cat.includes('merch') || cat.includes('apparel') || cat.includes('clothing')) return true
   const lower = String(product.name ?? '').toLowerCase()
-  return MERCH_KEYWORDS.some(k => lower.includes(k))
+  return hasKeyword(lower, MERCH_KEYWORDS)
 }
 
 function isRamen(product: CatalogueProduct): boolean {
