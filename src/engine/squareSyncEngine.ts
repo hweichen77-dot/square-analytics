@@ -279,7 +279,7 @@ async function _runSyncImpl(
       const payment = paymentByOrderId.get(tx.transactionID)
       if (!payment) continue
       tx.paymentSourceType = payment.sourceType
-      tx.processingFee = payment.processingFee?.[0]?.amountMoney?.amount ?? 0
+      tx.processingFee = (payment.processingFee ?? []).reduce((s, f) => s + (f.amountMoney?.amount ?? 0), 0)
       tx.cardBrand = payment.cardDetails?.card?.cardBrand
       tx.cardLastFour = payment.cardDetails?.card?.last4
       if (!tx.customerID && payment.customerId) {
