@@ -1,19 +1,34 @@
 import { startOfDay, startOfWeek, startOfMonth, format } from 'date-fns'
 import type { SalesTransaction } from '../types/models'
-import { parseProductItems } from '../types/models'
+import { parseProductItems, type ProductItem } from '../types/models'
 
 export const UNCATEGORIZED = 'Uncategorized (non-itemized sales)'
+export const REFUNDS = 'Refunds & returns'
+
+export function isRealProduct(name: string): boolean {
+  return name !== UNCATEGORIZED && name !== REFUNDS
+}
+
+export function mergeItems(items: ProductItem[]): ProductItem[] {
+  const map = new Map<string, number>()
+  for (const item of items) map.set(item.name, (map.get(item.name) ?? 0) + item.qty)
+  return Array.from(map, ([name, qty]) => ({ name, qty }))
+}
+
+function addTo(map: Map<string, number>, key: string, amount: number): void {
+  map.set(key, (map.get(key) ?? 0) + amount)
+}
 
 function allocateRevenue(tx: SalesTransaction): Map<string, number> {
   const result = new Map<string, number>()
-  const items = parseProductItems(tx.itemDescription)
+  const items = mergeItems(parseProductItems(tx.itemDescription))
   if (items.length === 0) return result
 
   if (tx.lineItems && tx.lineItems.length > 0) {
     const totalGross = tx.lineItems.reduce((s, li) => s + li.unitPrice * li.qty, 0)
     if (totalGross > 0) {
       for (const li of tx.lineItems) {
-        result.set(li.name, (li.unitPrice * li.qty / totalGross) * tx.netSales)
+        addTo(result, li.name, (li.unitPrice * li.qty / totalGross) * tx.netSales)
       }
       return result
     }
@@ -22,7 +37,7 @@ function allocateRevenue(tx: SalesTransaction): Map<string, number> {
   const totalQty = items.reduce((s, i) => s + i.qty, 0)
   const perUnit = tx.netSales / Math.max(totalQty, 1)
   for (const item of items) {
-    result.set(item.name, perUnit * item.qty)
+    addTo(result, item.name, perUnit * item.qty)
   }
   return result
 }
@@ -128,10 +143,34 @@ export function computeProductStats(
 ): ProductStats[] {
   const statsMap = new Map<string, ProductStats>()
 
+  function bucket(name: string, category: string, revenue: number, date: Date): void {
+    const existing = statsMap.get(name)
+    if (existing) {
+      existing.totalRevenue += revenue
+      if (date < existing.firstSoldDate) existing.firstSoldDate = date
+      if (date > existing.lastSoldDate) existing.lastSoldDate = date
+      return
+    }
+    statsMap.set(name, {
+      name,
+      category,
+      totalUnitsSold: 0,
+      totalRevenue: revenue,
+      avgPrice: 0,
+      firstSoldDate: date,
+      lastSoldDate: date,
+      monthlySales: {},
+      dailySales: {},
+    })
+  }
+
   for (const tx of transactions) {
 
-    if (tx.netSales < 0) continue
-    const items = parseProductItems(tx.itemDescription).filter(i => isAnalyticsItem(i.name))
+    if (tx.netSales < 0) {
+      bucket(REFUNDS, 'Other', tx.netSales, tx.date)
+      continue
+    }
+    const items = mergeItems(parseProductItems(tx.itemDescription)).filter(i => isAnalyticsItem(i.name))
     const revenueMap = allocateRevenue(tx)
     const monthKey = format(tx.date, 'yyyy-MM')
     const dayKey = format(tx.date, 'yyyy-MM-dd')
@@ -165,25 +204,8 @@ export function computeProductStats(
     }
 
     const leftover = tx.netSales - attributed
-    if (leftover > 0.005) {
-      const u = statsMap.get(UNCATEGORIZED)
-      if (u) {
-        u.totalRevenue += leftover
-        if (tx.date < u.firstSoldDate) u.firstSoldDate = tx.date
-        if (tx.date > u.lastSoldDate) u.lastSoldDate = tx.date
-      } else {
-        statsMap.set(UNCATEGORIZED, {
-          name: UNCATEGORIZED,
-          category: 'Other',
-          totalUnitsSold: 0,
-          totalRevenue: leftover,
-          avgPrice: 0,
-          firstSoldDate: tx.date,
-          lastSoldDate: tx.date,
-          monthlySales: {},
-          dailySales: {},
-        })
-      }
+    if (Math.abs(leftover) > 0.005) {
+      bucket(UNCATEGORIZED, 'Other', leftover, tx.date)
     }
   }
 
@@ -250,12 +272,16 @@ export function computeCategoryRevenue(
   const total = transactions.reduce((s, tx) => s + tx.netSales, 0)
 
   for (const tx of transactions) {
-    const items = parseProductItems(tx.itemDescription)
+    const items = mergeItems(parseProductItems(tx.itemDescription))
     const revenueMap = allocateRevenue(tx)
+    let attributed = 0
     for (const item of items) {
-      const cat = classifyProduct(item.name, overrides)
-      catMap.set(cat, (catMap.get(cat) ?? 0) + (revenueMap.get(item.name) ?? 0))
+      const itemRevenue = revenueMap.get(item.name) ?? 0
+      attributed += itemRevenue
+      addTo(catMap, classifyProduct(item.name, overrides), itemRevenue)
     }
+    const leftover = tx.netSales - attributed
+    if (Math.abs(leftover) > 0.005) addTo(catMap, 'Other', leftover)
   }
 
   return Array.from(catMap.entries())

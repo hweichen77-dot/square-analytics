@@ -11,7 +11,7 @@ import {
   computeWeeklyRevenue,
   computeMonthlyRevenue,
   isSlowMover,
-  UNCATEGORIZED,
+  isRealProduct,
 } from '../engine/analyticsEngine'
 import { computeGrossProfit } from '../engine/reportEngine'
 import { useAnalytics } from '../context/AnalyticsContext'
@@ -57,8 +57,8 @@ export default function DashboardView() {
   const insights = useMemo(() => {
     if (!daily.length) return null
     const bestDay = daily.reduce((a, b) => b.revenue > a.revenue ? b : a, daily[0])
-    const topProduct = stats.find(s => s.name !== UNCATEGORIZED) ?? null
-    const slowProduct = stats.find(s => isSlowMover(s)) ?? null
+    const topProduct = stats.find(s => isRealProduct(s.name)) ?? null
+    const slowProduct = stats.find(s => isRealProduct(s.name) && isSlowMover(s)) ?? null
     const topStaff = staffStats[0] ?? null
     return { bestDay, topProduct, slowProduct, topStaff }
   }, [daily, stats, staffStats])
@@ -80,7 +80,7 @@ export default function DashboardView() {
   const netRevenue = totalRevenue - totalRefunds
 
   const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
-  const uniqueProducts = stats.filter(s => s.name !== UNCATEGORIZED).length
+  const uniqueProducts = stats.filter(s => isRealProduct(s.name)).length
   const unitsSold = stats.reduce((s, p) => s + p.totalUnitsSold, 0)
 
   const { grossProfit, marginPct } = useMemo(
