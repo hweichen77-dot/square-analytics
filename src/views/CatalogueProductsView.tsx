@@ -189,7 +189,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               onChange={field('itemName')}
               disabled={isAddVariation}
               placeholder="e.g. Ramune Soda"
-              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] disabled:opacity-50 disabled:cursor-not-allowed"
             />
             {errors.itemName && <p className="text-xs text-red-400 mt-1">{errors.itemName}</p>}
           </div>
@@ -201,7 +201,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               value={form.variationName}
               onChange={field('variationName')}
               placeholder="e.g. Strawberry, Large, 12oz… (blank = Regular)"
-              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
             />
           </div>
 
@@ -212,7 +212,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="number" min="0" step="0.01"
                 value={form.price} onChange={field('price')}
                 placeholder="e.g. 3.50"
-                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
               {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
             </div>
@@ -222,7 +222,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="number" min="0" step="1"
                 value={form.quantity} onChange={field('quantity')}
                 placeholder="e.g. 24"
-                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
               {errors.quantity && <p className="text-xs text-red-400 mt-1">{errors.quantity}</p>}
             </div>
@@ -234,7 +234,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               type="text"
               value={form.sku} onChange={field('sku')}
               placeholder="e.g. RAM-STRAW-001"
-              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
             />
           </div>
 
@@ -242,7 +242,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
             <label className="block text-xs font-medium text-stone-400 mb-1.5">Category</label>
             <select
               value={form.category} onChange={field('category')}
-              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] cursor-pointer"
             >
               <option value="">Select a category…</option>
               {KNOWN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -256,7 +256,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="text"
                 value={form.customCategory} onChange={field('customCategory')}
                 placeholder="Enter category name"
-                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
               {errors.customCategory && <p className="text-xs text-red-400 mt-1">{errors.customCategory}</p>}
             </div>
@@ -494,12 +494,12 @@ export default function CatalogueProductsView() {
           placeholder="Search items or SKU…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] cursor-pointer"
         >
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>

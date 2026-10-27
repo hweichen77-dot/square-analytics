@@ -498,14 +498,14 @@ export default function ProfitView() {
             <thead className="sticky top-0 bg-stone-900 border-b border-stone-700/50">
               <tr>
                 {([
-                  ['name', 'Product'], ['category', 'Category'], ['unitCost', 'Unit Cost'],
-                  ['avgPrice', 'Avg Price'], ['marginPercent', 'Margin %'],
-                  ['unitsSold', 'Units Sold'], ['totalRevenue', 'Total Revenue'],
-                  ['totalCost', 'Total Cost'], ['totalProfit', 'Total Profit'],
+                  ['name', 'Product'], ['category', 'Category'], ['unitCost', 'Unit cost'],
+                  ['avgPrice', 'Avg price'], ['marginPercent', 'Margin %'],
+                  ['unitsSold', 'Units sold'], ['totalRevenue', 'Revenue'],
+                  ['totalCost', 'Cost'], ['totalProfit', 'Profit'],
                 ] as [keyof ProfitRow, string][]).map(([key, label]) => (
                   <th
                     key={key}
-                    className="px-4 py-2.5 font-semibold text-stone-400 text-left cursor-pointer hover:text-amber-400 hover:bg-stone-700 select-none"
+                    className={`px-4 h-10 font-normal text-stone-500 whitespace-nowrap cursor-pointer hover:text-stone-100 select-none ${key === "name" || key === "category" ? "text-left" : "text-right"}`}
                     onClick={() => toggleSort(key)}
                   >
                     {label}{sortArrow(key)}

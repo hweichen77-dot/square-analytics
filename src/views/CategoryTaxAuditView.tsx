@@ -276,7 +276,7 @@ export default function CategoryTaxAuditView() {
               placeholder="Search…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-44"
+              className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] w-44"
             />
           </div>
           <div className="divide-y divide-stone-700/30 max-h-[32rem] overflow-y-auto">
@@ -293,7 +293,7 @@ export default function CategoryTaxAuditView() {
                   <select
                     defaultValue=""
                     onChange={e => assignCategory(p.id, e.target.value)}
-                    className="shrink-0 border border-[#d4d2ce] rounded-lg px-2 py-1.5 text-sm bg-stone-900 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                    className="shrink-0 border border-[#d4d2ce] rounded-lg px-2 py-1.5 text-sm bg-stone-900 text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
                   >
                     <option value="" disabled>Set category…</option>
                     {KNOWN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}

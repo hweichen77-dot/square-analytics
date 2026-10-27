@@ -123,7 +123,7 @@ export default function BasketAnalysisView() {
               placeholder="Search item…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="flex-1 text-sm border border-stone-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+              className="flex-1 text-sm border border-stone-700 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
             />
             <div className="flex gap-1">
               {SORT_OPTIONS.map(opt => (

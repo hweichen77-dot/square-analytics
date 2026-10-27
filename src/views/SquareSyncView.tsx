@@ -278,7 +278,7 @@ export default function SquareSyncView() {
             value={tokenInput}
             onChange={e => setTokenInput(e.target.value)}
             placeholder="EAAA… (production access token)"
-            className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+            className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
             onKeyDown={e => { if (e.key === 'Enter') handleTokenConnect() }}
           />
           {connState === 'connecting' ? (
@@ -323,14 +323,14 @@ export default function SquareSyncView() {
                 value={appIDInput}
                 onChange={e => setAppIDInput(e.target.value)}
                 placeholder="Application ID · sq0idp-…"
-                className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
               <input
                 type="password"
                 value={appSecretInput}
                 onChange={e => setAppSecretInput(e.target.value)}
                 placeholder="Application Secret · sq0csp-…"
-                className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-800/60 text-sm tabular-nums text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
               <button
                 onClick={handleConnect}
@@ -357,7 +357,7 @@ export default function SquareSyncView() {
             <select
               value={store.locationID}
               onChange={e => store.setCredentials({ locationID: e.target.value })}
-              className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+              className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
             >
               <option value="">Select location…</option>
               {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
@@ -434,7 +434,7 @@ export default function SquareSyncView() {
             </div>
             <button
               onClick={() => store.setCredentials({ autoSyncEnabled: !store.autoSyncEnabled })}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-800 ${
+              className={`relative w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b9b6b1] focus-visible:ring-offset-2 focus-visible:ring-offset-stone-800 ${
                 store.autoSyncEnabled ? 'bg-amber-500' : 'bg-[#cfccc8]'
               }`}
               role="switch"

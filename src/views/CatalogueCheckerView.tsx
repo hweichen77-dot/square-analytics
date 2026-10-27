@@ -179,7 +179,7 @@ export default function CatalogueCheckerView() {
           <button
             key={sev}
             onClick={() => handleFilterClick(sev)}
-            className={`border p-4 text-left transition-[width,background-color] cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
+            className={`border p-4 text-left transition-[width,background-color] cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-[#b9b6b1]' : 'hover:brightness-110'}`}
           >
             <p className={`text-3xl font-bold tabular-nums ${color}`}>{count}</p>
             <p className="text-xs text-stone-400 mt-1 font-medium">{label}</p>

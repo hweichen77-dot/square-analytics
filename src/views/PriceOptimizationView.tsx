@@ -350,7 +350,7 @@ export default function PriceOptimizationView() {
             placeholder="Search products..."
             value={productSearch}
             onChange={e => setProductSearch(e.target.value)}
-            className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-56"
+            className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] w-56"
           />
         </div>
         <div className="overflow-y-auto max-h-96">

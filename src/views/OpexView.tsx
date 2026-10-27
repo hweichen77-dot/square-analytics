@@ -84,7 +84,7 @@ function EntryModal({
               value={form.name}
               onChange={e => set('name', e.target.value)}
               placeholder="e.g. Display shelving unit"
-              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] focus:border-amber-500/60"
             />
           </div>
 
@@ -94,7 +94,7 @@ function EntryModal({
               <select
                 value={form.category}
                 onChange={e => set('category', e.target.value as OpexCategory)}
-                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 cursor-pointer"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] focus:border-amber-500/60 cursor-pointer"
               >
                 {OPEX_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -106,7 +106,7 @@ function EntryModal({
                 required
                 value={form.month}
                 onChange={e => set('month', e.target.value)}
-                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] focus:border-amber-500/60"
               />
             </div>
           </div>
@@ -123,7 +123,7 @@ function EntryModal({
                 value={form.amount || ''}
                 onChange={e => set('amount', parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
-                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg pl-7 pr-3 py-2 text-sm text-stone-100 placeholder-stone-600 tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg pl-7 pr-3 py-2 text-sm text-stone-100 placeholder-stone-600 tabular-nums focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] focus:border-amber-500/60"
               />
             </div>
           </div>
@@ -135,7 +135,7 @@ function EntryModal({
               value={form.notes}
               onChange={e => set('notes', e.target.value)}
               placeholder="e.g. Receipt #12345"
-              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] focus:border-amber-500/60"
             />
           </div>
 
@@ -259,7 +259,7 @@ export default function OpexView() {
         <select
           value={filterMonth}
           onChange={e => setFilterMonth(e.target.value)}
-          className="bg-stone-800 border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+          className="bg-stone-800 border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] cursor-pointer"
         >
           <option value="all">All months</option>
           {availableMonths.map(m => (

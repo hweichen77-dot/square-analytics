@@ -31,13 +31,11 @@ const URGENCY_ORDER: Record<UrgencyTier, number> = {
 
 function urgencyColor(tier: UrgencyTier) {
   if (tier === 'outOfStock' || tier === 'critical') return '#c4242a'
-  if (tier === 'low') return '#1d5fbf'
-  if (tier === 'safe') return '#2e7d32'
-  return '#8a8783'
+  return '#625f5b'
 }
 
 function urgencyLabel(tier: UrgencyTier) {
-  if (tier === 'outOfStock') return 'OUT OF STOCK'
+  if (tier === 'outOfStock') return 'Out of stock'
   if (tier === 'critical') return 'Critical'
   if (tier === 'low') return 'Low'
   if (tier === 'safe') return 'Safe'
@@ -265,15 +263,10 @@ export default function RestockView() {
 
       {suggestedList.length > 0 && (
         <div className="bg-white border border-[var(--border)] rounded-lg p-5">
-          <h2 className="text-sm font-semibold text-amber-400 mb-3">Suggested restock list</h2>
-          <div className="space-y-2">
+          <h2 className="text-base font-semibold text-stone-100 mb-2">Suggested restock list</h2>
+          <div>
             {suggestedList.map(alert => (
-              <div key={alert.productName} className="flex items-center gap-3 p-3 rounded-lg"
-                style={{ backgroundColor: urgencyColor(alert.urgency) + '0d' }}>
-                <div
-                  className="w-1 self-stretch rounded-full shrink-0"
-                  style={{ backgroundColor: urgencyColor(alert.urgency) }}
-                />
+              <div key={alert.productName} className="flex items-center gap-3 py-2.5 border-t border-[var(--rule)] first:border-t-0">
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-stone-100 text-sm">{alert.productName}</p>
                   <p className="text-xs text-stone-400">{alert.category}</p>
@@ -284,7 +277,7 @@ export default function RestockView() {
                   </p>
                   {alert.stockRemaining !== null ? (
                     <p className="text-xs" style={{ color: urgencyColor(alert.urgency) }}>
-                      {alert.stockRemaining <= 0 ? 'OUT OF STOCK' : `${alert.stockRemaining} remaining`}
+                      {alert.stockRemaining <= 0 ? 'Out of stock' : `${alert.stockRemaining} remaining`}
                     </p>
                   ) : (
                     <p className="text-xs text-stone-400">No stock data</p>
@@ -292,9 +285,9 @@ export default function RestockView() {
                 </div>
                 <button
                   onClick={() => setProductToRestock(alert.productName)}
-                  className="shrink-0 text-xs px-3 py-1.5 border border-stone-700 rounded-lg hover:bg-stone-700/50"
+                  className="shrink-0 h-8 px-3 text-[13px] font-medium border border-[var(--control)] rounded-md bg-white hover:bg-[var(--raised)]"
                 >
-                  Log Restock
+                  Log restock
                 </button>
               </div>
             ))}

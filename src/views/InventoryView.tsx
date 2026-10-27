@@ -178,12 +178,12 @@ export default function InventoryView() {
           placeholder="Search product…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] cursor-pointer"
         >
           <option value="All">All categories</option>
           {ALL_CATEGORY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}

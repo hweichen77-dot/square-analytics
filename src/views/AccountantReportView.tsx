@@ -302,7 +302,7 @@ export default function AccountantReportView() {
                 type="date"
                 value={customStart}
                 onChange={e => setCustomStart(e.target.value)}
-                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
             </div>
             <div className="flex-1">
@@ -311,7 +311,7 @@ export default function AccountantReportView() {
                 type="date"
                 value={customEnd}
                 onChange={e => setCustomEnd(e.target.value)}
-                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                className="w-full border border-stone-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
               />
             </div>
           </div>
@@ -507,7 +507,7 @@ export default function AccountantReportView() {
                   placeholder="Search products..."
                   value={productSearch}
                   onChange={e => setProductSearch(e.target.value)}
-                  className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
+                  className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1] w-52"
                 />
               </div>
               <div className="overflow-y-auto max-h-[32rem] overflow-x-auto">

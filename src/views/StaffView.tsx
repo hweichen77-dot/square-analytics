@@ -104,8 +104,7 @@ export default function StaffView() {
   }
 
   const AVATAR_COLORS = [
-    'bg-amber-500', 'bg-emerald-500', 'bg-amber-600', 'bg-red-500',
-    'bg-amber-500', 'bg-emerald-600', 'bg-amber-700', 'bg-stone-500',
+    'bg-[#e3ecf9] text-[#1d3f73]', 'bg-[#e4f2e6] text-[#1f4d22]', 'bg-[#f6e8de] text-[#6b3416]', 'bg-[#e0f1f1] text-[#16494a]',
   ]
 
   return (
@@ -293,7 +292,7 @@ export default function StaffView() {
                   className="w-full flex items-center gap-4 px-5 py-4 hover:bg-stone-700/50 transition-colors text-left"
                   onClick={() => setExpandedStaff(isExpanded ? null : staff.name)}
                 >
-                  <div className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-white text-sm font-bold shrink-0`}>
+                  <div className={`w-10 h-10 rounded-full ${avatarColor} flex items-center justify-center text-sm font-semibold shrink-0`}>
                     {initials(staff.name)}
                   </div>
 

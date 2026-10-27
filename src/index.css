@@ -122,3 +122,5 @@ textarea[class] {
   background-color: #ffffff;
   border-color: var(--control);
 }
+
+td.tabular-nums { text-align: right; }

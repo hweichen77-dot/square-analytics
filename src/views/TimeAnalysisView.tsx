@@ -5,7 +5,7 @@ import { useDateRangeStore } from '../store/dateRangeStore'
 import { computeHeatmap, computeMonthlyComparison } from '../engine/analyticsEngine'
 import { EmptyState } from '../components/ui/EmptyState'
 import { formatCurrency } from '../utils/format'
-import { chart } from '../lib/chartTheme'
+import { chart, heatBlue } from '../lib/chartTheme'
 
 const HOURS = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -71,7 +71,7 @@ export default function TimeAnalysisView() {
                         backgroundColor:
                           count === 0
                             ? '#efeeec'
-                            : `rgba(29, 95, 191, ${0.15 + intensity * 0.8})`,
+                            : heatBlue(0.15 + intensity * 0.8),
                         color: intensity > 0.5 ? '#ffffff' : '#121110',
                       }}
                     >
@@ -92,7 +92,7 @@ export default function TimeAnalysisView() {
                     width: 14,
                     height: 14,
                     backgroundColor:
-                      v === 0 ? '#efeeec' : `rgba(29, 95, 191, ${0.15 + v * 0.8})`,
+                      v === 0 ? '#efeeec' : heatBlue(0.15 + v * 0.8),
                   }}
                 />
               ))}

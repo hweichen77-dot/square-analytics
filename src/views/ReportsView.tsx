@@ -342,16 +342,16 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
         <input
           type="text" placeholder="Search items or staff…" value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
         />
         <select value={payFilter} onChange={e => setPayFilter(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30">
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]">
           {paymentMethods.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
         <input
           type="number" placeholder="Min amount $" value={minAmount}
           onChange={e => setMinAmount(e.target.value)}
-          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-36 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
         />
         <span className="self-center text-sm text-stone-400 ml-auto">{formatNumber(filtered.length)} transactions</span>
       </div>
@@ -391,13 +391,6 @@ function TransactionLogReportView({ report }: { report: Extract<AnyReport, { typ
   )
 }
 
-const SEASON_COLORS: Record<string, string> = {
-  Spring: '#2e7d32',
-  Summer: '#1d5fbf',
-  Fall:   '#c4242a',
-  Winter: '#1d5fbf',
-}
-
 function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'seasonal' }> }) {
   const [activeSeason, setActiveSeason] = useState<string | null>(null)
   const chartData = report.monthly.map(m => ({
@@ -423,12 +416,9 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
             <button
               key={s.name}
               onClick={() => setActiveSeason(isActive ? null : s.name)}
-              className={`text-left p-4 border transition-[width,background-color] ${isActive ? 'ring-2 ring-offset-stone-900 ring-offset-1' : 'hover:bg-stone-700/50'}`}
-              style={{ borderColor: SEASON_COLORS[s.name], background: isActive ? `${SEASON_COLORS[s.name]}10` : undefined, ['--tw-ring-color' as any]: SEASON_COLORS[s.name] }}
+              aria-pressed={isActive}
+              className={`text-left p-4 rounded-lg border bg-white transition-colors ${isActive ? 'border-stone-100 ring-1 ring-stone-100' : 'border-[var(--border)] hover:border-[#b9b6b1]'}`}
             >
-              <div className="w-8 h-8 rounded-lg bg-stone-700 flex items-center justify-center text-xs font-bold text-stone-100 mb-2">
-                {s.name.slice(0, 2).toUpperCase()}
-              </div>
               <p className="font-semibold text-stone-200 text-sm">{s.name}</p>
               <p className="tabular-nums text-stone-100 mt-1">{formatCurrency(s.revenue)}</p>
               <p className="text-xs text-stone-400 mt-0.5">{s.revenueShare.toFixed(1)}% of total · {formatNumber(s.transactions)} txns</p>
@@ -476,7 +466,7 @@ function SeasonalReportView({ report }: { report: Extract<AnyReport, { type: 'se
                   <XAxis dataKey="label" tick={{ fontSize: 10, fill: chart.axis }} />
                   <YAxis tick={{ fontSize: 10, fill: chart.axis }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} width={44} />
                   <Tooltip {...TT} formatter={(v: number) => [formatCurrency(v), 'Revenue']} />
-                  <Bar dataKey="revenue" fill={SEASON_COLORS[selectedSeason.name]} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="revenue" fill={chart.bar} radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -1096,7 +1086,7 @@ function CashReportView({ report }: { report: Extract<AnyReport, { type: 'cash' 
           <input
             type="text" placeholder="Search…" value={search}
             onChange={e => setSearch(e.target.value)}
-            className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+            className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]"
           />
         </div>
         <div className="overflow-x-auto max-h-[28rem]">
@@ -1209,16 +1199,12 @@ export default function ReportsView() {
             <button
               key={type}
               onClick={() => { setSelectedType(type); setReport(null) }}
-              className={`text-left p-4 border transition-[width,background-color] ${
-                active
-                  ? 'border-amber-400 bg-amber-500/10 ring-1 ring-amber-400'
-                  : 'border-stone-700 bg-stone-800 hover:border-amber-500/30 hover:bg-stone-700/50'
+              aria-pressed={active}
+              className={`text-left p-4 rounded-lg border bg-white transition-colors ${
+                active ? 'border-stone-100 ring-1 ring-stone-100' : 'border-[var(--border)] hover:border-[#b9b6b1]'
               }`}
             >
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold mb-2 ${active ? 'bg-amber-500/15 text-amber-400' : 'bg-stone-700 text-stone-200'}`}>
-                {meta.label.slice(0, 2).toUpperCase()}
-              </div>
-              <p className={`text-sm font-semibold leading-tight ${active ? 'text-amber-400' : 'text-stone-200'}`}>
+              <p className="text-sm font-semibold leading-tight text-stone-100">
                 {meta.label}
               </p>
               <p className="text-xs text-stone-400 mt-1 leading-snug line-clamp-2">{meta.description}</p>
@@ -1232,13 +1218,13 @@ export default function ReportsView() {
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">From</label>
             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
-              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30" />
+              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]" />
           </div>
           <span className="text-stone-400 mt-5">–</span>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">To</label>
             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
-              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30" />
+              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]" />
           </div>
         </div>
 
@@ -1262,7 +1248,7 @@ export default function ReportsView() {
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Show top</label>
             <select value={topN} onChange={e => setTopN(Number(e.target.value))}
-              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30">
+              className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-[#b9b6b1]">
               {[10, 20, 50, 100].map(n => <option key={n} value={n}>{n} products</option>)}
             </select>
           </div>
@@ -1287,7 +1273,7 @@ export default function ReportsView() {
                   max={99}
                   value={overheadPct}
                   onChange={e => setOverheadPct(Math.min(99, Math.max(1, Number(e.target.value))))}
-                  className="w-12 bg-stone-900 border border-amber-500/30 rounded px-1.5 py-0.5 text-xs tabular-nums text-amber-300 text-center focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+                  className="w-12 bg-stone-900 border border-amber-500/30 rounded px-1.5 py-0.5 text-xs tabular-nums text-amber-300 text-center focus:outline-none focus:ring-1 focus:ring-[#b9b6b1]"
                 />
                 <span className="text-xs text-amber-400/60">%</span>
               </div>

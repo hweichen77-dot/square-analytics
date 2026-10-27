@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts'
-import { chart } from '../lib/chartTheme'
+import { chart, heatBlue } from '../lib/chartTheme'
 import { useFilteredTransactions } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -219,8 +219,8 @@ export default function StaffShiftView() {
                         width: 44,
                         height: 24,
                         backgroundColor: rev > 0
-                          ? `rgba(29, 95, 191, ${0.1 + intensity * 0.85})`
-                          : 'rgb(41 37 36)',
+                          ? heatBlue(0.1 + intensity * 0.85)
+                          : '#efeeec',
                       }}
                     >
                       {rev > 0 && intensity > 0.4 && (
