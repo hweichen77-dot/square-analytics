@@ -31,16 +31,12 @@ const EVENT_TAILWIND_COLOR: Record<string, string> = {
   red: 'bg-red-500/15 text-red-400',
   blue: 'bg-amber-500/15 text-amber-400',
   green: 'bg-emerald-500/15 text-emerald-400',
-  teal: 'bg-amber-100 text-amber-700',
+  teal: 'bg-stone-800 text-amber-700',
   gray: 'bg-stone-800 text-stone-200',
 }
 
-function eventHex(type: string) {
-  const map: Record<string, string> = {
-    'Big Game': '#14b8a6', 'Holiday': '#16a34a', 'Long Weekend': '#3b82f6',
-    'Payday': '#f59e0b', 'Local Event': '#a855f7', 'Promotion': '#ef4444',
-  }
-  return map[type] ?? '#a8a29e'
+function eventHex(_type: string) {
+  return '#1d5fbf'
 }
 
 function computeImpact(event: StoreEvent, transactions: SalesTransaction[]): EventImpact {
@@ -105,7 +101,7 @@ function EventEditModal({
   const [notes, setNotes] = useState(event?.notes ?? '')
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
       <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-96 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{event ? 'Edit Event' : 'Add Event'}</h2>
@@ -114,12 +110,12 @@ function EventEditModal({
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Event Name</label>
-            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Super Bowl Weekend" />
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Type</label>
-            <select className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <select className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={type} onChange={e => setType(e.target.value)}>
               {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
@@ -127,18 +123,18 @@ function EventEditModal({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-stone-400 mb-1">Start Date</label>
-              <input type="date" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+              <input type="date" className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
                 value={start} onChange={e => setStart(e.target.value)} />
             </div>
             <div>
               <label className="block text-xs font-medium text-stone-400 mb-1">End Date</label>
-              <input type="date" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+              <input type="date" className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
                 value={end} onChange={e => setEnd(e.target.value)} />
             </div>
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Notes (optional)</label>
-            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
@@ -193,7 +189,7 @@ export default function SeasonalView() {
   if (computing && !impactsRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Seasonal & Events</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Seasonal & events</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -205,7 +201,7 @@ export default function SeasonalView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Seasonal & Events</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Seasonal & events</h1>
         <Button
           onClick={() => setShowAdd(true)}
           className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
@@ -214,8 +210,8 @@ export default function SeasonalView() {
         </Button>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-3">Store Events</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Store events</h2>
         {events.length === 0 ? (
           <p className="text-sm text-stone-400">No events added yet. Click "Add Event" to get started.</p>
         ) : (
@@ -246,15 +242,15 @@ export default function SeasonalView() {
       </div>
 
       {chartData.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue Timeline</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue timeline</h2>
           <ResponsiveContainer width="100%" height={220}>
             <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: chart.axis }} interval="preserveStartEnd" />
               <YAxis tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11, fill: chart.axis }} />
               <Tooltip formatter={(v: number) => formatCurrency(v)} contentStyle={{ background: chart.tooltipBg, border: `1px solid ${chart.tooltipBorder}`, borderRadius: 8, fontSize: 12 }} labelStyle={{ color: chart.tooltipText }} itemStyle={{ color: chart.tooltipText }} />
-              <Area type="monotone" dataKey="revenue" fill="#F59E0B20" stroke={chart.line} strokeWidth={1.5} dot={false} />
+              <Area type="monotone" dataKey="revenue" fill="#1d5fbf20" stroke={chart.line} strokeWidth={1.5} dot={false} />
               {events.map(event => (
                 <ReferenceLine
                   key={`${event.id}-start`}
@@ -270,11 +266,11 @@ export default function SeasonalView() {
       )}
 
       {events.length > 0 && impacts.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-base font-semibold text-stone-100 mb-4">Event Impact Analysis</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-4">Event impact analysis</h2>
           <div className="space-y-3">
             {impacts.map(impact => {
-              const upliftColor = impact.upliftPct >= 0 ? '#16a34a' : '#dc2626'
+              const upliftColor = impact.upliftPct >= 0 ? '#2e7d32' : '#c4242a'
               const upliftSign = impact.upliftPct >= 0 ? '+' : ''
               return (
                 <div key={impact.event.id} className="flex items-start gap-3 p-4 border border-stone-700/50">
@@ -303,11 +299,11 @@ export default function SeasonalView() {
                       </div>
                       <div>
                         <p className="text-xs text-stone-400">Avg Daily During</p>
-                        <p className="font-mono text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueDuring)}/day</p>
+                        <p className="tabular-nums text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueDuring)}/day</p>
                       </div>
                       <div>
                         <p className="text-xs text-stone-400">Avg Daily Baseline</p>
-                        <p className="font-mono text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueBefore)}/day</p>
+                        <p className="tabular-nums text-sm text-stone-100">{formatCurrency(impact.avgDailyRevenueBefore)}/day</p>
                       </div>
                       {impact.topProducts.length > 0 && (
                         <div>

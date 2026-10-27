@@ -24,9 +24,9 @@ const TT = {
 }
 
 function marginColor(pct: number) {
-  if (pct < 20) return '#ef4444'
-  if (pct < 40) return '#f59e0b'
-  return '#16a34a'
+  if (pct < 20) return '#c4242a'
+  if (pct < 40) return '#1d5fbf'
+  return '#2e7d32'
 }
 
 function baseName(name: string) {
@@ -166,7 +166,7 @@ function CostManagementModal({
         }
       }
       if (badEntries > 0) {
-        show(`Saved. ${badEntries} entr${badEntries === 1 ? 'y' : 'ies'} skipped — invalid values.`, 'info')
+        show(`Saved. ${badEntries} entr${badEntries === 1 ? 'y' : 'ies'} skipped, invalid values.`, 'info')
       } else {
         show('Costs saved!', 'success')
       }
@@ -185,11 +185,11 @@ function CostManagementModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
       <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-full max-w-3xl max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <div>
-            <h2 className="text-lg font-bold text-stone-100">Manage Costs</h2>
+            <h2 className="text-lg font-bold text-stone-100">Manage costs</h2>
             <p className="text-xs text-stone-400">{products.length} products</p>
           </div>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl">×</button>
@@ -197,7 +197,7 @@ function CostManagementModal({
 
         <div className="px-6 py-3 border-b border-stone-700/50">
           <input
-            className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
             placeholder="Search products..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -232,7 +232,7 @@ function CostManagementModal({
                     <td className="px-4 py-2 text-right">
                       <input
                         type="number"
-                        className="border border-stone-600 rounded px-2 py-1 bg-stone-700/50 text-xs w-28 text-right"
+                        className="border border-[#d4d2ce] rounded px-2 py-1 bg-stone-700/50 text-xs w-28 text-right"
                         placeholder={draft.isPerCase ? 'Case $' : 'Unit $'}
                         value={draft.isPerCase ? draft.casePriceText : draft.unitCostText}
                         onChange={e =>
@@ -246,14 +246,14 @@ function CostManagementModal({
                       {draft.isPerCase ? (
                         <input
                           type="number"
-                          className="border border-stone-600 rounded px-2 py-1 bg-stone-700/50 text-xs w-20 text-right"
+                          className="border border-[#d4d2ce] rounded px-2 py-1 bg-stone-700/50 text-xs w-20 text-right"
                           placeholder="Units"
                           value={draft.unitsPerCaseText}
                           onChange={e => update(draft.productName, { unitsPerCaseText: e.target.value })}
                         />
                       ) : <span className="text-stone-500">—</span>}
                     </td>
-                    <td className="px-4 py-2 text-right font-mono font-semibold text-sm">
+                    <td className="px-4 py-2 text-right tabular-nums font-semibold text-sm">
                       {eff !== null ? `$${eff.toFixed(3)}` : <span className="text-stone-500">—</span>}
                     </td>
                   </tr>
@@ -422,7 +422,7 @@ export default function ProfitView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Profit Margins</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Profit margins</h1>
         <Button
           onClick={() => setShowCostSheet(true)}
           className="px-4 py-2 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
@@ -431,23 +431,23 @@ export default function ProfitView() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-5 gap-3 cf-stagger">
-        <StatCard label="Total Revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
-        <StatCard label="Total Cost" value={formatCurrency(sharedGP.cogs || totalCost)} countTo={sharedGP.cogs || totalCost} format={(n) => formatCurrency(n)} />
-        <StatCard label="Total Gross Profit" value={formatCurrency(sharedGP.grossProfit ?? totalProfit)} countTo={sharedGP.grossProfit ?? totalProfit} format={(n) => formatCurrency(n)} />
+      <div className="grid grid-cols-5 gap-3 kpi-strip">
+        <StatCard label="Total revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
+        <StatCard label="Total cost" value={formatCurrency(sharedGP.cogs || totalCost)} countTo={sharedGP.cogs || totalCost} format={(n) => formatCurrency(n)} />
+        <StatCard label="Total gross profit" value={formatCurrency(sharedGP.grossProfit ?? totalProfit)} countTo={sharedGP.grossProfit ?? totalProfit} format={(n) => formatCurrency(n)} />
         <StatCard
           label={coveredRevenue < totalRevenue ? `Margin (${Math.round(coveredRevenue / totalRevenue * 100)}% of rev)` : 'Overall Margin'}
           value={totalCost > 0 ? `${overallMargin.toFixed(1)}%` : '—'}
           countTo={totalCost > 0 ? overallMargin : undefined}
           format={totalCost > 0 ? (n) => `${n.toFixed(1)}%` : undefined}
         />
-        <StatCard label="Costs Entered" value={`${profitRows.filter(r => r.hasCostData).length}/${rawStats.length}`} />
+        <StatCard label="Costs entered" value={`${profitRows.filter(r => r.hasCostData).length}/${rawStats.length}`} />
       </div>
 
       {(hasProcessingFees || hasRefunds) && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-sm font-semibold text-stone-100 mb-3">Revenue Breakdown</h2>
-          <div className="space-y-2 text-sm font-mono">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-sm font-semibold text-stone-100 mb-3">Revenue breakdown</h2>
+          <div className="space-y-2 text-sm tabular-nums">
             <div className="flex justify-between text-stone-100">
               <span>Gross Revenue</span>
               <span>{formatCurrency(totalRevenue)}</span>
@@ -473,25 +473,25 @@ export default function ProfitView() {
       )}
 
       {moneyLosers.length > 0 && (
-        <div className="bg-red-500/10 border border-red-500/30 p-5">
-          <p className="font-semibold mb-2 text-red-400">
-            Money Losers — {moneyLosers.length} product{moneyLosers.length !== 1 ? 's' : ''} at 0% or negative margin
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <p className="font-semibold mb-2 text-stone-100">
+            Losing money: {moneyLosers.length} product{moneyLosers.length !== 1 ? 's' : ''} at 0% or negative margin
           </p>
           <div className="space-y-1">
             {moneyLosers.map(r => (
               <div key={r.name} className="flex items-center gap-3 text-sm text-stone-100">
                 <span className="flex-1">{r.name}</span>
-                <span className="font-mono w-14 text-right text-red-400">{(r.marginPercent ?? 0).toFixed(1)}%</span>
-                <span className="font-mono w-22 text-right text-red-400">{formatCurrency(r.totalProfit ?? 0)}</span>
+                <span className="tabular-nums w-14 text-right text-red-400">{(r.marginPercent ?? 0).toFixed(1)}%</span>
+                <span className="tabular-nums w-22 text-right text-red-400">{formatCurrency(r.totalProfit ?? 0)}</span>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50">
-          <h2 className="text-base font-semibold text-stone-100">Product Profit Analysis</h2>
+          <h2 className="text-base font-semibold text-stone-100">Product profit analysis</h2>
         </div>
         <div className="overflow-x-auto max-h-96">
           <table className="w-full text-xs">
@@ -518,17 +518,17 @@ export default function ProfitView() {
                 <tr key={r.name} className="border-b border-stone-800 hover:bg-stone-700/50">
                   <td className="px-4 py-2 font-medium text-stone-100 max-w-40 truncate">{r.name}</td>
                   <td className="px-4 py-2 text-stone-200">{r.category}</td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{r.unitCost != null ? `$${r.unitCost.toFixed(3)}` : <span className="text-stone-400 text-[10px]">enter cost</span>}</td>
-                  <td className="px-4 py-2 font-mono text-stone-100">${(r.avgPrice ?? 0).toFixed(2)}</td>
-                  <td className="px-4 py-2 font-mono font-semibold"
-                    style={{ color: r.marginPercent !== null ? marginColor(r.marginPercent) : '#a8a29e' }}>
-                    {r.marginPercent !== null ? `${r.marginPercent.toFixed(1)}%` : <span className="text-stone-400 font-normal text-[10px]">no cost</span>}
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{r.unitCost != null ? `$${r.unitCost.toFixed(3)}` : <span className="text-stone-400 text-xs">enter cost</span>}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-100">${(r.avgPrice ?? 0).toFixed(2)}</td>
+                  <td className="px-4 py-2 tabular-nums font-semibold"
+                    style={{ color: r.marginPercent !== null ? marginColor(r.marginPercent) : '#8a8783' }}>
+                    {r.marginPercent !== null ? `${r.marginPercent.toFixed(1)}%` : <span className="text-stone-400 font-normal text-xs">no cost</span>}
                   </td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{r.unitsSold}</td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{formatCurrency(r.totalRevenue)}</td>
-                  <td className="px-4 py-2 font-mono text-stone-200">{r.totalCost !== null ? formatCurrency(r.totalCost) : <span className="text-stone-400 text-[10px]">—</span>}</td>
-                  <td className="px-4 py-2 font-mono font-semibold" style={{ color: r.totalProfit !== null ? ((r.totalProfit >= 0) ? '#e7e5e4' : '#f87171') : '#64748b' }}>
-                    {r.totalProfit !== null ? formatCurrency(r.totalProfit) : <span className="text-stone-400 text-[10px]">—</span>}
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{r.unitsSold}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{formatCurrency(r.totalRevenue)}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-200">{r.totalCost !== null ? formatCurrency(r.totalCost) : <span className="text-stone-400 text-xs">—</span>}</td>
+                  <td className="px-4 py-2 tabular-nums font-semibold" style={{ color: r.totalProfit !== null ? ((r.totalProfit >= 0) ? '#3f3c39' : '#c4242a') : '#64748b' }}>
+                    {r.totalProfit !== null ? formatCurrency(r.totalProfit) : <span className="text-stone-400 text-xs">—</span>}
                   </td>
                 </tr>
               ))}
@@ -538,7 +538,7 @@ export default function ProfitView() {
       </div>
 
       {top15Profit.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <h2 className="text-base font-semibold text-stone-100 mb-4">Top 15 Products by Profit</h2>
           <ResponsiveContainer width="100%" height={top15Profit.length * 28 + 40}>
             <BarChart data={top15Profit} layout="vertical" margin={{ top: 4, right: 80, left: 16, bottom: 4 }}>
@@ -547,7 +547,7 @@ export default function ProfitView() {
               <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: chart.axis }} width={130} />
               <Tooltip {...TT} formatter={(v: number) => formatCurrency(v)} />
               <Bar dataKey="totalProfit" fill={chart.positive} radius={[0, 3, 3, 0]}
-                label={{ position: 'right', formatter: (v: number) => formatCurrency(v), fontSize: 10, fill: '#d6d3d1' }} />
+                label={{ position: 'right', formatter: (v: number) => formatCurrency(v), fontSize: 10, fill: '#625f5b' }} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -555,7 +555,7 @@ export default function ProfitView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {scatterData.length > 0 && (
-          <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+          <div className="bg-white border border-[var(--border)] rounded-lg p-5">
             <h2 className="text-base font-semibold text-stone-100 mb-4">Popularity vs. Profitability</h2>
             <ResponsiveContainer width="100%" height={300}>
               <ScatterChart margin={{ top: 4, right: 16, left: 0, bottom: 20 }}>
@@ -572,8 +572,8 @@ export default function ProfitView() {
         )}
 
         {categoryProfitData.length > 0 && (
-          <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-            <h2 className="text-base font-semibold text-stone-100 mb-4">Profit by Category</h2>
+          <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+            <h2 className="text-base font-semibold text-stone-100 mb-4">Profit by category</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie data={categoryProfitData} dataKey="profit" nameKey="category" cx="50%" cy="50%" outerRadius={110} innerRadius={55}>

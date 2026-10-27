@@ -154,7 +154,7 @@ export default function CatalogueCheckerView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Catalogue Checker</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">Catalogue checker</h1>
           <p className="text-sm text-stone-400 mt-0.5">
             Audits {catalogue.length} variations across your catalogue for errors and data quality issues.
           </p>
@@ -174,12 +174,12 @@ export default function CatalogueCheckerView() {
           { sev: 'error'   as Filter, label: 'Errors',   count: errorCount,   color: 'text-red-400',   bg: 'bg-red-500/10 border-red-500/25' },
           { sev: 'warning' as Filter, label: 'Warnings', count: warningCount, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/25' },
           { sev: 'info'    as Filter, label: 'Info',     count: infoCount,    color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/25' },
-          { sev: 'all'     as Filter, label: 'Total',    count: issues.length, color: 'text-stone-100', bg: 'bg-stone-700/50 border-stone-600/30' },
+          { sev: 'all'     as Filter, label: 'Total',    count: issues.length, color: 'text-stone-100', bg: 'bg-stone-700/50 border-[#d4d2ce]' },
         ].map(({ sev, label, count, color, bg }) => (
           <button
             key={sev}
             onClick={() => handleFilterClick(sev)}
-            className={`border p-4 text-left transition-all cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
+            className={`border p-4 text-left transition-[width,background-color] cursor-pointer ${bg} ${filter === sev ? 'ring-2 ring-amber-500/50' : 'hover:brightness-110'}`}
           >
             <p className={`text-3xl font-bold tabular-nums ${color}`}>{count}</p>
             <p className="text-xs text-stone-400 mt-1 font-medium">{label}</p>
@@ -188,7 +188,7 @@ export default function CatalogueCheckerView() {
       </div>
 
       <div className="bg-stone-800/60 border border-stone-700 px-4 py-3 text-sm text-stone-400 flex items-center gap-2">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d5fbf" strokeWidth="2" strokeLinecap="round" className="shrink-0">
           <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
         </svg>
         <span>
@@ -202,7 +202,7 @@ export default function CatalogueCheckerView() {
           <span className="text-xs font-medium text-stone-400 mr-1">Issue type:</span>
           <button
             onClick={() => selectIssueType('all')}
-            className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === 'all' ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-stone-600 text-stone-300 hover:border-amber-500/50'}`}
+            className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === 'all' ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-[#d4d2ce] text-stone-300 hover:border-amber-500/50'}`}
           >
             All ({issues.length})
           </button>
@@ -210,7 +210,7 @@ export default function CatalogueCheckerView() {
             <button
               key={type}
               onClick={() => selectIssueType(type)}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === type ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-stone-600 text-stone-300 hover:border-amber-500/50'}`}
+              className={`text-xs px-2.5 py-1 rounded-full border transition-colors cursor-pointer ${issueType === type ? 'bg-amber-500 text-stone-950 border-amber-500' : 'border-[#d4d2ce] text-stone-300 hover:border-amber-500/50'}`}
             >
               {type} ({count})
             </button>
@@ -221,7 +221,7 @@ export default function CatalogueCheckerView() {
       {issues.length === 0 && (
         <div className="text-center py-16">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
@@ -246,7 +246,7 @@ export default function CatalogueCheckerView() {
             const worstSev: AuditSeverity = group.errorCount > 0 ? 'error' : group.warningCount > 0 ? 'warning' : 'info'
 
             return (
-              <div key={group.itemName} className={`bg-stone-800/30 border overflow-hidden ${SEV[worstSev].border}`}>
+              <div key={group.itemName} className={`bg-white border overflow-hidden ${SEV[worstSev].border}`}>
                 <button
                   onClick={() => toggleItem(group.itemName)}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-stone-700/40 transition-colors cursor-pointer"
@@ -256,17 +256,17 @@ export default function CatalogueCheckerView() {
 
                   <div className="flex items-center gap-1.5">
                     {group.errorCount > 0 && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${SEV.error.badge}`}>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full border ${SEV.error.badge}`}>
                         {group.errorCount} err
                       </span>
                     )}
                     {group.warningCount > 0 && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${SEV.warning.badge}`}>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full border ${SEV.warning.badge}`}>
                         {group.warningCount} warn
       </span>
                     )}
                     {group.infoCount > 0 && (
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${SEV.info.badge}`}>
+                      <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full border ${SEV.info.badge}`}>
                         {group.infoCount} info
                       </span>
                     )}
@@ -303,7 +303,7 @@ export default function CatalogueCheckerView() {
                                 Auto-fix
                               </button>
                             ) : (
-                              <span className="text-[10px] text-stone-400 px-2">Manual</span>
+                              <span className="text-xs text-stone-400 px-2">Manual</span>
                             )}
                           </div>
                         </div>

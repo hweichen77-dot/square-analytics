@@ -1,8 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { Routes, Route, Navigate, useNavigate, NavLink, useLocation } from 'react-router-dom'
-import AppBackground from './components/kit/AppBackground'
-import TopNav from './components/layout/TopNav'
-import { DateRangePicker } from './components/layout/DateRangePicker'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import Sidebar from './components/layout/Sidebar'
 import { ToastContainer } from './components/ui/ToastContainer'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { CommandPalette } from './components/ui/CommandPalette'
@@ -42,7 +40,7 @@ const OpexView              = lazy(() => import('./views/OpexView'))
 function PageFallback() {
   return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-6 h-6 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
+      <div className="w-5 h-5 border-2 border-stone-700 border-t-stone-100 rounded-full animate-spin" />
     </div>
   )
 }
@@ -109,6 +107,9 @@ export default function App() {
 
   const { pathname } = useLocation()
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => { setMenuOpen(false) }, [pathname])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -123,35 +124,33 @@ export default function App() {
 
   return (
     <AnalyticsProvider>
-    <div className="relative flex flex-col h-screen overflow-hidden">
-      <AppBackground />
+    <div className="flex h-screen overflow-hidden bg-[var(--ground)]">
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-      <header className="relative z-30 shrink-0 sticky top-0 bg-stone-950/80 backdrop-blur-md border-b border-amber-500/25 shadow-[0_1px_0_0_oklch(0.72_0.14_78/0.10),0_8px_24px_-12px_oklch(0.09_0.007_55/0.9)] h-14 px-6 flex items-center justify-between gap-6">
-        <div className="flex items-center gap-7 min-w-0">
-          <NavLink to="/dashboard" className="group flex items-center gap-2.5 shrink-0">
-            <span className="grid place-items-center w-6 h-6 rounded-sm bg-amber-500 text-stone-950 font-display font-800 text-[13px] shadow-[0_0_18px_-2px_oklch(0.72_0.14_78/0.6)]">S</span>
-            <span className="font-display text-[16px] font-800 text-stone-100 tracking-tight group-hover:text-white transition-colors">Square Analytics</span>
-          </NavLink>
-          <div className="hidden lg:flex min-w-0">
-            <TopNav onSearch={() => setPaletteOpen(true)} />
+      <aside className="hidden lg:flex w-[240px] shrink-0 border-r border-[var(--border)]">
+        <Sidebar onSearch={() => setPaletteOpen(true)} />
+      </aside>
+      {menuOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 bg-[var(--ground)] flex flex-col">
+          <div className="h-12 shrink-0 flex items-center justify-end px-4 border-b border-[var(--border)]">
+            <button onClick={() => setMenuOpen(false)} className="h-11 px-3 text-sm text-stone-100" aria-label="Close menu">Close</button>
+          </div>
+          <div className="flex-1 min-h-0">
+            <Sidebar onNavigate={() => setMenuOpen(false)} onSearch={() => { setMenuOpen(false); setPaletteOpen(true) }} />
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => setPaletteOpen(true)}
-            className="lg:hidden p-1.5 text-stone-400 hover:text-stone-100"
-            aria-label="Search"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      )}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <header className="lg:hidden h-12 shrink-0 flex items-center gap-3 px-4 border-b border-[var(--border)] bg-[var(--ground)]">
+          <button onClick={() => setMenuOpen(true)} className="h-11 -ml-2 px-2 flex items-center gap-2 text-sm font-medium text-stone-100" aria-label="Open menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            Walley&apos;s
           </button>
-          <DateRangePicker />
-        </div>
-      </header>
-      <main className="relative z-10 flex-1 overflow-y-auto">
-        <div className="px-6 lg:px-10 py-8 mx-auto w-full max-w-[1600px]">
+        </header>
+        <main className="flex-1 overflow-y-auto">
+        <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-12 mx-auto w-full max-w-[1360px]">
           <ErrorBoundary>
           <Suspense fallback={<PageFallback />}>
-            <div key={pathname} className="cf-page-enter">
+            <div key={pathname}>
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<DashboardView />} />
@@ -186,7 +185,8 @@ export default function App() {
           </Suspense>
           </ErrorBoundary>
         </div>
-      </main>
+        </main>
+      </div>
       <ToastContainer />
     </div>
     </AnalyticsProvider>

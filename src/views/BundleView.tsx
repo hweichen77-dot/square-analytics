@@ -93,7 +93,7 @@ function BundleEditorModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50 p-4">
       <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-[500px] max-h-[85vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-700/50">
           <h2 className="text-base font-semibold">{bundle ? 'Edit Bundle' : 'Create Bundle'}</h2>
@@ -102,24 +102,24 @@ function BundleEditorModal({
         <div className="overflow-y-auto flex-1 p-6 space-y-4">
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Bundle Name</label>
-            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Snack Combo" />
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Bundle Price</label>
-            <input type="number" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input type="number" className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={priceText} onChange={e => setPriceText(e.target.value)} placeholder="0.00" />
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">Notes (optional)</label>
-            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
           <div>
             <label className="block text-xs font-medium text-stone-400 mb-1">
               Products (select 2–3 · {selectedProducts.size}/3)
             </label>
-            <input className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm mb-2"
+            <input className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm mb-2"
               placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
             <div className="border border-stone-700 rounded-lg overflow-y-auto h-48">
               {filtered.map(p => (
@@ -129,7 +129,7 @@ function BundleEditorModal({
                   onClick={() => toggle(p)}
                   disabled={!selectedProducts.has(p) && selectedProducts.size >= 3}
                 >
-                  <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${selectedProducts.has(p) ? 'bg-amber-500 border-amber-500' : 'border-stone-600'}`}>
+                  <span className={`w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center ${selectedProducts.has(p) ? 'bg-amber-500 border-amber-500' : 'border-[#d4d2ce]'}`}>
                     {selectedProducts.has(p) && (
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#020617" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     )}
@@ -222,7 +222,7 @@ export default function BundleView() {
   if (computing && !pairsRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Bundle & Cross-Sell</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Bundle & cross-sell</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -233,16 +233,16 @@ export default function BundleView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Bundle & Cross-Sell</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Bundle & cross-sell</h1>
 
-      <div className="grid grid-cols-3 gap-4 cf-stagger">
-        <StatCard label="Multi-Item Transactions" value={String(multiItemTxCount)} countTo={multiItemTxCount} format={(n) => Math.round(n).toLocaleString()} />
-        <StatCard label="Product Pairs Found" value={String(pairs.length)} countTo={pairs.length} format={(n) => Math.round(n).toLocaleString()} />
-        <StatCard label="Saved Bundles" value={String(savedBundles.length)} countTo={savedBundles.length} format={(n) => Math.round(n).toLocaleString()} />
+      <div className="grid grid-cols-3 gap-4 kpi-strip">
+        <StatCard label="Multi-item orders" value={String(multiItemTxCount)} countTo={multiItemTxCount} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Product pairs found" value={String(pairs.length)} countTo={pairs.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Saved bundles" value={String(savedBundles.length)} countTo={savedBundles.length} format={(n) => Math.round(n).toLocaleString()} />
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-3">Product Affinity Lookup</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Product affinity lookup</h2>
         <select
           className="border border-stone-700 rounded-lg px-3 py-1.5 text-sm text-stone-100 mb-4 max-w-xs"
           value={selectedProduct}
@@ -268,7 +268,7 @@ export default function BundleView() {
                       Bought together {pair.count}× · Score: {pair.score.toFixed(1)}%
                     </p>
                   </div>
-                  <div className="w-20 bg-stone-200 rounded-full h-1.5">
+                  <div className="w-20 bg-stone-800 rounded-full h-1.5">
                     <div
                       className="bg-amber-500/100 rounded-full h-1.5"
                       style={{ width: `${(pair.count / maxCount) * 100}%` }}
@@ -281,8 +281,8 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-4">Top Co-Purchase Pairs</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-4">Top co-Purchase pairs</h2>
         {pairs.length === 0 ? (
           <p className="text-sm text-stone-400">No multi-item transactions found.</p>
         ) : (
@@ -291,24 +291,24 @@ export default function BundleView() {
               const maxCount = categoryPairs[0]?.count ?? 1
               return (
                 <div key={category}>
-                  <p className="text-xs font-semibold text-stone-400 uppercase tracking-widest mb-3">{category}</p>
+                  <p className="text-xs font-semibold text-stone-400 mb-3">{category}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {categoryPairs.map((p, idx) => {
                       const isTop = idx === 0 && category === groupedPairs[0][0]
                       const strength = p.score > 20 ? 'Strong' : p.score > 10 ? 'Medium' : 'Weak'
                       const strengthColors = {
                         Strong: 'bg-emerald-100 text-emerald-700',
-                        Medium: 'bg-amber-100 text-amber-400',
+                        Medium: 'bg-stone-800 text-amber-400',
                         Weak: 'bg-stone-800 text-stone-200',
                       }
-                      const barColor = p.score > 20 ? '#10b981' : p.score > 10 ? '#f59e0b' : '#a8a29e'
+                      const barColor = p.score > 20 ? '#2e7d32' : p.score > 10 ? '#1d5fbf' : '#8a8783'
                       return (
                         <div
                           key={p.id}
-                          className={`border p-4 flex flex-col gap-3 ${isTop ? 'border-amber-300/60 bg-amber-500/10' : 'border-stone-700/40 bg-stone-800/30'}`}
+                          className={`border p-4 flex flex-col gap-3 ${isTop ? 'border-amber-300/60 bg-amber-500/10' : 'border-stone-700/40 bg-white'}`}
                         >
                           {isTop && (
-                            <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide">Top Recommendation</p>
+                            <p className="text-xs font-semibold text-amber-400">Top Recommendation</p>
                           )}
                           <div className="flex items-start gap-2">
                             <div className="flex-1 min-w-0">
@@ -323,18 +323,18 @@ export default function BundleView() {
                           <div>
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-xs text-stone-400">Bought together {p.count}×</span>
-                              <span className="text-xs font-mono font-semibold" style={{ color: barColor }}>{p.score.toFixed(1)}% match</span>
+                              <span className="text-xs tabular-nums font-semibold" style={{ color: barColor }}>{p.score.toFixed(1)}% match</span>
                             </div>
                             <div className="w-full bg-stone-800 rounded-full h-1.5">
                               <div
-                                className="rounded-full h-1.5 transition-all"
+                                className="rounded-full h-1.5 transition-[width,background-color]"
                                 style={{ width: `${Math.min(100, (p.count / maxCount) * 100)}%`, backgroundColor: barColor }}
                               />
                             </div>
                           </div>
                           <div className="flex items-center justify-between pt-1 border-t border-stone-700/50">
                             <span className="text-xs text-stone-400">Suggested bundle price</span>
-                            <span className="text-sm font-mono font-bold text-stone-100">{formatCurrency(p.suggestedPrice)}</span>
+                            <span className="text-sm tabular-nums font-bold text-stone-100">{formatCurrency(p.suggestedPrice)}</span>
                           </div>
                         </div>
                       )
@@ -347,9 +347,9 @@ export default function BundleView() {
         )}
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-stone-100">Saved Bundles</h2>
+          <h2 className="text-base font-semibold text-stone-100">Saved bundles</h2>
           <Button
             onClick={() => setShowCreate(true)}
             className="px-3 py-1.5 text-sm bg-amber-500 text-stone-950 rounded-lg hover:bg-amber-600"
@@ -362,7 +362,7 @@ export default function BundleView() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {savedBundles.map(bundle => (
-              <div key={bundle.id} className="border border-stone-700/40 bg-stone-800/20 p-4">
+              <div key={bundle.id} className="border border-stone-700/40 bg-white p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-sm text-stone-100">{bundle.name}</p>
                   <div className="flex gap-2">

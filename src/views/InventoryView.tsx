@@ -159,9 +159,9 @@ export default function InventoryView() {
 
   return (
     <div className="space-y-5" onClick={() => setCtxMenu(null)}>
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Transactions</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Transactions</h1>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 cf-stagger">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 kpi-strip">
         <StatCard label="Total revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
         <StatCard label="Units sold" value={formatNumber(totalUnits)} countTo={totalUnits} format={(n) => Math.round(n).toLocaleString()} />
         <StatCard label="Growing items" value={String(growingCount)} countTo={growingCount} format={(n) => Math.round(n).toLocaleString()} />
@@ -178,12 +178,12 @@ export default function InventoryView() {
           placeholder="Search product…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
         >
           <option value="All">All categories</option>
           {ALL_CATEGORY_NAMES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -193,16 +193,16 @@ export default function InventoryView() {
         </span>
         <button
           onClick={() => exportTransactionsCSV(transactions)}
-          className="ml-auto px-3 py-2 bg-stone-700 border border-stone-600 text-stone-100 rounded-lg text-sm font-medium hover:bg-stone-600 transition-colors"
+          className="ml-auto px-3 py-2 bg-stone-700 border border-[#d4d2ce] text-stone-100 rounded-lg text-sm font-medium hover:bg-stone-800 transition-colors"
         >
           Export CSV
         </button>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-stone-900 text-stone-400 uppercase text-xs border-b border-stone-700/60">
+            <thead className="bg-stone-900 text-stone-400 text-xs border-b border-stone-700/60">
               <tr>
                 <th className="px-4 py-3 w-8"></th>
                 <th className="px-4 py-3 text-left">Product</th>
@@ -240,7 +240,7 @@ export default function InventoryView() {
                         <div className="flex items-center gap-2">
                           {group.itemName}
                           {multiVar && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                            <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25">
                               {group.variations.length} vars
                             </span>
                           )}
@@ -259,14 +259,14 @@ export default function InventoryView() {
                       return (
                         <tr
                           key={`var-${v.name}`}
-                          className="border-b border-stone-700/20 bg-stone-900/60 hover:bg-stone-700/30 transition-colors cursor-pointer"
+                          className="border-b border-stone-700/20 bg-[var(--raised)] hover:bg-stone-700/30 transition-colors cursor-pointer"
                           onClick={e => { e.stopPropagation(); navigate(`/inventory/${encodeURIComponent(v.name)}`) }}
                           onContextMenu={e => { e.preventDefault(); e.stopPropagation(); setCtxMenu({ x: e.clientX, y: e.clientY, name: v.name }) }}
                         >
                           <td className="px-4 py-2.5" />
                           <td className="px-4 py-2.5 pl-10">
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-stone-600 shrink-0" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#cfccc8] shrink-0" />
                               <span className="text-stone-100 text-xs">
                                 {splitItemVariation(v.name).variationName}
                               </span>
@@ -299,11 +299,11 @@ export default function InventoryView() {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setCtxMenu(null)} />
           <div
-            className="fixed z-20 bg-stone-800/30 border border-stone-700/40 shadow-xl py-1 min-w-44"
+            className="fixed z-20 bg-white border border-[var(--border)] rounded-lg shadow-xl py-1 min-w-44"
             style={{ left: ctxMenu.x, top: ctxMenu.y }}
             onClick={e => e.stopPropagation()}
           >
-            <p className="px-3 py-1 text-xs text-stone-400 font-medium uppercase tracking-wider">Set category</p>
+            <p className="px-3 py-1 text-xs text-stone-400 font-medium">Set category</p>
             {ALL_CATEGORY_NAMES.map(cat => (
               <button
                 key={cat}

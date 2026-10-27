@@ -193,7 +193,7 @@ export default function PurchaseOrderView() {
   if (computing && !previewRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Purchase Order</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Purchase order</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Loading…
@@ -205,7 +205,7 @@ export default function PurchaseOrderView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Purchase Order</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Purchase order</h1>
         {generated && (
           <Button
             onClick={() => exportToXLSX(displayItems, qtyOverrides)}
@@ -217,7 +217,7 @@ export default function PurchaseOrderView() {
         )}
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-6">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-6">
         <h2 className="text-sm font-semibold text-stone-100 mb-1">Select time period to order for</h2>
         <p className="text-xs text-stone-400 mb-5">
           Recommended quantities are based on recent (8-week) sales velocity, scaled to cover the
@@ -232,7 +232,7 @@ export default function PurchaseOrderView() {
               className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
                 selectedWeeks === opt.weeks
                   ? 'bg-amber-500 text-stone-950 border-amber-500'
-                  : 'border-stone-600 text-stone-300 hover:border-amber-500/50 hover:text-stone-100'
+                  : 'border-[#d4d2ce] text-stone-300 hover:border-amber-500/50 hover:text-stone-100'
               }`}
             >
               {opt.label}
@@ -255,16 +255,16 @@ export default function PurchaseOrderView() {
 
       {!generated && velocityPreview.length > 0 && (
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-4 cf-stagger">
+          <div className="grid grid-cols-3 gap-4 kpi-strip">
             <StatCard
-              label="Products Tracked"
+              label="Products tracked"
               value={String(totalProductCount)}
               countTo={totalProductCount}
               format={(n) => Math.round(n).toLocaleString()}
               sub="in transaction history"
             />
             <StatCard
-              label="Top Velocity Item"
+              label="Top velocity item"
               value={velocityPreview[0]?.name ?? '—'}
               sub={velocityPreview[0] ? `${velocityPreview[0].weeklyVelocity.toFixed(1)} units/wk` : ''}
             />
@@ -277,11 +277,11 @@ export default function PurchaseOrderView() {
             />
           </div>
 
-          <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+          <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
             <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-stone-100">Velocity Preview</h2>
-                <p className="text-xs text-stone-400 mt-0.5">Top 8 items by weekly sales — likely candidates for reorder</p>
+                <h2 className="font-semibold text-stone-100">Velocity preview</h2>
+                <p className="text-xs text-stone-400 mt-0.5">Top 8 items by weekly sales, likely candidates for reorder</p>
               </div>
               <span className="text-xs text-stone-400 bg-stone-700/50 px-2 py-1 rounded-lg">
                 {selectedWeeks}-week window
@@ -309,7 +309,7 @@ export default function PurchaseOrderView() {
                 )
               })}
             </div>
-            <div className="px-5 py-3 bg-stone-900/40 border-t border-stone-700/50">
+            <div className="px-5 py-3 bg-[var(--raised)] border-t border-stone-700/50">
               <p className="text-xs text-stone-400">
                 Click <span className="text-amber-400 font-medium">Generate Report</span> above to build the full order with seasonal adjustments, low-stock flags, and XLSX export.
               </p>
@@ -321,8 +321,8 @@ export default function PurchaseOrderView() {
       {generated && (
         <>
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div className="bg-white border border-[var(--border)] rounded-lg p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                 <IconBox />
               </div>
               <div>
@@ -331,8 +331,8 @@ export default function PurchaseOrderView() {
                 <p className="text-xs text-stone-400">{totalItemCount} total units</p>
               </div>
             </div>
-            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="bg-white border border-[var(--border)] rounded-lg p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
                 <IconDollar />
               </div>
               <div>
@@ -341,8 +341,8 @@ export default function PurchaseOrderView() {
                 <p className="text-xs text-stone-400">at avg sell price</p>
               </div>
             </div>
-            <div className="bg-stone-800/30 border border-stone-700/40 p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <div className="bg-white border border-[var(--border)] rounded-lg p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
                 <IconCalendar />
               </div>
               <div>
@@ -396,7 +396,7 @@ export default function PurchaseOrderView() {
             <p className="text-xs text-stone-400">{displayItems.length} of {orderItems.length} items</p>
           </div>
 
-          <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+          <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead className="bg-stone-900 border-b border-stone-700/50">
@@ -416,20 +416,20 @@ export default function PurchaseOrderView() {
                   {displayItems.map((item, idx) => {
                     const qty = qtyOverrides[item.productName] ?? item.recommendedQty
                     return (
-                      <tr key={item.productName} className={`border-b border-stone-700/30 hover:bg-stone-700/30 ${idx % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+                      <tr key={item.productName} className={`border-b border-stone-700/30 hover:bg-stone-700/30 ${idx % 2 === 1 ? 'bg-white' : ''}`}>
                         <td className="px-4 py-2.5">
                           <div className="font-medium text-stone-100">{item.productName}</div>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium mt-0.5 inline-block ${categoryClass(item.category)}`}>
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium mt-0.5 inline-block ${categoryClass(item.category)}`}>
                             {item.category}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 font-mono text-stone-100">
+                        <td className="px-4 py-2.5 tabular-nums text-stone-100">
                           {(item.avgDailyVelocity * 7).toFixed(1)}<span className="text-stone-400"> /wk</span>
                         </td>
                         <td className="px-4 py-2.5 text-right">
                           <input
                             type="number"
-                            className="border border-stone-600 rounded px-2 py-0.5 text-xs w-16 text-right font-mono bg-stone-700/50 text-stone-100"
+                            className="border border-[#d4d2ce] rounded px-2 py-0.5 text-xs w-16 text-right tabular-nums bg-stone-700/50 text-stone-100"
                             value={qty}
                             onChange={e => {
                               const v = parseInt(e.target.value, 10)
@@ -440,7 +440,7 @@ export default function PurchaseOrderView() {
                             min={0}
                           />
                         </td>
-                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-stone-100">
+                        <td className="px-4 py-2.5 text-right tabular-nums font-semibold text-stone-100">
                           {formatCurrency(item.avgPrice * qty)}
                         </td>
                         <td className="px-4 py-2.5 text-stone-400 max-w-48 truncate">
@@ -455,8 +455,8 @@ export default function PurchaseOrderView() {
           </div>
 
           {categorySubtotals.length > 0 && (
-            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-              <h2 className="text-sm font-semibold text-stone-100 mb-4">Category Subtotals</h2>
+            <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+              <h2 className="text-sm font-semibold text-stone-100 mb-4">Category subtotals</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {categorySubtotals.map(([cat, { qty, rev }]) => (
                   <div key={cat} className="flex items-center justify-between p-3 bg-stone-900">
@@ -464,7 +464,7 @@ export default function PurchaseOrderView() {
                       <p className="font-semibold text-sm text-stone-100">{cat}</p>
                       <p className="text-xs text-stone-400">{qty} units</p>
                     </div>
-                    <p className="font-mono text-sm text-stone-100">{formatCurrency(rev)}</p>
+                    <p className="tabular-nums text-sm text-stone-100">{formatCurrency(rev)}</p>
                   </div>
                 ))}
               </div>

@@ -1,111 +1,99 @@
 import { useState } from 'react'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { BarChart, Bar, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts'
 import { format } from 'date-fns'
 import type { DailyRevenue, TimeGranularity } from '../../engine/analyticsEngine'
+import { formatCurrency } from '../../utils/format'
+import { chart } from '../../lib/chartTheme'
 
 interface RevenueChartProps {
   daily: DailyRevenue[]
   weekly: DailyRevenue[]
   monthly: DailyRevenue[]
-  prevDaily?: DailyRevenue[]
-  prevWeekly?: DailyRevenue[]
-  prevMonthly?: DailyRevenue[]
+  usualDay: number
+  bigDayThreshold: number
 }
 
 function shortCurrency(value: number): string {
-  if (value >= 1000) return `$${(value / 1000).toFixed(1)}k`
+  if (value >= 1000) return `$${(value / 1000).toFixed(value % 1000 === 0 ? 0 : 1)}k`
   return `$${value.toFixed(0)}`
 }
 
 const GRANULARITIES: TimeGranularity[] = ['Daily', 'Weekly', 'Monthly']
 
-export function RevenueChart({ daily, weekly, monthly, prevDaily, prevWeekly, prevMonthly }: RevenueChartProps) {
+export function RevenueChart({ daily, weekly, monthly, usualDay, bigDayThreshold }: RevenueChartProps) {
   const [granularity, setGranularity] = useState<TimeGranularity>('Daily')
-  const [showComparison, setShowComparison] = useState(false)
 
   const data = granularity === 'Daily' ? daily : granularity === 'Weekly' ? weekly : monthly
-  const prevData = granularity === 'Daily' ? prevDaily : granularity === 'Weekly' ? prevWeekly : prevMonthly
-  const fmt = granularity === 'Monthly' ? 'MMM yyyy' : 'MMM d'
+  const isDaily = granularity === 'Daily'
+  const labelFmt = granularity === 'Monthly' ? 'MMM yyyy' : granularity === 'Weekly' ? "'Week of' MMM d" : 'EEE, MMM d, yyyy'
+  const tickFmt = granularity === 'Monthly' ? 'MMM' : 'MMM d'
 
-  const chartData = data.map((d, i) => ({
-    date: format(d.date, fmt),
+  const chartData = data.map(d => ({
+    label: format(d.date, labelFmt),
+    tick: format(d.date, tickFmt),
     revenue: Math.round(d.revenue * 100) / 100,
-    transactions: d.transactionCount,
-    prevRevenue: showComparison && prevData?.[i] != null
-      ? Math.round(prevData[i].revenue * 100) / 100
-      : undefined,
+    orders: d.transactionCount,
+    big: isDaily && d.revenue >= bigDayThreshold,
   }))
 
-  const hasPrev = (prevData?.length ?? 0) > 0
-
   return (
-    <div className="bg-stone-800/30 border border-stone-700/40 p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-600 text-stone-200 text-sm tracking-tight">Revenue</h2>
-        <div className="flex items-center gap-2">
-          {hasPrev && (
+    <section className="bg-white border border-[var(--border)] rounded-lg p-5" aria-labelledby="sales-chart-title">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <h2 id="sales-chart-title" className="text-base font-semibold text-stone-100">Sales</h2>
+          {isDaily && (
+            <div className="flex items-center gap-4 text-xs text-stone-500">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{ background: chart.bar }} />Big day, 3× usual or more</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{ background: chart.grey }} />School day</span>
+              {usualDay > 0 && (
+                <span className="flex items-center gap-1.5 tabular-nums">
+                  <svg width="14" height="2" aria-hidden="true"><line x1="0" y1="1" x2="14" y2="1" stroke={chart.ink} strokeDasharray="3 2" /></svg>
+                  Usual day {formatCurrency(usualDay)}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="flex h-8 p-0.5 rounded-md bg-[var(--active)]" role="tablist" aria-label="Group sales by">
+          {GRANULARITIES.map(g => (
             <button
-              onClick={() => setShowComparison(v => !v)}
-              className={`px-2.5 py-1 text-xs font-medium transition-colors duration-150 cursor-pointer border ${
-                showComparison
-                  ? 'border-stone-500 text-stone-100 bg-stone-700/40'
-                  : 'border-stone-700 text-stone-300 hover:text-stone-400'
+              key={g}
+              role="tab"
+              aria-selected={granularity === g}
+              onClick={() => setGranularity(g)}
+              className={`px-3 rounded text-[13px] transition-colors ${
+                granularity === g ? 'bg-white text-stone-100 font-medium shadow-[0_1px_2px_rgb(0_0_0/0.06)]' : 'text-stone-400 hover:text-stone-100'
               }`}
             >
-              vs prev
+              {g}
             </button>
-          )}
-          <div className="flex gap-0.5">
-            {GRANULARITIES.map(g => (
-              <button
-                key={g}
-                onClick={() => setGranularity(g)}
-                className={`px-2.5 py-1 text-xs font-medium transition-colors duration-150 cursor-pointer ${
-                  granularity === g
-                    ? 'bg-amber-500/15 text-amber-400'
-                    : 'text-stone-200 hover:text-stone-300 hover:bg-stone-700/50'
-                }`}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={240}>
-        <AreaChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-          <defs>
-            <linearGradient id="revGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%"  stopColor="oklch(0.80 0.13 80)" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="oklch(0.80 0.13 80)" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.23 0.006 55)" />
-          <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#d6d3d1' }} interval="preserveStartEnd" axisLine={{ stroke: 'oklch(0.23 0.006 55)' }} tickLine={false} />
-          <YAxis tickFormatter={shortCurrency} tick={{ fontSize: 11, fill: '#d6d3d1' }} width={48} axisLine={false} tickLine={false} />
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barCategoryGap={isDaily ? 1 : '20%'}>
+          <CartesianGrid vertical={false} stroke={chart.grid} />
+          <XAxis dataKey="tick" tick={{ fontSize: 12 }} interval="preserveStartEnd" minTickGap={40} axisLine={{ stroke: '#d4d2ce' }} tickLine={false} />
+          <YAxis tickFormatter={shortCurrency} tick={{ fontSize: 12 }} width={48} axisLine={false} tickLine={false} domain={[0, 'auto']} allowDataOverflow allowDecimals={false} />
           <Tooltip
-            contentStyle={{ background: 'oklch(0.17 0.007 55)', border: '1px solid oklch(0.26 0.006 55)', borderRadius: '4px', fontSize: '12px' }}
-            labelStyle={{ color: '#d6d3d1' }}
-            formatter={(v: number, name: string) => [
-              `$${v.toFixed(2)}`,
-              name === 'prevRevenue' ? 'Prev Period' : 'Revenue',
-            ]}
+            cursor={{ fill: 'rgb(0 0 0 / 0.04)' }}
+            labelFormatter={(_l: string, p: { payload?: { label?: string } }[]) => p?.[0]?.payload?.label ?? ''}
+            formatter={(v, _n, p) => [`${formatCurrency(Number(v))} · ${p.payload?.orders} orders`, p.payload?.big ? "Big day" : "Sales"] as [string, string]}
           />
-          {showComparison && hasPrev && (
-            <Area
-              type="monotone"
-              dataKey="prevRevenue"
-              stroke="#a8a29e"
-              fill="none"
-              strokeWidth={1}
-              strokeDasharray="4 2"
-              dot={false}
-              strokeOpacity={0.5}
+          {isDaily && usualDay > 0 && (
+            <ReferenceLine
+              y={usualDay}
+              stroke={chart.ink}
+              strokeDasharray="3 2"
             />
           )}
-          <Area type="monotone" dataKey="revenue" stroke="oklch(0.80 0.13 80)" fill="url(#revGradient)" strokeWidth={1.5} dot={false} />
-        </AreaChart>
+          <Bar dataKey="revenue" isAnimationActive={false}>
+            {chartData.map((d, i) => (
+              <Cell key={i} fill={!isDaily || d.big ? chart.bar : chart.grey} />
+            ))}
+          </Bar>
+        </BarChart>
       </ResponsiveContainer>
-    </div>
+    </section>
   )
 }

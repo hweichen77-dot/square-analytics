@@ -85,7 +85,7 @@ export default function BasketAnalysisView() {
   if (computing && !resultRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Basket Analysis</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Basket analysis</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing baskets…
@@ -97,26 +97,26 @@ export default function BasketAnalysisView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Basket Analysis</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Basket analysis</h1>
         <p className="text-sm text-stone-200 mt-1">
-          Items that are frequently purchased together — useful for upsell training and layout decisions.
+          Items that are frequently purchased together, useful for upsell training and layout decisions.
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 cf-stagger">
+      <div className="grid grid-cols-3 gap-4 kpi-strip">
         <StatCard label="Total orders" value={formatNumber(result.totalTransactions)} countTo={result.totalTransactions} format={(n) => Math.round(n).toLocaleString()} />
         <StatCard label="Multi-item orders" value={formatNumber(result.multiItemTransactions)} countTo={result.multiItemTransactions} format={(n) => Math.round(n).toLocaleString()} />
         <StatCard label="Item pairs found" value={formatNumber(result.pairs.length)} countTo={result.pairs.length} format={(n) => Math.round(n).toLocaleString()} />
       </div>
 
       {result.pairs.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-200">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-8 text-center text-sm text-stone-200">
           {result.multiItemTransactions === 0
             ? 'No multi-item orders found. Basket analysis requires orders with 2+ items.'
             : 'No item pairs appear together enough times to show (min. 2 co-occurrences).'}
         </div>
       ) : (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-700/50">
             <input
               type="text"
@@ -134,7 +134,7 @@ export default function BasketAnalysisView() {
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     sortKey === opt.key
                       ? 'bg-amber-500 text-stone-950'
-                      : 'bg-stone-800 text-stone-400 hover:bg-stone-600'
+                      : 'bg-stone-800 text-stone-400 hover:bg-stone-800'
                   }`}
                 >
                   {opt.label}
@@ -143,7 +143,7 @@ export default function BasketAnalysisView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-2 bg-stone-900 border-b border-stone-700/50 text-xs text-stone-400 font-medium uppercase tracking-wide">
+          <div className="flex items-center gap-3 px-4 py-2 bg-stone-900 border-b border-stone-700/50 text-xs text-stone-400 font-medium">
             <span className="w-5" />
             <span className="flex-1">Items</span>
             <span className="w-20 text-right">Together</span>

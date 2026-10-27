@@ -39,10 +39,10 @@ function segmentFor(count: number): CustomerSegment {
 }
 
 const SEGMENT_COLOR: Record<CustomerSegment, string> = {
-  Regulars: '#f59e0b',
-  Frequent: '#d99a2b',
-  Occasional: '#f59e0b',
-  'One-Timers': '#a8a29e',
+  Regulars: '#1d5fbf',
+  Frequent: '#1d5fbf',
+  Occasional: '#1d5fbf',
+  'One-Timers': '#8a8783',
 }
 
 function buildProfiles(transactions: SalesTransaction[]): {
@@ -200,12 +200,12 @@ export default function CustomerView() {
   if (identifiedCount === 0) {
     return (
       <div className="space-y-4">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Customer Frequency</h1>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center">
+        <h1 className="text-2xl font-semibold text-stone-100">Customer frequency</h1>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-8 text-center">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-3 text-amber-500/80">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="17" y1="8" x2="23" y2="8" />
           </svg>
-          <h2 className="text-lg font-semibold text-stone-100 mb-2">No Customer IDs Found</h2>
+          <h2 className="text-lg font-semibold text-stone-100 mb-2">No customer IDs found</h2>
           <p className="text-sm text-stone-300 max-w-md mx-auto">
             Customer IDs are found in Square CSV exports when customers have accounts.
             Cash and guest transactions won't have IDs.
@@ -217,31 +217,31 @@ export default function CustomerView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Customer Frequency</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Customer frequency</h1>
       <p className="text-sm text-stone-400 -mt-4">{identifiedPct}% of transactions have customer data</p>
 
-      <div className="grid grid-cols-4 gap-4 cf-stagger">
+      <div className="grid grid-cols-4 gap-4 kpi-strip">
         <StatCard
-          label="Identified Customers"
+          label="Identified customers"
           value={String(profiles.length)}
           countTo={profiles.length}
           format={(n) => Math.round(n).toLocaleString()}
         />
         <StatCard
-          label="Repeat Customers"
+          label="Repeat customers"
           value={String(repeatCustomers)}
           countTo={repeatCustomers}
           format={(n) => Math.round(n).toLocaleString()}
           sub={`${profiles.length ? Math.round(repeatCustomers / profiles.length * 100) : 0}% of customers`}
         />
         <StatCard
-          label="Avg Lifetime Value"
+          label="Avg lifetime value"
           value={formatCurrency(avgCLV)}
           countTo={avgCLV}
           format={(n) => formatCurrency(n)}
         />
         <StatCard
-          label="Avg Transactions"
+          label="Avg transactions"
           value={profiles.length ? (profiles.reduce((s, p) => s + p.transactionCount, 0) / profiles.length).toFixed(1) : '—'}
         />
       </div>
@@ -249,7 +249,7 @@ export default function CustomerView() {
       {pareto && (
         <div className="border border-amber-500/20 bg-amber-500/5 px-5 py-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400 mb-1">Pareto Insight</p>
+            <p className="text-xs font-semibold text-amber-400 mb-1">Pareto Insight</p>
             <p className="text-sm text-stone-100">
               Top <span className="text-amber-400 font-semibold">{pareto.count}</span> customers
               ({Math.round((pareto.count / pareto.total) * 100)}% of {pareto.total}) generate{' '}
@@ -257,14 +257,14 @@ export default function CustomerView() {
             </p>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-2xl font-mono font-bold text-amber-400">{pareto.pct.toFixed(0)}%</p>
-            <p className="text-[10px] text-stone-500">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
+            <p className="text-2xl tabular-nums font-bold text-amber-400">{pareto.pct.toFixed(0)}%</p>
+            <p className="text-xs text-stone-500">from top {Math.round((pareto.count / pareto.total) * 100)}%</p>
           </div>
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-3">Customer Segments</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-3">Customer segments</h2>
         <div className="grid grid-cols-4 gap-3 mb-4">
           {segmentData.map(({ seg, count, rev }) => {
             const pct = profiles.length ? Math.round(count / profiles.length * 100) : 0
@@ -299,8 +299,8 @@ export default function CustomerView() {
       </div>
 
       {retention.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-base font-semibold text-stone-100 mb-1">Retention Curve</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-1">Retention curve</h2>
           <p className="text-xs text-stone-400 mb-4">
             Of customers who first purchased in a given month, what % returned the next month.
           </p>
@@ -316,7 +316,7 @@ export default function CustomerView() {
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50 flex items-center gap-4 flex-wrap">
           <h2 className="text-base font-semibold text-stone-100 flex-1">
             {selectedSegment ? `${selectedSegment} (${filteredProfiles.length})` : `All Customers (${filteredProfiles.length})`}
@@ -364,18 +364,18 @@ export default function CustomerView() {
                       {p.segment}
                     </span>
                   </td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{p.transactionCount}</td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{formatCurrency(p.totalSpent)}</td>
-                  <td className="px-4 py-2 font-mono text-stone-100">{formatCurrency(p.avgTransaction)}</td>
-                  <td className="px-4 py-2 font-mono text-amber-400/80">
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{p.transactionCount}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{formatCurrency(p.totalSpent)}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-100">{formatCurrency(p.avgTransaction)}</td>
+                  <td className="px-4 py-2 tabular-nums text-amber-400/80">
                     {(() => {
                       const months = Math.max(1, differenceInMonths(p.lastPurchase, p.firstPurchase) + 1)
                       return formatCurrency((p.totalSpent / months) * 12)
                     })()}
                   </td>
-                  <td className="px-4 py-2 font-mono text-stone-400">{format(p.firstPurchase, 'M/d/yy')}</td>
-                  <td className="px-4 py-2 font-mono text-stone-400">{format(p.lastPurchase, 'M/d/yy')}</td>
-                  <td className="px-4 py-2 font-mono" style={{ color: p.daysSinceLastVisit > 60 ? '#dc2626' : p.daysSinceLastVisit > 30 ? '#f59e0b' : '#374151' }}>
+                  <td className="px-4 py-2 tabular-nums text-stone-400">{format(p.firstPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 tabular-nums text-stone-400">{format(p.lastPurchase, 'M/d/yy')}</td>
+                  <td className="px-4 py-2 tabular-nums" style={{ color: p.daysSinceLastVisit > 60 ? '#c4242a' : p.daysSinceLastVisit > 30 ? '#1d5fbf' : '#374151' }}>
                     {p.daysSinceLastVisit}
                   </td>
                   <td className="px-4 py-2 text-stone-400 truncate max-w-32">{p.favoriteProduct}</td>
@@ -387,7 +387,7 @@ export default function CustomerView() {
       </div>
 
       {selectedCustomer && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <div className="flex items-start justify-between mb-4">
             <div>
               <h2 className="text-base font-semibold text-stone-100">{selectedCustomer.name || selectedCustomer.id}</h2>

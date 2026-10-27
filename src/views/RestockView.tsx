@@ -30,10 +30,10 @@ const URGENCY_ORDER: Record<UrgencyTier, number> = {
 }
 
 function urgencyColor(tier: UrgencyTier) {
-  if (tier === 'outOfStock' || tier === 'critical') return '#ef4444'
-  if (tier === 'low') return '#f59e0b'
-  if (tier === 'safe') return '#16a34a'
-  return '#a8a29e'
+  if (tier === 'outOfStock' || tier === 'critical') return '#c4242a'
+  if (tier === 'low') return '#1d5fbf'
+  if (tier === 'safe') return '#2e7d32'
+  return '#8a8783'
 }
 
 function urgencyLabel(tier: UrgencyTier) {
@@ -154,11 +154,11 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
       <div className="bg-stone-800 rounded-lg shadow-lg border border-stone-700 w-96 p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-stone-100">Log Restock</h2>
+            <h2 className="text-lg font-semibold text-stone-100">Log restock</h2>
             <p className="text-sm text-stone-400">{productName}</p>
           </div>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-100 text-xl leading-none">×</button>
@@ -167,7 +167,7 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-stone-100 mb-1">Restock Date</label>
-            <input type="date" className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+            <input type="date" className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={date} onChange={e => setDate(e.target.value)} />
           </div>
           <div>
@@ -180,7 +180,7 @@ function LogRestockModal({ productName, onClose }: { productName: string; onClos
           <div>
             <label className="block text-sm font-medium text-stone-100 mb-1">Notes (optional)</label>
             <input type="text" placeholder="e.g. Received from supplier"
-              className="w-full border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
+              className="w-full border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm"
               value={notes} onChange={e => setNotes(e.target.value)} />
           </div>
         </div>
@@ -223,7 +223,7 @@ export default function RestockView() {
   if (computing && !alertsRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Restock Alerts & Forecasting</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Restock alerts & forecasting</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -234,17 +234,17 @@ export default function RestockView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Restock Alerts & Forecasting</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Restock alerts & forecasting</h1>
 
-      <div className="grid grid-cols-4 gap-4 cf-stagger">
+      <div className="grid grid-cols-4 gap-4 kpi-strip">
         <StatCard
-          label="Total Products"
+          label="Total products"
           value={String(alerts.length)}
           countTo={alerts.length}
           format={(n) => Math.round(n).toLocaleString()}
         />
         <StatCard
-          label="Out of Stock"
+          label="Out of stock"
           value={String(outOfStockCount)}
           countTo={outOfStockCount}
           format={(n) => Math.round(n).toLocaleString()}
@@ -264,8 +264,8 @@ export default function RestockView() {
       </div>
 
       {suggestedList.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-sm font-semibold text-amber-400 mb-3">Suggested Restock List</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-sm font-semibold text-amber-400 mb-3">Suggested restock list</h2>
           <div className="space-y-2">
             {suggestedList.map(alert => (
               <div key={alert.productName} className="flex items-center gap-3 p-3 rounded-lg"
@@ -302,9 +302,9 @@ export default function RestockView() {
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50">
-          <h2 className="text-base font-semibold text-stone-100">All Products — Stock Status</h2>
+          <h2 className="text-base font-semibold text-stone-100">Stock status for every product</h2>
         </div>
         {alerts.length === 0 ? (
           <div className="p-8 text-center text-sm text-stone-400">Import CSV sales data to see restock alerts.</div>
@@ -325,18 +325,18 @@ export default function RestockView() {
                       <div className="font-medium text-stone-100">{alert.productName}</div>
                     </td>
                     <td className="px-4 py-2.5 text-stone-400">{alert.category}</td>
-                    <td className="px-4 py-2.5 font-mono text-stone-100">{alert.weeklyVelocity.toFixed(1)}/wk</td>
-                    <td className="px-4 py-2.5 font-mono font-semibold" style={{ color: urgencyColor(alert.urgency) }}>
+                    <td className="px-4 py-2.5 tabular-nums text-stone-100">{alert.weeklyVelocity.toFixed(1)}/wk</td>
+                    <td className="px-4 py-2.5 tabular-nums font-semibold" style={{ color: urgencyColor(alert.urgency) }}>
                       {alert.stockRemaining !== null
                         ? alert.stockRemaining <= 0 ? 'OUT' : alert.stockRemaining
                         : '—'}
                     </td>
-                    <td className="px-4 py-2.5 font-mono" style={{ color: urgencyColor(alert.urgency) }}>
+                    <td className="px-4 py-2.5 tabular-nums" style={{ color: urgencyColor(alert.urgency) }}>
                       {alert.urgency === 'outOfStock' ? '0'
                         : alert.daysUntilStockout !== null ? Math.round(alert.daysUntilStockout)
                         : '—'}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-stone-400">
+                    <td className="px-4 py-2.5 tabular-nums text-stone-400">
                       {alert.projectedStockoutDate ? format(alert.projectedStockoutDate, 'MMM d') : '—'}
                     </td>
                     <td className="px-4 py-2.5 text-stone-400">

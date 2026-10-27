@@ -111,7 +111,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
 
   const isAddVariation = !!forItem && !editing
-  const title = editing ? 'Edit Variation' : isAddVariation ? `Add Variation — ${forItem}` : 'Add New Item'
+  const title = editing ? 'Edit Variation' : isAddVariation ? `Add variation to ${forItem}` : 'Add New Item'
 
   function field(key: keyof FormData) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -189,7 +189,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               onChange={field('itemName')}
               disabled={isAddVariation}
               placeholder="e.g. Ramune Soda"
-              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             {errors.itemName && <p className="text-xs text-red-400 mt-1">{errors.itemName}</p>}
           </div>
@@ -201,7 +201,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               value={form.variationName}
               onChange={field('variationName')}
               placeholder="e.g. Strawberry, Large, 12oz… (blank = Regular)"
-              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           </div>
 
@@ -212,7 +212,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="number" min="0" step="0.01"
                 value={form.price} onChange={field('price')}
                 placeholder="e.g. 3.50"
-                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.price && <p className="text-xs text-red-400 mt-1">{errors.price}</p>}
             </div>
@@ -222,7 +222,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="number" min="0" step="1"
                 value={form.quantity} onChange={field('quantity')}
                 placeholder="e.g. 24"
-                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.quantity && <p className="text-xs text-red-400 mt-1">{errors.quantity}</p>}
             </div>
@@ -234,7 +234,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
               type="text"
               value={form.sku} onChange={field('sku')}
               placeholder="e.g. RAM-STRAW-001"
-              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
           </div>
 
@@ -242,7 +242,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
             <label className="block text-xs font-medium text-stone-400 mb-1.5">Category</label>
             <select
               value={form.category} onChange={field('category')}
-              className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+              className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
             >
               <option value="">Select a category…</option>
               {KNOWN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -256,7 +256,7 @@ function ItemModal({ editing, forItem, onClose, onSave }: ItemModalProps) {
                 type="text"
                 value={form.customCategory} onChange={field('customCategory')}
                 placeholder="Enter category name"
-                className="w-full bg-stone-700/60 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full bg-stone-700/60 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               {errors.customCategory && <p className="text-xs text-red-400 mt-1">{errors.customCategory}</p>}
             </div>
@@ -447,13 +447,13 @@ export default function CatalogueProductsView() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Catalogue Products</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">Catalogue products</h1>
           <p className="text-sm text-stone-400 mt-0.5">{totalItems} items · {totalVars} total variations</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={handleExport} disabled={exporting}
-            className="px-3 py-2 rounded-lg bg-stone-700 hover:bg-stone-600 border border-stone-600 disabled:opacity-50 text-stone-200 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-3 py-2 rounded-lg bg-stone-700 hover:bg-stone-800 border border-[#d4d2ce] disabled:opacity-50 text-stone-200 text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -470,7 +470,7 @@ export default function CatalogueProductsView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 cf-stagger">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 kpi-strip">
         {[
           { label: 'Items',           value: totalItems },
           { label: 'Multi-variation', value: multiVarItems },
@@ -494,12 +494,12 @@ export default function CatalogueProductsView() {
           placeholder="Search items or SKU…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
         />
         <select
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
-          className="border border-stone-600 rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
+          className="border border-[#d4d2ce] rounded-lg px-3 py-2 bg-stone-700/50 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 cursor-pointer"
         >
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
@@ -519,10 +519,10 @@ export default function CatalogueProductsView() {
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-stone-900 text-stone-400 uppercase text-xs border-b border-stone-700/60">
+            <thead className="bg-stone-900 text-stone-400 text-xs border-b border-stone-700/60">
               <tr>
                 <th className="px-4 py-3 text-left w-8"></th>
                 <th className="px-4 py-3 text-left">Item</th>
@@ -557,7 +557,7 @@ export default function CatalogueProductsView() {
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-stone-100">{group.itemName}</span>
                           {varCount > 1 && (
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 tabular-nums">
+                            <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 tabular-nums">
                               {varCount} vars
                             </span>
                           )}
@@ -566,7 +566,7 @@ export default function CatalogueProductsView() {
                           )}
                         </div>
                         {varCount === 1 && group.variations[0].sku && (
-                          <p className="text-[11px] text-stone-500 font-mono mt-0.5">{group.variations[0].sku}</p>
+                          <p className="text-[11px] text-stone-500 tabular-nums mt-0.5">{group.variations[0].sku}</p>
                         )}
                       </td>
 
@@ -605,14 +605,14 @@ export default function CatalogueProductsView() {
                           {varCount === 1 && (
                             <button
                               onClick={() => openEdit(group.variations[0])}
-                              className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer"
+                              className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-[#d4d2ce] hover:border-amber-500/40 transition-colors cursor-pointer"
                             >
                               Edit
                             </button>
                           )}
                           <button
                             onClick={() => openAddVariation(group.itemName)}
-                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer whitespace-nowrap"
+                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-[#d4d2ce] hover:border-amber-500/40 transition-colors cursor-pointer whitespace-nowrap"
                           >
                             + Variation
                           </button>
@@ -624,17 +624,17 @@ export default function CatalogueProductsView() {
                       <tr
                         key={`var-${v.id ?? v.name}`}
                         onClick={() => openDetail(v.name)}
-                        className={`border-b border-stone-700/20 bg-stone-900/60 hover:bg-stone-700/30 transition-colors cursor-pointer ${!v.enabled ? 'opacity-50' : ''}`}
+                        className={`border-b border-stone-700/20 bg-[var(--raised)] hover:bg-stone-700/30 transition-colors cursor-pointer ${!v.enabled ? 'opacity-50' : ''}`}
                       >
                         <td className="px-4 py-2.5" />
 
                         <td className="px-4 py-2.5 pl-10">
                           <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-stone-600 shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#cfccc8] shrink-0" />
                             <span className="text-stone-400 text-xs font-medium">
                               {v.variationName || 'Regular'}
                             </span>
-                            {v.sku && <span className="text-[10px] text-stone-500 font-mono">{v.sku}</span>}
+                            {v.sku && <span className="text-xs text-stone-500 tabular-nums">{v.sku}</span>}
                           </div>
                         </td>
 
@@ -659,7 +659,7 @@ export default function CatalogueProductsView() {
                         </td>
 
                         <td className="px-4 py-2.5 text-center">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${v.enabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-stone-700 text-stone-200'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${v.enabled ? 'bg-emerald-500/10 text-emerald-400' : 'bg-stone-700 text-stone-200'}`}>
                             {v.enabled ? 'Active' : 'Archived'}
                           </span>
                         </td>
@@ -667,7 +667,7 @@ export default function CatalogueProductsView() {
                         <td className="px-4 py-2.5 text-right" onClick={e => e.stopPropagation()}>
                           <button
                             onClick={() => openEdit(v)}
-                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-stone-600/60 hover:border-amber-500/40 transition-colors cursor-pointer"
+                            className="text-xs px-2.5 py-1 rounded-md text-stone-200 hover:text-amber-400 hover:bg-stone-700 border border-[#d4d2ce] hover:border-amber-500/40 transition-colors cursor-pointer"
                           >
                             Edit
                           </button>

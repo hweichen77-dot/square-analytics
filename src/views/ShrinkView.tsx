@@ -92,10 +92,10 @@ export default function ShrinkView() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Shrink & Loss</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">Shrink & loss</h1>
           <p className="text-sm text-stone-400 mt-1">Waste, damage, and downward inventory adjustments</p>
         </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-400">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-8 text-center text-sm text-stone-400">
           No waste or loss adjustments recorded in your synced stock history. That's good news.
         </div>
       </div>
@@ -105,28 +105,28 @@ export default function ShrinkView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Shrink & Loss</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Shrink & loss</h1>
         <p className="text-sm text-stone-400 mt-1">Waste, damage, and downward inventory adjustments from Square stock movements</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-4">
           <p className="text-xs text-stone-400">Loss Events</p>
           <p className="text-2xl font-bold text-stone-100 mt-1">{losses.length}</p>
         </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-4">
           <p className="text-xs text-stone-400">Units Lost</p>
           <p className="text-2xl font-bold text-red-400 mt-1">{totalUnits.toLocaleString()}</p>
         </div>
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-4">
           <p className="text-xs text-stone-400">Cost of Shrink</p>
           <p className="text-2xl font-bold text-red-400 mt-1">{hasCost ? formatCurrency(totalCost) : 'Add costs →'}</p>
         </div>
       </div>
 
       {byCategory.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-sm font-semibold text-stone-100 mb-4">Loss by Category</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-sm font-semibold text-stone-100 mb-4">Loss by category</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {byCategory.map(c => (
               <div key={c.category} className="flex items-center justify-between p-3 bg-stone-900">
@@ -134,7 +134,7 @@ export default function ShrinkView() {
                   <p className="font-semibold text-sm text-stone-100">{c.category}</p>
                   <p className="text-xs text-stone-400">{c.units} units</p>
                 </div>
-                <p className="font-mono text-sm text-red-400">{c.cost > 0 ? formatCurrency(c.cost) : '—'}</p>
+                <p className="tabular-nums text-sm text-red-400">{c.cost > 0 ? formatCurrency(c.cost) : '—'}</p>
               </div>
             ))}
           </div>
@@ -142,8 +142,8 @@ export default function ShrinkView() {
       )}
 
       {chartData.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-          <h2 className="text-base font-semibold text-stone-100 mb-4">Top Shrink by Product</h2>
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+          <h2 className="text-base font-semibold text-stone-100 mb-4">Top shrink by product</h2>
           <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 24)}>
             <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 16, left: 16, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chart.grid} />
@@ -163,9 +163,9 @@ export default function ShrinkView() {
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50">
-          <h2 className="text-base font-semibold text-stone-100">Loss Events</h2>
+          <h2 className="text-base font-semibold text-stone-100">Loss events</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -185,9 +185,9 @@ export default function ShrinkView() {
                   <td className="px-4 py-2 font-medium text-stone-100">{l.productName}</td>
                   <td className="px-4 py-2 text-stone-400">{l.category}</td>
                   <td className="px-4 py-2 text-stone-300">{l.reason}</td>
-                  <td className="px-4 py-2 text-right font-mono text-stone-100">{l.units}</td>
-                  <td className="px-4 py-2 text-right font-mono text-red-400">{l.cost != null ? formatCurrency(l.cost) : '—'}</td>
-                  <td className="px-4 py-2 text-right font-mono text-stone-400">{format(l.occurredAt, 'MMM d, yyyy')}</td>
+                  <td className="px-4 py-2 text-right tabular-nums text-stone-100">{l.units}</td>
+                  <td className="px-4 py-2 text-right tabular-nums text-red-400">{l.cost != null ? formatCurrency(l.cost) : '—'}</td>
+                  <td className="px-4 py-2 text-right tabular-nums text-stone-400">{format(l.occurredAt, 'MMM d, yyyy')}</td>
                 </tr>
               ))}
             </tbody>

@@ -22,15 +22,15 @@ import { chart } from '../lib/chartTheme'
 import { StatCard } from '../components/ui/StatCard'
 
 const CATEGORY_COLORS: Record<string, string> = {
-  'Drinks':        '#d99a2b',
-  'Food':          '#22c55e',
-  'Ice Cream':     '#CA8A04',
-  'Ramen/Hot Food':'#f59e0b',
-  'Merch':         '#9A3412',
+  'Drinks':        '#1d5fbf',
+  'Food':          '#2e7d32',
+  'Ice Cream':     '#1d5fbf',
+  'Ramen/Hot Food':'#1d5fbf',
+  'Merch':         '#1d5fbf',
 }
 
 function categoryColor(cat: string): string {
-  return CATEGORY_COLORS[cat] ?? '#a8a29e'
+  return CATEGORY_COLORS[cat] ?? '#8a8783'
 }
 
 function movingAverage(data: ProductTimePoint[]): { date: Date; value: number }[] {
@@ -181,7 +181,7 @@ export default function ProductDetailView() {
           <button onClick={() => navigate(-1)} className="text-amber-400 text-sm hover:underline">← Back</button>
         </div>
         <div className="flex items-baseline gap-3 flex-wrap">
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">{productName}</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">{productName}</h1>
           <span
             className="px-3 py-1 rounded-full text-sm font-medium"
             style={{ background: `${col}22`, color: col, border: `1px solid ${col}44` }}
@@ -194,9 +194,9 @@ export default function ProductDetailView() {
         </div>
 
         {catalogueProduct && (
-          <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4">
+          <div className="bg-white border border-[var(--border)] rounded-lg p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-stone-100">Inventory &amp; Cost</h2>
+              <h2 className="font-semibold text-stone-100">Inventory &amp; cost</h2>
               {catalogueProduct.lastSyncedAt && (
                 <span className="text-xs text-stone-500">
                   synced {format(new Date(catalogueProduct.lastSyncedAt), 'MMM d, yyyy')}
@@ -206,16 +206,16 @@ export default function ProductDetailView() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <StatCard
-                label="On Hand"
+                label="On hand"
                 value={onHand != null ? formatNumber(onHand) : '—'}
                 sub={catalogueProduct.stockAlertEnabled && catalogueProduct.stockAlertCount != null
                   ? `alert at ${catalogueProduct.stockAlertCount}`
                   : undefined}
               />
-              <StatCard label="Stock Value" value={stockValue != null ? formatCurrency(stockValue) : '—'} sub={unitCost != null ? `${formatCurrency(unitCost)} / unit cost` : 'no cost set'} />
+              <StatCard label="Stock value" value={stockValue != null ? formatCurrency(stockValue) : '—'} sub={unitCost != null ? `${formatCurrency(unitCost)} / unit cost` : 'no cost set'} />
               <StatCard label="Margin" value={margin != null ? `${margin.toFixed(0)}%` : '—'} sub={price != null ? `${formatCurrency(price)} price` : undefined} />
               <StatCard
-                label="Days of Supply"
+                label="Days of supply"
                 value={daysOfSupply != null ? Math.round(daysOfSupply).toString() : '—'}
                 sub={dailyUnits > 0 ? `${dailyUnits.toFixed(1)} units/day` : 'no recent sales'}
               />
@@ -223,11 +223,11 @@ export default function ProductDetailView() {
 
             <dl className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 text-sm border-t border-stone-700/40 pt-4">
               <DetailField label="Vendor" value={catalogueProduct.vendorName} />
-              <DetailField label="Vendor Code" value={catalogueProduct.vendorCode} mono />
+              <DetailField label="Vendor code" value={catalogueProduct.vendorCode} mono />
               <DetailField label="SKU" value={catalogueProduct.sku} mono />
-              <DetailField label="GTIN" value={catalogueProduct.gtin} mono />
+              <DetailField label="Gtin" value={catalogueProduct.gtin} mono />
               <DetailField label="Variation" value={catalogueProduct.variationName} />
-              <DetailField label="Unit Type" value={catalogueProduct.unitType} />
+              <DetailField label="Unit type" value={catalogueProduct.unitType} />
               <DetailField label="Taxable" value={catalogueProduct.taxable ? 'Yes' : 'No'} />
               <DetailField
                 label="Tracking"
@@ -241,9 +241,9 @@ export default function ProductDetailView() {
           </div>
         )}
 
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="px-4 py-3 border-b border-stone-700/50 flex items-center justify-between">
-            <h2 className="font-semibold text-stone-100">Stock History</h2>
+            <h2 className="font-semibold text-stone-100">Stock history</h2>
             <span className="text-xs text-stone-400">{movements.length} updates</span>
           </div>
           {movements.length === 0 ? (
@@ -253,7 +253,7 @@ export default function ProductDetailView() {
           ) : (
             <div className="overflow-x-auto max-h-80">
               <table className="w-full text-sm">
-                <thead className="sticky top-0 bg-stone-900 text-stone-400 uppercase text-xs">
+                <thead className="sticky top-0 bg-stone-900 text-stone-400 text-xs">
                   <tr>
                     <th className="px-4 py-2 text-left">Date</th>
                     <th className="px-4 py-2 text-left">Update</th>
@@ -288,36 +288,36 @@ export default function ProductDetailView() {
         </div>
 
         {!stats && (
-          <div className="bg-stone-800/30 border border-stone-700/40 py-10 text-center text-stone-400 text-sm">
+          <div className="bg-white border border-[var(--border)] rounded-lg py-10 text-center text-stone-400 text-sm">
             No sales recorded for this product yet.
           </div>
         )}
 
         {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 cf-stagger">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 kpi-strip">
           <StatCard
-            label="Units Sold"
+            label="Units sold"
             value={formatNumber(stats.totalUnitsSold)}
             countTo={stats.totalUnitsSold}
             format={(n) => Math.round(n).toLocaleString()}
           />
           <StatCard
-            label="Total Revenue"
+            label="Total revenue"
             value={formatCurrency(stats.totalRevenue)}
             countTo={stats.totalRevenue}
             format={(n) => formatCurrency(n)}
           />
           <StatCard
-            label="Avg Price"
+            label="Avg price"
             value={formatCurrency(stats.avgPrice)}
             countTo={stats.avgPrice}
             format={(n) => formatCurrency(n)}
           />
           {bestMonth && (
-            <StatCard label="Best Month" value={bestMonth.label} sub={`${bestMonth.units} units`} />
+            <StatCard label="Best month" value={bestMonth.label} sub={`${bestMonth.units} units`} />
           )}
           <StatCard
-            label="This vs Last Month"
+            label="This vs last month"
             value={monthOverMonth !== null ? `${Math.abs(monthOverMonth).toFixed(0)}%` : 'N/A'}
             trend={monthOverMonth !== null ? 'vs last month' : undefined}
             trendUp={monthOverMonth !== null ? monthOverMonth >= 0 : undefined}
@@ -328,9 +328,9 @@ export default function ProductDetailView() {
 
       {stats && (
       <>
-      <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-stone-100">Revenue & Units Over Time</h2>
+          <h2 className="font-semibold text-stone-100">Revenue & units over time</h2>
           <div className="flex gap-1">
             {(['Daily', 'Weekly', 'Monthly'] as const).map(g => (
               <button key={g} onClick={() => setGranularity(g)}
@@ -341,7 +341,7 @@ export default function ProductDetailView() {
           </div>
         </div>
 
-        <div className="bg-stone-900/50 rounded-lg p-3 space-y-2">
+        <div className="bg-[var(--raised)] rounded-lg p-3 space-y-2">
           <div className="flex items-center gap-4">
             <span className="text-xs font-medium text-stone-400">Revenue</span>
             <span className="flex items-center gap-1 text-xs text-stone-400">
@@ -362,31 +362,31 @@ export default function ProductDetailView() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 11, fill: '#d6d3d1' }} width={48} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#625f5b' }} tickLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 11, fill: '#625f5b' }} width={48} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
               <Tooltip
-                contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
-                labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
+                contentStyle={{ background: '#ffffff', border: '1px solid #e6e4e1', borderRadius: 8, fontSize: 12 }}
+                labelStyle={{ color: '#121110', fontWeight: 600 }}
                 formatter={(v: number, n: string) => [n === 'revenue' ? formatCurrency(v) : n === 'ma' ? `${formatCurrency(v)} avg` : v, n === 'revenue' ? 'Revenue' : n === 'ma' ? '3-period avg' : n]}
               />
               <Area type="linear" dataKey="revenue" stroke={chart.line} fill="url(#revGrad)" strokeWidth={2} dot={{ r: 3, fill: chart.bar, strokeWidth: 0 }} activeDot={{ r: 5 }} />
               {maData.length > 0 && (
-                <Line type="linear" dataKey="ma" stroke="#fb923c" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
+                <Line type="linear" dataKey="ma" stroke="#1d5fbf" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
               )}
             </ComposedChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-stone-900/50 rounded-lg p-3 space-y-2">
+        <div className="bg-[var(--raised)] rounded-lg p-3 space-y-2">
           <span className="text-xs font-medium text-stone-400">Units Sold</span>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 11, fill: '#d6d3d1' }} width={32} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#625f5b' }} tickLine={false} interval="preserveStartEnd" />
+              <YAxis tick={{ fontSize: 11, fill: '#625f5b' }} width={32} />
               <Tooltip
-                contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
-                labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
+                contentStyle={{ background: '#ffffff', border: '1px solid #e6e4e1', borderRadius: 8, fontSize: 12 }}
+                labelStyle={{ color: '#121110', fontWeight: 600 }}
               />
               <Bar dataKey="units" fill={chart.bar} fillOpacity={0.75} radius={[3, 3, 0, 0]} maxBarSize={32} />
             </BarChart>
@@ -395,19 +395,19 @@ export default function ProductDetailView() {
       </div>
 
       <div className="space-y-3">
-        <h2 className="font-semibold text-stone-100">Sales Patterns</h2>
+        <h2 className="font-semibold text-stone-100">Sales patterns</h2>
         <div className="flex gap-4 items-start">
-          <div className="flex-1 bg-stone-800/30 border border-stone-700/40 p-4 space-y-2">
+          <div className="flex-1 bg-white border border-[var(--border)] rounded-lg p-4 space-y-2">
             <span className="text-xs font-medium text-stone-400">Sales by Day of Week</span>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={dowData} margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
-                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#d6d3d1' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#d6d3d1' }} width={28} />
-                <Tooltip contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#625f5b' }} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#625f5b' }} width={28} />
+                <Tooltip contentStyle={{ background: '#ffffff', border: '1px solid #e6e4e1', borderRadius: 8, fontSize: 12 }} />
                 <Bar dataKey="count" maxBarSize={32} radius={[3, 3, 0, 0]}>
                   {dowData.map(entry => (
                     <Cell key={entry.dayOfWeek}
-                      fill={entry.dayOfWeek === peakDayOfWeek ? chart.bar : 'rgba(245,158,11,0.35)'}
+                      fill={entry.dayOfWeek === peakDayOfWeek ? chart.bar : 'rgba(29, 95, 191, 0.35)'}
                     />
                   ))}
                 </Bar>
@@ -415,20 +415,20 @@ export default function ProductDetailView() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-stone-800/30 border border-stone-700/40 p-4 space-y-4 w-52 shrink-0">
+          <div className="bg-white border border-[var(--border)] rounded-lg p-4 space-y-4 w-52 shrink-0">
             <PatternIndicator title="Best Day"
               value={peakDayOfWeek ? dayName(peakDayOfWeek) : 'N/A'} />
             <PatternIndicator title="Peak Hour"
               value={peakHour !== null ? formatHour(peakHour) : 'N/A'} />
             <PatternIndicator title="Trend" value={trend ?? 'N/A'}
-              color={trend === 'Growing' ? '#22c55e' : trend === 'Declining' ? '#ef4444' : '#a8a29e'} />
+              color={trend === 'Growing' ? '#2e7d32' : trend === 'Declining' ? '#c4242a' : '#8a8783'} />
           </div>
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-4 py-3 border-b border-stone-700/50 flex items-center justify-between">
-          <h2 className="font-semibold text-stone-100">Transaction History</h2>
+          <h2 className="font-semibold text-stone-100">Transaction history</h2>
           <span className="text-xs text-stone-400">{txRows.length} total</span>
         </div>
         {txRows.length === 0 ? (
@@ -436,7 +436,7 @@ export default function ProductDetailView() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-900 text-stone-400 uppercase text-xs">
+              <thead className="bg-stone-900 text-stone-400 text-xs">
                 <tr>
                   <SortTh label="Date" field="dateDesc" altField="dateAsc" sort={txSort} onSort={setTxSort} />
                   <th className="px-4 py-2 text-left">Time</th>
@@ -481,12 +481,12 @@ function DetailField({ label, value, mono }: { label: string; value?: string | n
   return (
     <div>
       <dt className="text-xs text-stone-400">{label}</dt>
-      <dd className={`text-stone-100 mt-0.5 ${mono ? 'font-mono text-xs' : ''}`}>{value || '—'}</dd>
+      <dd className={`text-stone-100 mt-0.5 ${mono ? 'tabular-nums text-xs' : ''}`}>{value || '—'}</dd>
     </div>
   )
 }
 
-function PatternIndicator({ title, value, color = '#e7e5e4' }: { title: string; value: string; color?: string }) {
+function PatternIndicator({ title, value, color = '#3f3c39' }: { title: string; value: string; color?: string }) {
   return (
     <div className="flex items-start gap-3">
       <div>

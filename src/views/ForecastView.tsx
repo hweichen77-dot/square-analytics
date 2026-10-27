@@ -56,7 +56,7 @@ export default function ForecastView() {
   if (!forecast) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Sales Forecast</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Sales forecast</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -68,7 +68,7 @@ export default function ForecastView() {
   if (!forecast.hasEnoughData) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Sales Forecast</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Sales forecast</h1>
         <div className="bg-amber-500/10 border border-amber-500/30 p-5 text-sm text-amber-300">
           <p className="font-semibold">Not enough history to forecast</p>
           <p className="mt-1">Need at least 2 complete weeks of data. You have {forecast.weeksOfHistory} week{forecast.weeksOfHistory === 1 ? '' : 's'}.</p>
@@ -100,7 +100,7 @@ export default function ForecastView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Sales Forecast</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Sales forecast</h1>
         <TrendBadge label={trendLabel} />
       </div>
 
@@ -129,7 +129,7 @@ export default function ForecastView() {
             </div>
             <div className="w-full bg-stone-800 rounded-full h-2 border border-stone-700">
               <div
-                className={`h-2 rounded-full transition-all ${onTrack ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                className={`h-2 rounded-full transition-[width,background-color] ${onTrack ? 'bg-emerald-500' : 'bg-amber-400'}`}
                 style={{ width: `${Math.min(progressPct, 100)}%` }}
               />
             </div>
@@ -137,8 +137,8 @@ export default function ForecastView() {
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="font-semibold text-stone-100 mb-1">{weekLabel(thisWeek.weekStart)} — Current Week</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="font-semibold text-stone-100 mb-1">{weekLabel(thisWeek.weekStart)}, this week</h2>
         <p className="text-xs text-stone-400 mb-4">Solid bars = actual revenue. Striped bars = forecast for remaining days.</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={thisWeekData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
@@ -152,9 +152,9 @@ export default function ForecastView() {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="font-semibold text-stone-100">{weekLabel(nextWeek.weekStart)} — Forecast</h2>
+          <h2 className="font-semibold text-stone-100">{weekLabel(nextWeek.weekStart)}, forecast</h2>
           <span className="text-sm font-semibold text-amber-400">{formatCurrency(nextWeek.projectedTotal)} projected</span>
         </div>
         <p className="text-xs text-stone-400 mb-4">Based on day-of-week averages from the last {Math.min(12, forecast.weeksOfHistory)} weeks.</p>
@@ -175,7 +175,7 @@ export default function ForecastView() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {accuracyData && (
-          <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <div className="bg-white border border-[var(--border)] rounded-lg p-4">
             <p className="text-xs text-stone-400 font-medium mb-1">Forecast Accuracy (This Week)</p>
             <p className={`text-3xl font-bold tabular-nums ${accuracyData.accuracyPct >= 90 ? 'text-emerald-400' : accuracyData.accuracyPct >= 70 ? 'text-amber-400' : 'text-red-400'}`}>
               {accuracyData.accuracyPct.toFixed(0)}%
@@ -189,7 +189,7 @@ export default function ForecastView() {
           </div>
         )}
 
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-4">
           <p className="text-xs text-stone-400 font-medium mb-1">Next Week Projection</p>
           <p className="text-3xl font-bold tabular-nums text-amber-400">{formatCurrency(nextWeek.projectedTotal)}</p>
           <p className="text-xs text-stone-400 mt-1">
@@ -197,7 +197,7 @@ export default function ForecastView() {
           </p>
         </div>
 
-        <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-4">
           <p className="text-xs text-stone-400 font-medium mb-1">History Used</p>
           <p className="text-3xl font-bold tabular-nums text-stone-100">{forecast.weeksOfHistory}</p>
           <p className="text-xs text-stone-400 mt-1">
@@ -207,10 +207,10 @@ export default function ForecastView() {
       </div>
 
       {topProducts.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-700/50">
-            <h2 className="font-semibold text-stone-100">Top Products by Demand</h2>
-            <p className="text-xs text-stone-400 mt-0.5">Highest-velocity items — expect continued strong demand</p>
+            <h2 className="font-semibold text-stone-100">Top products by demand</h2>
+            <p className="text-xs text-stone-400 mt-0.5">Highest-velocity items, expect continued strong demand</p>
           </div>
           <div className="divide-y divide-stone-700/30">
             {topProducts.map((p, i) => {

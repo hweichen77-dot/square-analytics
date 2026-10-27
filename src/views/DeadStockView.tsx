@@ -28,9 +28,9 @@ interface DeadStockItem {
 }
 
 function tierColor(tier: Tier) {
-  if (tier === 'Dead') return '#ef4444'
-  if (tier === 'Dying') return '#f59e0b'
-  return '#eab308'
+  if (tier === 'Dead') return '#c4242a'
+  if (tier === 'Dying') return '#1d5fbf'
+  return '#1d5fbf'
 }
 
 function buildDeadStockItems(
@@ -108,8 +108,8 @@ function buildDeadStockItems(
       : (onHand !== undefined ? onHand : Math.max(0, raw.prior30 * 0.5)) * unitCost
 
     let recommendation: string
-    if (raw.last30 === 0 && raw.prior30 > 10) recommendation = 'Markdown 30% to clear — was popular, now stalled'
-    else if (raw.prior30 <= 3) recommendation = 'Consider discontinuing — never sold well'
+    if (raw.last30 === 0 && raw.prior30 > 10) recommendation = 'Markdown 30% to clear, was popular, now stalled'
+    else if (raw.prior30 <= 3) recommendation = 'Consider discontinuing, never sold well'
     else if (trendPct <= -50) recommendation = 'Bundle with a top seller to boost visibility'
     else recommendation = 'Review inventory levels and reorder point'
 
@@ -142,7 +142,7 @@ function TierSection({
   const color = tierColor(tier)
 
   return (
-    <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+    <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
       <button
         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-stone-700/50"
         onClick={() => setIsExpanded(e => !e)}
@@ -178,19 +178,19 @@ function TierSection({
                       <div className="font-medium text-stone-100">{item.name}</div>
                       <div className="text-stone-400">{item.category}</div>
                     </td>
-                    <td className="px-4 py-2 text-stone-300 font-mono">{format(item.lastSaleDate, 'MMM d, yyyy')}</td>
+                    <td className="px-4 py-2 text-stone-300 tabular-nums">{format(item.lastSaleDate, 'MMM d, yyyy')}</td>
                     <td
-                      className="px-4 py-2 text-right font-mono font-semibold"
-                      style={{ color: item.daysSinceLastSale > 30 ? '#ef4444' : '#a8a29e' }}
+                      className="px-4 py-2 text-right tabular-nums font-semibold"
+                      style={{ color: item.daysSinceLastSale > 30 ? '#c4242a' : '#8a8783' }}
                     >
                       {item.daysSinceLastSale}
                     </td>
-                    <td className="px-4 py-2 text-right font-mono text-stone-100">{item.last30Units}</td>
-                    <td className="px-4 py-2 text-right font-mono text-stone-100">{item.prior30Units}</td>
-                    <td className="px-4 py-2 text-right font-mono font-medium" style={{ color: item.trendPct >= 0 ? '#16a34a' : '#dc2626' }}>
+                    <td className="px-4 py-2 text-right tabular-nums text-stone-100">{item.last30Units}</td>
+                    <td className="px-4 py-2 text-right tabular-nums text-stone-100">{item.prior30Units}</td>
+                    <td className="px-4 py-2 text-right tabular-nums font-medium" style={{ color: item.trendPct >= 0 ? '#2e7d32' : '#c4242a' }}>
                       {item.prior30Units > 0 ? `${item.trendPct >= 0 ? '+' : ''}${item.trendPct.toFixed(0)}%` : '—'}
                     </td>
-                    <td className="px-4 py-2 text-right font-mono text-stone-300">
+                    <td className="px-4 py-2 text-right tabular-nums text-stone-300">
                       {item.capitalTiedUp !== null ? formatCurrency(item.capitalTiedUp) : '—'}
                     </td>
                   </tr>
@@ -232,7 +232,7 @@ export default function DeadStockView() {
   if (computing && !itemsRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dead Stock Detector</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Dead stock detector</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -244,15 +244,15 @@ export default function DeadStockView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dead Stock Detector</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Dead stock detector</h1>
         <p className="text-sm text-stone-400 mt-1">Products with no or declining sales activity</p>
       </div>
 
       <div className="grid grid-cols-4 gap-4">
         {[
-          { label: 'Dead', count: deadItems.length, color: '#ef4444' },
-          { label: 'Dying', count: dyingItems.length, color: '#f59e0b' },
-          { label: 'Slow Movers', count: slowItems.length, color: '#eab308' },
+          { label: 'Dead', count: deadItems.length, color: '#c4242a' },
+          { label: 'Dying', count: dyingItems.length, color: '#1d5fbf' },
+          { label: 'Slow Movers', count: slowItems.length, color: '#1d5fbf' },
           {
             label: 'Capital Tied Up',
             count: null,
@@ -260,7 +260,7 @@ export default function DeadStockView() {
             color: '#6b7280',
           },
         ].map(c => (
-          <div key={c.label} className="bg-stone-800/30 border border-stone-700/40 p-4">
+          <div key={c.label} className="bg-white border border-[var(--border)] rounded-lg p-4">
             <p className="text-xs text-stone-400">{c.label}</p>
             <p className="text-2xl font-bold mt-1" style={{ color: c.color }}>
               {c.count !== null ? c.count : c.value}
@@ -271,10 +271,10 @@ export default function DeadStockView() {
 
       {(deadItems.length > 0 || dyingItems.length > 0) && (
         <div className="bg-stone-800/80 border border-amber-500/20 p-5">
-          <h2 className="text-sm font-semibold text-amber-400 mb-3">Recommended Actions</h2>
+          <h2 className="text-sm font-semibold text-amber-400 mb-3">Recommended actions</h2>
           <div className="space-y-2">
             {[...deadItems, ...dyingItems].slice(0, 10).map(item => (
-              <div key={item.name} className="flex items-start gap-3 bg-stone-700/50 rounded-lg p-3 border border-stone-600">
+              <div key={item.name} className="flex items-start gap-3 bg-stone-700/50 rounded-lg p-3 border border-[#d4d2ce]">
                 <div
                   className="w-2 h-2 rounded-full mt-1.5 shrink-0"
                   style={{ backgroundColor: tierColor(item.tier) }}
@@ -303,7 +303,7 @@ export default function DeadStockView() {
       <TierSection tier="Slow Mover" tierItems={slowItems} />
 
       {chartData.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <h2 className="text-base font-semibold text-stone-100">30-Day Sales by Product</h2>
           <p className="text-xs text-stone-400 mt-0.5 mb-4">Highlighting dead and dying products</p>
           <ResponsiveContainer width="100%" height={Math.max(200, chartData.length * 22)}>
@@ -316,7 +316,7 @@ export default function DeadStockView() {
                 {chartData.map((item, i) => (
                   <Cell
                     key={i}
-                    fill={item.tier === 'Dead' ? chart.negative : item.tier === 'Dying' ? chart.bar : '#F59E0Baa'}
+                    fill={item.tier === 'Dead' ? chart.negative : item.tier === 'Dying' ? chart.bar : '#1d5fbfaa'}
                   />
                 ))}
               </Bar>

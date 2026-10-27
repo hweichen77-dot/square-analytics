@@ -119,18 +119,18 @@ export default function StaffShiftView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Staff Shift Analysis</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Staff shift analysis</h1>
 
-      <div className="grid grid-cols-4 gap-4 cf-stagger">
-        <StatCard label="Top Earner" value={topStaff?.name ?? '—'} />
-        <StatCard label="Total Staff" value={String(profiles.length)} countTo={profiles.length} format={(n) => Math.round(n).toLocaleString()} />
-        <StatCard label="Avg Revenue/Staff" value={formatCurrency(avgRevenue)} countTo={avgRevenue} format={(n) => formatCurrency(n)} />
+      <div className="grid grid-cols-4 gap-4 kpi-strip">
+        <StatCard label="Top earner" value={topStaff?.name ?? '—'} />
+        <StatCard label="Total staff" value={String(profiles.length)} countTo={profiles.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Avg revenue per person" value={formatCurrency(avgRevenue)} countTo={avgRevenue} format={(n) => formatCurrency(n)} />
         <StatCard label="Coverage" value={`${coveragePct}%`} countTo={coveragePct} format={(n) => `${Math.round(n)}%`} />
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-stone-100">Staff Leaderboard</h2>
+          <h2 className="text-base font-semibold text-stone-100">Staff leaderboard</h2>
           <div className="flex gap-1">
             {([['revenue', 'Total Revenue'], ['transactions', 'Transactions'], ['avgValue', 'Avg Value']] as [StaffMetric, string][]).map(([key, label]) => (
               <button
@@ -153,7 +153,7 @@ export default function StaffShiftView() {
             <Bar dataKey={d => metricValue(d)} radius={[0, 3, 3, 0]}
               label={{ position: 'right', formatter: (v: number) => metricLabel(v), fontSize: 10, fill: chart.axis }}>
               {chartData.map((p, i) => (
-                <Cell key={i} fill={p.name === selectedStaff ? chart.bar : '#F59E0B60'} />
+                <Cell key={i} fill={p.name === selectedStaff ? chart.bar : '#1d5fbf60'} />
               ))}
             </Bar>
           </BarChart>
@@ -182,10 +182,10 @@ export default function StaffShiftView() {
                     />
                     <span className="font-medium text-stone-100">{p.name}</span>
                   </td>
-                  <td className="py-2 font-mono text-stone-100">{p.totalTransactions}</td>
-                  <td className="py-2 font-mono text-stone-100">{formatCurrency(p.totalRevenue)}</td>
-                  <td className="py-2 font-mono text-stone-100">{formatCurrency(p.avgTransactionValue)}</td>
-                  <td className="py-2 font-mono text-stone-100">{p.activeDays}</td>
+                  <td className="py-2 tabular-nums text-stone-100">{p.totalTransactions}</td>
+                  <td className="py-2 tabular-nums text-stone-100">{formatCurrency(p.totalRevenue)}</td>
+                  <td className="py-2 tabular-nums text-stone-100">{formatCurrency(p.avgTransactionValue)}</td>
+                  <td className="py-2 tabular-nums text-stone-100">{p.activeDays}</td>
                   <td className="py-2 text-stone-200 truncate max-w-32">{p.topProducts[0]?.name ?? '—'}</td>
                 </tr>
               ))}
@@ -194,7 +194,7 @@ export default function StaffShiftView() {
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <h2 className="text-base font-semibold text-stone-100 mb-1">Staff × Day of Week Revenue Heatmap</h2>
         <p className="text-xs text-stone-400 mb-4">Color intensity = revenue generated in that slot</p>
         <div className="overflow-x-auto">
@@ -219,7 +219,7 @@ export default function StaffShiftView() {
                         width: 44,
                         height: 24,
                         backgroundColor: rev > 0
-                          ? `rgba(245,158,11,${0.1 + intensity * 0.85})`
+                          ? `rgba(29, 95, 191, ${0.1 + intensity * 0.85})`
                           : 'rgb(41 37 36)',
                       }}
                     >
@@ -236,14 +236,14 @@ export default function StaffShiftView() {
       </div>
 
       {selectedProfile && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-stone-100">{selectedProfile.name} — Detail View</h2>
+            <h2 className="text-base font-semibold text-stone-100">{selectedProfile.name} in detail</h2>
             <button onClick={() => setSelectedStaff('')} className="text-stone-400 hover:text-stone-100 text-lg">×</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-stone-900 p-4">
-              <h3 className="text-sm font-medium text-stone-100 mb-3">Revenue by Hour of Day</h3>
+              <h3 className="text-sm font-medium text-stone-100 mb-3">Revenue by hour of day</h3>
               <ResponsiveContainer width="100%" height={140}>
                 <BarChart data={selectedProfile.revenueByHour} margin={{ top: 4, right: 8, left: -20, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
@@ -264,7 +264,7 @@ export default function StaffShiftView() {
                 {selectedProfile.topProducts.slice(0, 5).map(item => (
                   <div key={item.name} className="flex items-center justify-between">
                     <span className="text-xs text-stone-100 truncate flex-1 mr-2">{item.name}</span>
-                    <span className="text-xs font-semibold font-mono text-stone-100">{item.count}×</span>
+                    <span className="text-xs font-semibold tabular-nums text-stone-100">{item.count}×</span>
                   </div>
                 ))}
               </div>

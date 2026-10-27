@@ -1,156 +1,167 @@
 import { NavLink } from 'react-router-dom'
+import { format, isToday } from 'date-fns'
 import { useRestockAlertCount } from '../../hooks/useRestockAlertCount'
 import { useFabsAuditCount } from '../../hooks/useFabsAuditCount'
+import { useAuthStore } from '../../store/authStore'
+import { DateRangePicker } from './DateRangePicker'
 
 type NavItem = { label: string; path: string }
 
 const NAV_SECTIONS: { heading?: string; items: NavItem[] }[] = [
   {
     items: [
-      { label: 'Dashboard', path: '/dashboard' },
+      { label: 'Overview', path: '/dashboard' },
       { label: 'Transactions', path: '/inventory' },
     ],
   },
   {
-    heading: 'Analytics',
+    heading: 'Stock',
     items: [
-      { label: 'Time Analysis', path: '/time-analysis' },
-      { label: 'Staff Performance', path: '/staff' },
-      { label: 'Profit Margins', path: '/profit' },
-      { label: 'Seasonal & Events', path: '/seasonal' },
-      { label: 'Customer Frequency', path: '/customers' },
+      { label: 'Restock alerts', path: '/restock' },
+      { label: 'Purchase order', path: '/purchase-order' },
+      { label: 'Dead stock', path: '/dead-stock' },
+      { label: 'Shrink and loss', path: '/shrink' },
     ],
   },
   {
-    heading: 'Inventory',
+    heading: 'Sales',
     items: [
-      { label: 'Restock Alerts', path: '/restock' },
-      { label: 'Dead Stock', path: '/dead-stock' },
-      { label: 'Shrink & Loss', path: '/shrink' },
-      { label: 'Purchase Order', path: '/purchase-order' },
+      { label: 'Time of day', path: '/time-analysis' },
+      { label: 'Seasonal and events', path: '/seasonal' },
+      { label: 'Profit margins', path: '/profit' },
+      { label: 'Customers', path: '/customers' },
+    ],
+  },
+  {
+    heading: 'Team',
+    items: [
+      { label: 'Staff performance', path: '/staff' },
+      { label: 'Shifts', path: '/staff-shift' },
     ],
   },
   {
     heading: 'Insights',
     items: [
-      { label: 'Sales Forecast', path: '/forecast' },
-      { label: 'Anomaly Alerts', path: '/anomalies' },
-      { label: 'Basket Analysis', path: '/basket-analysis' },
-      { label: 'Bundle & Cross-Sell', path: '/bundles' },
-      { label: 'Price Optimization', path: '/price-optimization' },
-      { label: 'Staff Shift Analysis', path: '/staff-shift' },
+      { label: 'Forecast', path: '/forecast' },
+      { label: 'Anomalies', path: '/anomalies' },
+      { label: 'Baskets', path: '/basket-analysis' },
+      { label: 'Bundles', path: '/bundles' },
+      { label: 'Pricing', path: '/price-optimization' },
     ],
   },
   {
     heading: 'Catalogue',
     items: [
-      { label: 'Category & Tax Audit', path: '/category-tax-audit' },
-      { label: 'Catalogue Checker', path: '/catalogue-checker' },
-      { label: 'Catalogue Products', path: '/catalogue-products' },
+      { label: 'Category and tax audit', path: '/category-tax-audit' },
+      { label: 'Catalogue checker', path: '/catalogue-checker' },
+      { label: 'Products', path: '/catalogue-products' },
     ],
   },
   {
-    heading: 'Finance',
+    heading: 'Money',
     items: [
-      { label: 'Operating Expenses', path: '/opex' },
+      { label: 'Operating expenses', path: '/opex' },
+      { label: 'Reports', path: '/reports' },
+      { label: 'Accountant report', path: '/accountant-report' },
     ],
   },
 ]
 
-const BOTTOM_ITEMS: NavItem[] = [
-  { label: 'Reports', path: '/reports' },
-  { label: 'Accountant Report', path: '/accountant-report' },
-  { label: 'Import Data', path: '/import' },
-  { label: 'Square Sync', path: '/square-sync' },
+const DATA_ITEMS: NavItem[] = [
+  { label: 'Square sync', path: '/square-sync' },
+  { label: 'Import a file', path: '/import' },
 ]
 
-function NavRow({ item, badge, onClose }: { item: NavItem; badge?: number; onClose?: () => void }) {
+function WalleysMark() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true" className="shrink-0">
+      <rect width="28" height="28" rx="6" fill="#121110" />
+      <path d="M6.5 9l2.6 10 2.4-7.4L14 19l2.5-7.4L19 19l2.5-10" fill="none" stroke="#f4f3f1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function NavRow({ item, count, countNoun, onNavigate }: { item: NavItem; count?: number; countNoun?: string; onNavigate?: () => void }) {
   return (
     <NavLink
       to={item.path}
-      onClick={onClose}
+      onClick={onNavigate}
       className={({ isActive }) =>
-        `group flex items-center gap-2.5 pl-6 pr-4 py-[5px] text-[13.5px] transition-colors duration-150 ${
-          isActive
-            ? 'text-amber-400 font-medium'
-            : 'text-stone-400 hover:text-stone-100'
+        `mx-2 flex items-center gap-2 h-8 px-3 rounded-md text-[14px] transition-colors ${
+          isActive ? 'bg-[var(--active)] text-stone-100 font-medium' : 'text-stone-400 hover:text-stone-100 hover:bg-[#ecebe8]'
         }`
       }
     >
-      {({ isActive }) => (
-        <>
-          <span
-            aria-hidden="true"
-            className={`h-[3px] w-[3px] rounded-full shrink-0 transition-colors ${
-              isActive ? 'bg-amber-400' : 'bg-transparent group-hover:bg-stone-600'
-            }`}
-          />
-          <span className="truncate flex-1">{item.label}</span>
-          {badge != null && badge > 0 && (
-            <span className="shrink-0 font-mono text-[11px] tabular-nums text-red-400">
-              {badge > 99 ? '99+' : badge}
-            </span>
-          )}
-        </>
+      <span className="truncate flex-1">{item.label}</span>
+      {count != null && count > 0 && (
+        <span className="shrink-0 tabular-nums text-xs text-red-500" aria-label={`${count} ${countNoun ?? ''}`}>
+          {count > 99 ? '99+' : count}
+        </span>
       )}
     </NavLink>
   )
 }
 
-export default function Sidebar({ open, onClose }: { open?: boolean; onClose?: () => void }) {
+function SyncStamp() {
+  const lastSyncDate = useAuthStore(s => s.lastSyncDate)
+  if (!lastSyncDate) return <p className="px-5 text-xs text-stone-500">Not synced with Square yet</p>
+  const d = new Date(lastSyncDate)
+  return (
+    <p className="px-5 text-xs text-stone-500">
+      Synced {isToday(d) ? format(d, 'h:mm a') : format(d, 'MMM d, h:mm a')}
+    </p>
+  )
+}
+
+export default function Sidebar({ onNavigate, onSearch }: { onNavigate?: () => void; onSearch: () => void }) {
   const restockAlertCount = useRestockAlertCount()
   const fabsAuditCount = useFabsAuditCount()
 
   return (
-    <aside className={[
-      'w-56 shrink-0 bg-stone-900 border-r border-stone-800/80 flex flex-col h-full',
-      'fixed inset-y-0 left-0 z-50 transition-transform duration-200',
-      'lg:static lg:translate-x-0',
-      open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
-    ].join(' ')}>
-      <div className="px-6 pt-7 pb-6 flex items-start justify-between">
-        <div>
-          <h1 className="font-display text-[22px] font-800 text-stone-100 leading-none tracking-tight">
-            Walley&apos;s
-          </h1>
-          <p className="font-mono text-[10px] tracking-[0.24em] uppercase text-amber-500/80 mt-2">
-            Store Ledger
-          </p>
+    <div className="flex flex-col h-full">
+      <div className="px-5 pt-5 pb-4 flex items-center gap-3">
+        <WalleysMark />
+        <div className="min-w-0">
+          <p className="text-[15px] font-semibold text-stone-100 leading-tight">Walley&apos;s</p>
+          <p className="text-xs text-stone-500 leading-tight mt-0.5 truncate">Valley Christian school store</p>
         </div>
-        {onClose && (
-          <button onClick={onClose} className="lg:hidden p-1 text-stone-400 hover:text-stone-100 -mt-1 -mr-1" aria-label="Close menu">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto pb-3 [scrollbar-width:thin]">
+      <div className="px-4 space-y-2 pb-3">
+        <DateRangePicker />
+        <button
+          onClick={onSearch}
+          className="w-full flex items-center gap-2 h-8 px-3 rounded-md border border-[var(--control)] bg-white text-[13px] text-stone-500 hover:text-stone-100 hover:border-[#b9b6b1] transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          <span className="flex-1 text-left">Search</span>
+          <kbd className="text-xs text-stone-500 font-sans">⌘K</kbd>
+        </button>
+      </div>
+
+      <nav className="flex-1 overflow-y-auto pb-4 [scrollbar-width:thin]" aria-label="Main">
         {NAV_SECTIONS.map((section, si) => (
           <div key={si} role={section.heading ? 'group' : undefined} aria-label={section.heading}>
             {section.heading && (
-              <p aria-hidden="true" className="pl-6 pr-4 pt-5 pb-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-stone-500 select-none">
-                {section.heading}
-              </p>
+              <p aria-hidden="true" className="px-5 pt-5 pb-1.5 text-xs text-stone-500 select-none">{section.heading}</p>
             )}
             {section.items.map(item => (
               <NavRow
                 key={item.path}
                 item={item}
-                badge={item.path === '/restock' ? restockAlertCount : item.path === '/category-tax-audit' ? fabsAuditCount : undefined}
-                onClose={onClose}
+                count={item.path === '/restock' ? restockAlertCount : item.path === '/category-tax-audit' ? fabsAuditCount : undefined}
+                countNoun={item.path === '/restock' ? 'products to restock' : 'items to fix'}
+                onNavigate={onNavigate}
               />
             ))}
           </div>
         ))}
       </nav>
 
-      <div className="border-t border-stone-800/80 py-3">
-        {BOTTOM_ITEMS.map(item => (
-          <NavRow key={item.path} item={item} onClose={onClose} />
-        ))}
+      <div className="border-t border-[var(--border)] pt-3 pb-4 space-y-0.5">
+        {DATA_ITEMS.map(item => <NavRow key={item.path} item={item} onNavigate={onNavigate} />)}
+        <div className="pt-2"><SyncStamp /></div>
       </div>
-    </aside>
+    </div>
   )
 }

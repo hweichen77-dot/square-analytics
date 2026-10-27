@@ -1,26 +1,21 @@
-import Button from '../components/ui/Button'
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { format, startOfWeek, startOfMonth, endOfWeek, endOfMonth, getDaysInMonth, getDay } from 'date-fns'
+import { Link, useNavigate } from 'react-router-dom'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { db } from '../db/database'
+import { startOfWeek, startOfMonth, endOfWeek, endOfMonth, getDaysInMonth, getDay, differenceInCalendarDays } from 'date-fns'
 import { useFilteredTransactions, useProductCostData, useAllTransactions, useRefunds } from '../db/useTransactions'
 import { useDateRangeStore } from '../store/dateRangeStore'
 import { useGoalStore } from '../store/goalStore'
-import {
-  computeProductStats,
-  computeDailyRevenue,
-  computeWeeklyRevenue,
-  computeMonthlyRevenue,
-  isSlowMover,
-  isRealProduct,
-} from '../engine/analyticsEngine'
+import { isRealProduct } from '../engine/analyticsEngine'
 import { computeGrossProfit } from '../engine/reportEngine'
 import { useAnalytics } from '../context/AnalyticsContext'
+import { useRestockQueue } from '../hooks/useRestockAlertCount'
 import { StatCard } from '../components/ui/StatCard'
 import { RevenueChart } from '../components/charts/RevenueChart'
-import { CategoryBreakdownChart } from '../components/charts/CategoryBreakdownChart'
-import { TopProductsChart } from '../components/charts/TopProductsChart'
 import { formatCurrency, formatNumber } from '../utils/format'
 import type { DateRange } from '../db/useTransactions'
+
+const BIG_DAY_MULTIPLE = 3
 
 function previousPeriod(range: DateRange): DateRange {
   const { start, end } = range
@@ -32,36 +27,105 @@ function previousPeriod(range: DateRange): DateRange {
   }
 }
 
-function pctChange(current: number, previous: number): { label: string; up: boolean } | null {
+function median(values: number[]): number {
+  if (!values.length) return 0
+  const sorted = [...values].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
+  return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
+}
+
+function periodWords(range: DateRange): string {
+  if (!range.start || !range.end) return ''
+  const days = differenceInCalendarDays(range.end, range.start) + 1
+  return `vs the previous ${days} days`
+}
+
+function change(current: number, previous: number, window: string) {
   if (previous <= 0) return null
   const pct = ((current - previous) / previous) * 100
-  const abs = Math.abs(pct)
-  const label = `${abs.toFixed(1)}% vs prev period`
-  return { label, up: pct >= 0 }
+  if (Math.abs(pct) < 0.05) return null
+  return { label: `${Math.abs(pct).toFixed(1)}% ${window}`, up: pct > 0 }
+}
+
+function Panel({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="bg-white border border-[var(--border)] rounded-lg">
+      <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-2">
+        <h2 className="text-base font-semibold text-stone-100">{title}</h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function RankedList({ rows, empty }: { rows: { name: string; value: number; sub: string }[]; empty: string }) {
+  if (!rows.length) return <p className="px-5 pb-5 text-sm text-stone-500">{empty}</p>
+  const max = Math.max(...rows.map(r => r.value), 1)
+  return (
+    <ol className="px-5 pb-3">
+      {rows.map((r, i) => (
+        <li key={r.name} className="py-2.5 border-t border-[var(--rule)] first:border-t-0">
+          <div className="flex items-baseline gap-3">
+            <span className="flex-1 min-w-0 truncate text-sm text-stone-100" title={r.name}>{r.name}</span>
+            <span className="text-xs text-stone-500 tabular-nums shrink-0">{r.sub}</span>
+            <span className="w-24 text-right text-sm font-medium text-stone-100 tabular-nums shrink-0">{formatCurrency(r.value)}</span>
+          </div>
+          <div className="mt-1.5 h-[2px] rounded-full" style={{ width: `${(r.value / max) * 100}%`, background: i === 0 ? '#121110' : '#cfccc8' }} />
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+function GoalRow({ label, revenue, goal, pace, onSet }: { label: string; revenue: number; goal: number | null; pace: number | null; onSet: () => void }) {
+  if (goal == null) {
+    return (
+      <div className="flex items-center justify-between py-3 border-t border-[var(--rule)] first:border-t-0">
+        <span className="text-sm text-stone-100">{label}</span>
+        <button onClick={onSet} className="text-sm font-medium text-stone-100 underline underline-offset-4 decoration-[var(--control)] hover:decoration-stone-100">Set a goal</button>
+      </div>
+    )
+  }
+  const pct = Math.min(100, (revenue / goal) * 100)
+  const hit = revenue >= goal
+  return (
+    <div className="py-3 border-t border-[var(--rule)] first:border-t-0">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-sm text-stone-100">{label}</span>
+        <span className="text-sm tabular-nums text-stone-100">
+          {formatCurrency(revenue)} <span className="text-stone-500">of {formatCurrency(goal)}</span>
+        </span>
+      </div>
+      <div
+        role="progressbar"
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`${label} goal ${Math.round(pct)}% reached`}
+        className="mt-2 h-2 rounded-full bg-[var(--active)] overflow-hidden"
+      >
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: hit ? 'var(--positive)' : 'var(--data)' }} />
+      </div>
+      <p className="mt-1.5 text-xs text-stone-500">
+        {hit ? 'Goal reached' : pace != null ? `On pace for ${formatCurrency(pace)}` : ''}
+      </p>
+    </div>
+  )
 }
 
 export default function DashboardView() {
   const { range } = useDateRangeStore()
-  const { transactions, overrides, productStats: stats, daily, weekly, monthly, categories, staffStats, totalRevenue, totalTransactions } = useAnalytics()
+  const { productStats: stats, daily, weekly, monthly, categories, totalRevenue, totalTransactions } = useAnalytics()
   const { weeklyGoal, monthlyGoal, setWeeklyGoal, setMonthlyGoal } = useGoalStore()
   const [editingGoal, setEditingGoal] = useState<'weekly' | 'monthly' | null>(null)
   const [goalInput, setGoalInput] = useState('')
+  const [productMode, setProductMode] = useState<'revenue' | 'units'>('revenue')
   const prevRange = useMemo(() => previousPeriod(range), [range])
   const prevTransactions = useFilteredTransactions(prevRange)
   const navigate = useNavigate()
-
-  const prevDaily = useMemo(() => computeDailyRevenue(prevTransactions), [prevTransactions])
-  const prevWeekly = useMemo(() => computeWeeklyRevenue(prevTransactions), [prevTransactions])
-  const prevMonthly = useMemo(() => computeMonthlyRevenue(prevTransactions), [prevTransactions])
-
-  const insights = useMemo(() => {
-    if (!daily.length) return null
-    const bestDay = daily.reduce((a, b) => b.revenue > a.revenue ? b : a, daily[0])
-    const topProduct = stats.find(s => isRealProduct(s.name)) ?? null
-    const slowProduct = stats.find(s => isRealProduct(s.name) && isSlowMover(s)) ?? null
-    const topStaff = staffStats[0] ?? null
-    return { bestDay, topProduct, slowProduct, topStaff }
-  }, [daily, stats, staffStats])
+  const restockQueue = useRestockQueue()
+  const storedCount = useLiveQuery(() => db.salesTransactions.count(), [])
 
   const allTransactions = useAllTransactions()
   const costData = useProductCostData() ?? []
@@ -76,17 +140,22 @@ export default function DashboardView() {
     })
     return inRange.reduce((s, r) => s + r.amount, 0) / 100
   }, [refunds, range])
-  const hasRefunds = totalRefunds > 0
-  const netRevenue = totalRevenue - totalRefunds
 
-  const avgTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
-  const uniqueProducts = stats.filter(s => isRealProduct(s.name)).length
-  const unitsSold = stats.reduce((s, p) => s + p.totalUnitsSold, 0)
+  const avgOrder = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
 
   const { grossProfit, marginPct } = useMemo(
     () => computeGrossProfit(stats, costData, totalRevenue),
     [stats, costData, totalRevenue],
   )
+
+  const days = useMemo(() => {
+    const usual = median(daily.filter(d => d.revenue > 0).map(d => d.revenue))
+    const threshold = usual * BIG_DAY_MULTIPLE
+    const big = usual > 0 ? daily.filter(d => d.revenue >= threshold) : []
+    const bigSales = big.reduce((s, d) => s + d.revenue, 0)
+    const best = daily.reduce<typeof daily[number] | null>((a, d) => (!a || d.revenue > a.revenue ? d : a), null)
+    return { usual, threshold, bigCount: big.length, bigShare: totalRevenue > 0 ? bigSales / totalRevenue : 0, best }
+  }, [daily, totalRevenue])
 
   const goalProgress = useMemo(() => {
     const now = new Date()
@@ -94,298 +163,253 @@ export default function DashboardView() {
     const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
     const monthStart = startOfMonth(now)
     const monthEnd = endOfMonth(now)
-
-    const weekRevenue = allTransactions
-      .filter(t => t.date >= weekStart && t.date <= weekEnd)
-      .reduce((s, t) => s + t.netSales, 0)
-    const monthRevenue = allTransactions
-      .filter(t => t.date >= monthStart && t.date <= monthEnd)
-      .reduce((s, t) => s + t.netSales, 0)
-
+    const weekRevenue = allTransactions.filter(t => t.date >= weekStart && t.date <= weekEnd).reduce((s, t) => s + t.netSales, 0)
+    const monthRevenue = allTransactions.filter(t => t.date >= monthStart && t.date <= monthEnd).reduce((s, t) => s + t.netSales, 0)
     const dayOfWeek = ((getDay(now) + 6) % 7) + 1
-    const dayOfMonth = now.getDate()
-    const daysInMonth = getDaysInMonth(now)
-
     const weekPace = weeklyGoal != null ? (weekRevenue / dayOfWeek) * 7 : null
-    const monthPace = monthlyGoal != null ? (monthRevenue / dayOfMonth) * daysInMonth : null
-
+    const monthPace = monthlyGoal != null ? (monthRevenue / now.getDate()) * getDaysInMonth(now) : null
     return { weekRevenue, monthRevenue, weekPace, monthPace }
   }, [allTransactions, weeklyGoal, monthlyGoal])
 
-  const hasPrevPeriod = prevRange.start !== null
-  const prevRevenue = hasPrevPeriod ? prevTransactions.reduce((s, t) => s + t.netSales, 0) : 0
-  const prevTxCount = hasPrevPeriod ? prevTransactions.length : 0
-  const prevAvg = prevTxCount > 0 ? prevRevenue / prevTxCount : 0
-  const prevProducts = useMemo(
-    () => hasPrevPeriod ? computeProductStats(prevTransactions, overrides).length : 0,
-    [hasPrevPeriod, prevTransactions, overrides],
-  )
+  const hasPrev = prevRange.start !== null
+  const window = periodWords(range)
+  const prevRevenue = hasPrev ? prevTransactions.reduce((s, t) => s + t.netSales, 0) : 0
+  const prevOrders = hasPrev ? prevTransactions.length : 0
+  const revTrend = hasPrev ? change(totalRevenue, prevRevenue, window) : null
+  const orderTrend = hasPrev ? change(totalTransactions, prevOrders, window) : null
+  const avgTrend = hasPrev && prevOrders > 0 ? change(avgOrder, prevRevenue / prevOrders, window) : null
 
-  const revTrend      = hasPrevPeriod ? pctChange(totalRevenue, prevRevenue) : null
-  const txTrend       = hasPrevPeriod ? pctChange(totalTransactions, prevTxCount) : null
-  const avgTrend      = hasPrevPeriod ? pctChange(avgTransaction, prevAvg) : null
-  const productsTrend = hasPrevPeriod ? pctChange(uniqueProducts, prevProducts) : null
+  const topProducts = useMemo(() => {
+    const real = stats.filter(s => isRealProduct(s.name))
+    const sorted = productMode === 'revenue'
+      ? [...real].sort((a, b) => b.totalRevenue - a.totalRevenue)
+      : [...real].sort((a, b) => b.totalUnitsSold - a.totalUnitsSold)
+    return sorted.slice(0, 5).map(p => ({
+      name: p.name,
+      value: productMode === 'revenue' ? p.totalRevenue : p.totalUnitsSold,
+      sub: productMode === 'revenue' ? `${formatNumber(p.totalUnitsSold)} sold` : formatCurrency(p.totalRevenue),
+    }))
+  }, [stats, productMode])
 
-  if (transactions.length === 0) {
-    const paths = [
-      {
-        n: '01',
-        title: 'Connect Square directly',
-        desc: 'Paste your Square access token on the Sync page. Orders import on their own after every shift.',
-        cta: 'Set up Square Sync',
-        to: '/square-sync',
-      },
-      {
-        n: '02',
-        title: 'Or drop in a CSV',
-        desc: 'Export a Sales Summary from Square (Reports → Sales Summary → Export) and drop the file on the Import page.',
-        cta: 'Import a CSV file',
-        to: '/import',
-      },
-    ]
+  const categoryRows = categories.slice(0, 5).map(c => ({ name: c.category, value: c.revenue, sub: `${c.percentage.toFixed(1)}%` }))
+
+  if (storedCount === undefined) {
     return (
-      <div className="max-w-2xl pt-10">
-        <p className="text-sm font-medium text-amber-400">
-          Walley&apos;s Store Ledger
-        </p>
-        <h1 className="font-display text-4xl font-700 text-stone-100 tracking-tight mt-3 leading-[1.06]">
-          No numbers yet.<br />Let&apos;s bring your sales in.
-        </h1>
-        <p className="text-stone-400 mt-4 text-[15px] leading-relaxed max-w-md">
-          Walley&apos;s turns your Square sales into plain answers — what&apos;s selling, what to restock,
-          where the money goes. Two ways to begin:
-        </p>
-        <div className="mt-10 space-y-8">
-          {paths.map(({ n, title, desc, cta, to }) => (
-            <div key={n} className="flex gap-5">
-              <span className="font-display text-3xl text-amber-500/90 tabular-nums leading-none w-10 shrink-0">{n}</span>
-              <div className="pt-0.5">
-                <h2 className="text-stone-100 font-semibold">{title}</h2>
-                <p className="text-stone-400 text-sm mt-1 leading-relaxed max-w-md">{desc}</p>
-                <button
-                  onClick={() => navigate(to)}
-                  className="text-amber-400 hover:text-amber-300 text-sm font-medium mt-2.5 underline underline-offset-4 decoration-amber-500/30 hover:decoration-amber-400"
-                >
-                  {cta} →
-                </button>
-              </div>
+      <div role="status" aria-label="Loading sales">
+        <h1 className="text-2xl font-semibold text-stone-100">Overview</h1>
+        <div className="mt-2 h-4 w-80 max-w-full rounded bg-[var(--active)]" />
+      </div>
+    )
+  }
+
+  if (storedCount === 0) {
+    return (
+      <div className="max-w-xl">
+        <h1 className="text-2xl font-semibold text-stone-100">Overview</h1>
+        <p className="mt-1.5 text-sm text-stone-400">No sales yet. Bring in Square sales to see takings, top sellers and what to restock.</p>
+        <div className="mt-6 rounded-lg border border-dashed border-[var(--control)] bg-white divide-y divide-[var(--rule)]">
+          <div className="p-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-stone-100">Connect Square</h2>
+              <p className="text-sm text-stone-400 mt-0.5">Orders import on their own after every shift.</p>
             </div>
-          ))}
+            <button onClick={() => navigate('/square-sync')} className="h-9 px-4 rounded-md bg-stone-100 text-white text-sm font-medium hover:bg-stone-300 shrink-0">Set up sync</button>
+          </div>
+          <div className="p-5 flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-stone-100">Import a file</h2>
+              <p className="text-sm text-stone-400 mt-0.5">A Sales Summary export from Square works.</p>
+            </div>
+            <button onClick={() => navigate('/import')} className="h-9 px-4 rounded-md border border-[var(--control)] bg-white text-stone-100 text-sm font-medium hover:bg-[var(--raised)] shrink-0">Import</button>
+          </div>
         </div>
       </div>
     )
   }
 
-  return (
-    <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Dashboard</h1>
+  const finding = days.bigCount > 0
+    ? `${days.bigCount} big ${days.bigCount === 1 ? 'day' : 'days'} brought in ${(days.bigShare * 100).toFixed(0)}% of sales. A usual school day takes ${formatCurrency(days.usual)}.`
+    : days.usual > 0 ? `A usual school day in this period takes ${formatCurrency(days.usual)}.` : 'No sales in this period.'
 
-      <div className="cf-stagger grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard
-          label="Total Revenue"
-          value={formatCurrency(totalRevenue)}
-          trend={revTrend?.label}
-          trendUp={revTrend?.up}
-          sub={hasRefunds ? `${formatCurrency(netRevenue)} net of refunds` : undefined}
-        />
-        <StatCard
-          label="Transactions"
-          value={formatNumber(totalTransactions)}
-          trend={txTrend?.label}
-          trendUp={txTrend?.up}
-        />
-        <StatCard
-          label="Avg Transaction"
-          value={formatCurrency(avgTransaction)}
-          trend={avgTrend?.label}
-          trendUp={avgTrend?.up}
-        />
-        <StatCard
-          label="Units Sold"
-          value={formatNumber(unitsSold)}
-          trend={productsTrend?.label}
-          trendUp={productsTrend?.up}
-        />
-        {grossProfit !== null && (
-          <StatCard
-            label="Gross Profit"
-            value={formatCurrency(grossProfit)}
-            sub={marginPct !== null ? `${marginPct.toFixed(1)}% margin` : undefined}
-          />
-        )}
-        {grossProfit === null && (
-          <div onClick={() => navigate('/profit')} className="cursor-pointer">
-            <StatCard
-              label="Gross Profit"
-              value="—"
-              sub="Click to add COGS →"
-            />
-          </div>
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-4 pb-2">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold text-stone-100">Overview</h1>
+          <p className="mt-1 text-sm text-stone-400">{finding}</p>
+        </div>
+        {restockQueue.length > 0 && (
+          <button onClick={() => navigate('/restock')} className="h-9 px-4 rounded-md bg-stone-100 text-white text-sm font-medium hover:bg-stone-300 transition-colors">
+            Restock {restockQueue.length} {restockQueue.length === 1 ? 'item' : 'items'}
+          </button>
         )}
       </div>
 
-      {(
-        <div className="border border-stone-700/50 bg-stone-800/25 px-5 py-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400">Revenue Goals</p>
-            {editingGoal ? null : (
-              <button
-                onClick={() => { setEditingGoal('weekly'); setGoalInput(weeklyGoal?.toString() ?? '') }}
-                className="text-[10px] text-stone-400 hover:text-amber-400 uppercase tracking-wide"
-              >
-                Edit
-              </button>
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px] gap-4 items-start">
+        <div className="space-y-4 min-w-0">
+          <div className="kpi-strip grid grid-cols-2 md:grid-cols-4">
+            <StatCard
+              label="Sales"
+              value={formatCurrency(totalRevenue)}
+              trend={revTrend?.label}
+              trendUp={revTrend?.up}
+              sub={totalRefunds > 0 ? `${formatCurrency(totalRevenue - totalRefunds)} after ${formatCurrency(totalRefunds)} refunds` : undefined}
+            />
+            <StatCard label="Orders" value={formatNumber(totalTransactions)} trend={orderTrend?.label} trendUp={orderTrend?.up} />
+            <StatCard label="Average order" value={formatCurrency(avgOrder)} trend={avgTrend?.label} trendUp={avgTrend?.up} />
+            {grossProfit !== null ? (
+              <StatCard label="Gross profit" value={formatCurrency(grossProfit)} sub={marginPct !== null ? `${marginPct.toFixed(1)}% margin` : undefined} />
+            ) : (
+              <div className="px-5 py-4 bg-white">
+                <p className="text-[13px] text-stone-500">Gross profit</p>
+                <p className="mt-1.5 text-[24px] leading-8 text-stone-500">–</p>
+                <Link to="/profit" className="text-xs font-medium text-stone-100 underline underline-offset-4 decoration-[var(--control)]">Add item costs</Link>
+              </div>
             )}
           </div>
-          {editingGoal ? (
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex-1">
-                <label className="block text-xs text-stone-200 mb-1">Weekly Target ($)</label>
-                <input
-                  type="number"
-                  value={editingGoal === 'weekly' ? goalInput : (weeklyGoal?.toString() ?? '')}
-                  onChange={e => { setEditingGoal('weekly'); setGoalInput(e.target.value) }}
-                  onFocus={() => setEditingGoal('weekly')}
-                  placeholder="e.g. 5000"
-                  className="w-full bg-stone-900 border border-stone-600 px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:border-amber-500/50"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-xs text-stone-200 mb-1">Monthly Target ($)</label>
-                <input
-                  type="number"
-                  value={editingGoal === 'monthly' ? goalInput : (monthlyGoal?.toString() ?? '')}
-                  onChange={e => { setEditingGoal('monthly'); setGoalInput(e.target.value) }}
-                  onFocus={() => setEditingGoal('monthly')}
-                  placeholder="e.g. 20000"
-                  className="w-full bg-stone-900 border border-stone-600 px-3 py-1.5 text-sm text-stone-200 focus:outline-none focus:border-amber-500/50"
-                />
-              </div>
-              <div className="flex items-end gap-2">
-                <Button
-                  onClick={() => {
+
+          <RevenueChart daily={daily} weekly={weekly} monthly={monthly} usualDay={days.usual} bigDayThreshold={days.threshold} />
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+            <Panel
+              title="Top sellers"
+              action={
+                <div className="flex h-8 p-0.5 rounded-md bg-[var(--active)]" role="tablist" aria-label="Rank top sellers by">
+                  {(['revenue', 'units'] as const).map(m => (
+                    <button
+                      key={m}
+                      role="tab"
+                      aria-selected={productMode === m}
+                      onClick={() => setProductMode(m)}
+                      className={`px-3 rounded text-[13px] transition-colors ${productMode === m ? 'bg-white text-stone-100 font-medium shadow-[0_1px_2px_rgb(0_0_0/0.06)]' : 'text-stone-400 hover:text-stone-100'}`}
+                    >
+                      {m === 'revenue' ? 'Sales' : 'Units'}
+                    </button>
+                  ))}
+                </div>
+              }
+            >
+              {productMode === 'revenue' ? (
+                <RankedList rows={topProducts} empty="Nothing sold in this period." />
+              ) : (
+                <ol className="px-5 pb-3">
+                  {topProducts.map((r, i) => (
+                    <li key={r.name} className="py-2.5 border-t border-[var(--rule)] first:border-t-0">
+                      <div className="flex items-baseline gap-3">
+                        <span className="flex-1 min-w-0 truncate text-sm text-stone-100" title={r.name}>{r.name}</span>
+                        <span className="text-xs text-stone-500 tabular-nums shrink-0">{r.sub}</span>
+                        <span className="w-24 text-right text-sm font-medium text-stone-100 tabular-nums shrink-0">{formatNumber(r.value)}</span>
+                      </div>
+                      <div className="mt-1.5 h-[2px] rounded-full" style={{ width: `${(r.value / Math.max(topProducts[0]?.value ?? 1, 1)) * 100}%`, background: i === 0 ? '#121110' : '#cfccc8' }} />
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </Panel>
+            <Panel title="Sales by category" action={<Link to="/profit" className="text-[13px] text-stone-400 hover:text-stone-100">Margins</Link>}>
+              <RankedList rows={categoryRows} empty="No categories in this period." />
+            </Panel>
+          </div>
+        </div>
+
+        <div className="space-y-4 min-w-0">
+          <Panel
+            title="Restock next"
+            action={restockQueue.length > 0 ? <span className="text-[13px] text-stone-500 tabular-nums">{restockQueue.length} items</span> : undefined}
+          >
+            {restockQueue.length === 0 ? (
+              <p className="px-5 pb-5 text-sm text-stone-400">Nothing is running low. Stock counts come from Square and your restock log.</p>
+            ) : (
+              <>
+                <ul className="px-5">
+                  {restockQueue.slice(0, 8).map(item => (
+                    <li key={item.name} className="flex items-center gap-3 h-11 border-t border-[var(--rule)] first:border-t-0">
+                      <Link to={`/inventory/${encodeURIComponent(item.name)}`} className="flex-1 min-w-0 truncate text-sm text-stone-100 hover:underline underline-offset-4" title={item.name}>{item.name}</Link>
+                      <span className={`text-[13px] tabular-nums shrink-0 ${item.stockRemaining <= 0 ? 'text-red-500 font-medium' : 'text-stone-400'}`}>
+                        {item.stockRemaining <= 0 ? 'Sold out' : `${formatNumber(Math.round(item.stockRemaining))} left${item.daysUntilStockout != null ? ` · ${Math.max(1, Math.round(item.daysUntilStockout))}d` : ''}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="px-5 pt-1 pb-4">
+                  <Link to="/restock" className="flex items-center justify-center h-8 rounded-md border border-[var(--control)] text-[13px] font-medium text-stone-100 hover:bg-[var(--raised)]">
+                    View all {restockQueue.length}
+                  </Link>
+                </div>
+              </>
+            )}
+          </Panel>
+
+          <Panel
+            title="Goals"
+            action={!editingGoal && (weeklyGoal != null || monthlyGoal != null) ? (
+              <button onClick={() => { setEditingGoal('weekly'); setGoalInput(weeklyGoal?.toString() ?? '') }} className="text-[13px] text-stone-400 hover:text-stone-100">Edit</button>
+            ) : undefined}
+          >
+            <div className="px-5 pb-4">
+              {editingGoal ? (
+                <form
+                  className="space-y-3 pt-1"
+                  onSubmit={e => {
+                    e.preventDefault()
                     const v = parseFloat(goalInput)
                     if (editingGoal === 'weekly') setWeeklyGoal(isNaN(v) || v <= 0 ? null : v)
                     else setMonthlyGoal(isNaN(v) || v <= 0 ? null : v)
                     setEditingGoal(null)
                   }}
-                  className="px-3 py-1.5 bg-amber-500 text-stone-900 text-xs font-semibold hover:bg-amber-400"
                 >
-                  Save
-                </Button>
-                <button onClick={() => setEditingGoal(null)} className="px-3 py-1.5 text-xs text-stone-200 hover:text-stone-200">
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(['weekly', 'monthly'] as const).map(period => {
-                const goal = period === 'weekly' ? weeklyGoal : monthlyGoal
-                const revenue = period === 'weekly' ? goalProgress.weekRevenue : goalProgress.monthRevenue
-                const pace = period === 'weekly' ? goalProgress.weekPace : goalProgress.monthPace
-                const pct = goal ? Math.min(100, (revenue / goal) * 100) : 0
-                const hit = goal != null && revenue >= goal
-                const barColor = hit ? 'bg-emerald-500' : pct >= 80 ? 'bg-amber-400' : 'bg-amber-500'
-                return (
-                  <div key={period}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs text-stone-200 capitalize">{period}</span>
-                      {goal != null ? (
-                        <span className={`text-xs font-mono font-semibold ${hit ? 'text-emerald-400' : 'text-stone-100'}`}>
-                          {formatCurrency(revenue)} / {formatCurrency(goal)}
-                          {hit && ' ✓'}
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => { setEditingGoal(period); setGoalInput('') }}
-                          className="text-xs text-stone-200 hover:text-amber-400"
-                        >
-                          + Set goal
-                        </button>
-                      )}
-                    </div>
-                    {goal != null && (
-                      <>
-                        <div
-                          role="progressbar"
-                          aria-valuenow={Math.round(pct)}
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          aria-label={`${period === 'weekly' ? 'Weekly' : 'Monthly'} goal: ${Math.round(pct)}% complete`}
-                          className="h-1.5 bg-stone-700/60 rounded-full overflow-hidden"
-                        >
-                          <div className={`h-full rounded-full transition-all duration-500 ${barColor}`} style={{ width: `${pct}%` }} />
-                        </div>
-                        {pace != null && !hit && (
-                          <p className="text-[10px] text-stone-200 mt-1">
-                            On pace for {formatCurrency(pace)} this {period === 'weekly' ? 'week' : 'month'}
-                          </p>
-                        )}
-                      </>
-                    )}
+                  <div className="flex h-8 p-0.5 rounded-md bg-[var(--active)] w-fit" role="tablist" aria-label="Goal period">
+                    {(['weekly', 'monthly'] as const).map(p => (
+                      <button
+                        type="button"
+                        key={p}
+                        role="tab"
+                        aria-selected={editingGoal === p}
+                        onClick={() => { setEditingGoal(p); setGoalInput((p === 'weekly' ? weeklyGoal : monthlyGoal)?.toString() ?? '') }}
+                        className={`px-3 rounded text-[13px] ${editingGoal === p ? 'bg-white text-stone-100 font-medium' : 'text-stone-400'}`}
+                      >
+                        {p === 'weekly' ? 'This week' : 'This month'}
+                      </button>
+                    ))}
                   </div>
-                )
-              })}
+                  <label className="block">
+                    <span className="block text-sm font-medium text-stone-100 mb-1.5">Sales target in dollars</span>
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      autoFocus
+                      value={goalInput}
+                      onChange={e => setGoalInput(e.target.value)}
+                      placeholder={editingGoal === 'weekly' ? '1500' : '6000'}
+                      className="w-full h-9 px-3 rounded-md border border-[var(--control)] bg-white text-sm text-stone-100 tabular-nums focus:outline-none focus:border-stone-100"
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    <button type="submit" className="h-8 px-3 rounded-md bg-stone-100 text-white text-[13px] font-medium hover:bg-stone-300">Save</button>
+                    <button type="button" onClick={() => setEditingGoal(null)} className="h-8 px-3 rounded-md text-[13px] text-stone-400 hover:text-stone-100">Cancel</button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <GoalRow label="This week" revenue={goalProgress.weekRevenue} goal={weeklyGoal} pace={goalProgress.weekPace} onSet={() => { setEditingGoal('weekly'); setGoalInput('') }} />
+                  <GoalRow label="This month" revenue={goalProgress.monthRevenue} goal={monthlyGoal} pace={goalProgress.monthPace} onSet={() => { setEditingGoal('monthly'); setGoalInput('') }} />
+                </>
+              )}
             </div>
+          </Panel>
+
+          {days.best && (
+            <Panel title="Best day">
+              <div className="px-5 pb-4">
+                <p className="text-sm text-stone-100">{days.best.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                <p className="mt-0.5 text-sm text-stone-400 tabular-nums">
+                  {formatCurrency(days.best.revenue)} from {formatNumber(days.best.transactionCount)} orders
+                  {days.usual > 0 && `, ${(days.best.revenue / days.usual).toFixed(0)}× a usual day`}
+                </p>
+              </div>
+            </Panel>
           )}
         </div>
-      )}
-
-      <RevenueChart
-        daily={daily} weekly={weekly} monthly={monthly}
-        prevDaily={prevDaily} prevWeekly={prevWeekly} prevMonthly={prevMonthly}
-      />
-
-      {insights && (
-        <div className="border border-stone-700/50 bg-stone-800/25 px-5 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-400 mb-3">Quick Insights</p>
-          <ul className="space-y-1.5 text-sm">
-            <li className="text-stone-100">
-              Best day:{' '}
-              <span className="text-stone-200">
-                {format(insights.bestDay.date, 'EEE, MMM d')} — {formatCurrency(insights.bestDay.revenue)}
-              </span>
-            </li>
-            {insights.topProduct && (
-              <li className="text-stone-100">
-                Top seller:{' '}
-                <span className="text-stone-200">
-                  {insights.topProduct.name} ({formatNumber(insights.topProduct.totalUnitsSold)} units,{' '}
-                  {formatCurrency(insights.topProduct.totalRevenue)})
-                </span>
-              </li>
-            )}
-            {insights.slowProduct && (
-              <li className="text-stone-100">
-                Slow mover:{' '}
-                <span className="text-amber-400">{insights.slowProduct.name}</span>
-                {' '}— no sales in {Math.floor((Date.now() - insights.slowProduct.lastSoldDate.getTime()) / 86_400_000)} days
-              </li>
-            )}
-            {insights.topStaff && insights.topStaff.name !== 'Unknown' && (
-              <li className="text-stone-100">
-                Top staff:{' '}
-                <span className="text-stone-200">
-                  {insights.topStaff.name} — {formatCurrency(insights.topStaff.totalSales)} across{' '}
-                  {formatNumber(insights.topStaff.transactionCount)} transactions
-                </span>
-              </li>
-            )}
-            {hasRefunds && (
-              <li className="text-stone-100">
-                Refunds:{' '}
-                <span className="text-amber-400">- {formatCurrency(totalRefunds)}</span>
-                {' '}— net revenue {formatCurrency(netRevenue)}
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CategoryBreakdownChart data={categories} />
-        <TopProductsChart products={stats} />
       </div>
     </div>
   )

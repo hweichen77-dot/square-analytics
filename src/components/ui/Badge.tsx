@@ -1,21 +1,13 @@
 type BadgeVariant = 'default' | 'secondary' | 'success' | 'warning' | 'danger'
 
 const VARIANT_CLASSES: Record<BadgeVariant, string> = {
-  default:   'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-  secondary: 'bg-stone-700 text-stone-200 border border-stone-600',
-  success:   'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
-  warning:   'bg-amber-500/15 text-amber-400 border border-amber-500/20',
-  danger:    'bg-red-500/15 text-red-400 border border-red-500/20',
+  default:   'bg-[#eeeeee] text-[#3d3d3d]',
+  secondary: 'bg-[#eeeeee] text-[#3d3d3d]',
+  success:   'bg-[#dcfae5] text-[#04250e]',
+  warning:   'bg-[#fffbeb] text-[#92400e]',
+  danger:    'bg-[#ffedea] text-[#831c1e]',
 }
 
-const CATEGORY_BADGE_VARIANT: Record<string, BadgeVariant> = {
-  'Food':           'warning',
-  'Drinks':         'default',
-  'Ice Cream':      'success',
-  'Ramen/Hot Food': 'danger',
-  'Merch':          'secondary',
-  'Other':          'secondary',
-}
 
 interface BadgeProps {
   children: React.ReactNode
@@ -24,13 +16,12 @@ interface BadgeProps {
 
 export function Badge({ children, variant = 'default' }: BadgeProps) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${VARIANT_CLASSES[variant]}`}>
+    <span className={`inline-flex flex-none items-center whitespace-nowrap h-5 px-2 rounded text-xs font-medium ${VARIANT_CLASSES[variant]}`}>
       {children}
     </span>
   )
 }
 
 export function CategoryBadge({ category }: { category: string }) {
-  const variant = CATEGORY_BADGE_VARIANT[category] ?? 'secondary'
-  return <Badge variant={variant}>{category}</Badge>
+  return <Badge variant="secondary">{category}</Badge>
 }

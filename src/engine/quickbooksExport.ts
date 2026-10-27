@@ -8,7 +8,7 @@ function sanitize(v: string): string {
 export function exportQuickBooksPL(data: AccountantReportData): void {
   const rows: (string | number | null)[][] = []
 
-  rows.push(["Walley's Analytics — Profit & Loss"])
+  rows.push(["Walley's Analytics, Profit & Loss"])
   rows.push([data.dateRange])
   rows.push([])
 

@@ -35,10 +35,10 @@ export default function TimeAnalysisView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Time Analysis</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Time analysis</h1>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100">Sales Heatmap</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100">Sales heatmap</h2>
         <p className="text-xs text-stone-400 mt-0.5 mb-4">Sales volume by day and hour</p>
 
         <div className="overflow-x-auto">
@@ -70,9 +70,9 @@ export default function TimeAnalysisView() {
                         height: 28,
                         backgroundColor:
                           count === 0
-                            ? 'rgb(28, 25, 23)'
-                            : `rgba(245, 158, 11, ${0.15 + intensity * 0.8})`,
-                        color: intensity > 0.5 ? '#fafaf9' : '#a8a29e',
+                            ? '#efeeec'
+                            : `rgba(29, 95, 191, ${0.15 + intensity * 0.8})`,
+                        color: intensity > 0.5 ? '#ffffff' : '#121110',
                       }}
                     >
                       {count > 0 ? count : ''}
@@ -92,7 +92,7 @@ export default function TimeAnalysisView() {
                     width: 14,
                     height: 14,
                     backgroundColor:
-                      v === 0 ? 'rgb(28, 25, 23)' : `rgba(245, 158, 11, ${0.15 + v * 0.8})`,
+                      v === 0 ? '#efeeec' : `rgba(29, 95, 191, ${0.15 + v * 0.8})`,
                   }}
                 />
               ))}
@@ -102,8 +102,8 @@ export default function TimeAnalysisView() {
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-4">Monthly Comparison</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-4">Monthly comparison</h2>
         {monthly.length === 0 ? (
           <p className="text-sm text-stone-400">No monthly data available.</p>
         ) : (
@@ -131,10 +131,10 @@ export default function TimeAnalysisView() {
                 <tbody>
                   {monthly.map(m => (
                     <tr key={m.month} className="border-b border-stone-800">
-                      <td className="py-1.5 text-stone-100 font-mono text-xs">{m.month}</td>
-                      <td className="py-1.5 text-stone-100 font-mono text-xs text-right">{formatCurrency(m.revenue)}</td>
-                      <td className="py-1.5 text-stone-100 font-mono text-xs text-right">{m.transactions}</td>
-                      <td className="py-1.5 text-stone-100 font-mono text-xs text-right">{formatCurrency(m.avgTransaction)}</td>
+                      <td className="py-1.5 text-stone-100 tabular-nums text-xs">{m.month}</td>
+                      <td className="py-1.5 text-stone-100 tabular-nums text-xs text-right">{formatCurrency(m.revenue)}</td>
+                      <td className="py-1.5 text-stone-100 tabular-nums text-xs text-right">{m.transactions}</td>
+                      <td className="py-1.5 text-stone-100 tabular-nums text-xs text-right">{formatCurrency(m.avgTransaction)}</td>
                     </tr>
                   ))}
                 </tbody>

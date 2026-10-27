@@ -16,7 +16,7 @@ const CATEGORY_STYLES: Record<string, string> = {
   'Employee Expenses': 'bg-amber-500/15 text-amber-400 border border-amber-500/25',
   'Gift Cards':        'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25',
   'Service Charge':    'bg-amber-500/15 text-amber-400 border border-amber-500/25',
-  'Other':             'bg-stone-600/15 text-stone-200 border border-stone-600/25',
+  'Other':             'bg-[#cfccc8] text-stone-200 border border-[#d4d2ce]',
 }
 
 function CategoryBadge({ category }: { category: string }) {
@@ -64,7 +64,7 @@ function EntryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-stone-950/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-stone-950/70" onClick={onClose} />
       <div className="relative bg-stone-800 border border-stone-700 rounded-lg shadow-lg w-full max-w-md mx-4">
         <div className="px-6 py-4 border-b border-stone-700 flex items-center justify-between">
           <h2 className="font-semibold text-stone-100">{initial ? 'Edit Expense' : 'Add Expense'}</h2>
@@ -84,7 +84,7 @@ function EntryModal({
               value={form.name}
               onChange={e => set('name', e.target.value)}
               placeholder="e.g. Display shelving unit"
-              className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
             />
           </div>
 
@@ -94,7 +94,7 @@ function EntryModal({
               <select
                 value={form.category}
                 onChange={e => set('category', e.target.value as OpexCategory)}
-                className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 cursor-pointer"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60 cursor-pointer"
               >
                 {OPEX_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -106,7 +106,7 @@ function EntryModal({
                 required
                 value={form.month}
                 onChange={e => set('month', e.target.value)}
-                className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
               />
             </div>
           </div>
@@ -123,7 +123,7 @@ function EntryModal({
                 value={form.amount || ''}
                 onChange={e => set('amount', parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
-                className="w-full bg-stone-900 border border-stone-600 rounded-lg pl-7 pr-3 py-2 text-sm text-stone-100 placeholder-stone-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+                className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg pl-7 pr-3 py-2 text-sm text-stone-100 placeholder-stone-600 tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
               />
             </div>
           </div>
@@ -135,7 +135,7 @@ function EntryModal({
               value={form.notes}
               onChange={e => set('notes', e.target.value)}
               placeholder="e.g. Receipt #12345"
-              className="w-full bg-stone-900 border border-stone-600 rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
+              className="w-full bg-stone-900 border border-[#d4d2ce] rounded-lg px-3 py-2 text-sm text-stone-100 placeholder-stone-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/60"
             />
           </div>
 
@@ -143,7 +143,7 @@ function EntryModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 text-sm font-medium border border-stone-600 text-stone-400 rounded-lg hover:bg-stone-700/50 hover:text-stone-100 transition-colors cursor-pointer"
+              className="flex-1 py-2 text-sm font-medium border border-[#d4d2ce] text-stone-400 rounded-lg hover:bg-stone-700/50 hover:text-stone-100 transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -216,7 +216,7 @@ export default function OpexView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Operating Expenses</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">Operating expenses</h1>
           <p className="text-sm text-stone-400 mt-0.5">Track manual OPEX entries that appear in the Monthly Income Statement</p>
         </div>
         <Button
@@ -230,7 +230,7 @@ export default function OpexView() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 cf-stagger">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 kpi-strip">
         <StatCard
           label={filterMonth === 'all' ? 'Total OPEX' : 'OPEX This Month'}
           value={formatCurrency(totalOpex)}
@@ -269,9 +269,9 @@ export default function OpexView() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-12 text-center">
-          <div className="w-10 h-10 bg-stone-700 rounded-xl flex items-center justify-center mx-auto mb-3">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-12 text-center">
+          <div className="w-10 h-10 bg-stone-700 rounded-lg flex items-center justify-center mx-auto mb-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8783" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
           </div>
@@ -285,16 +285,16 @@ export default function OpexView() {
           </button>
         </div>
       ) : (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-stone-900 border-b border-stone-700/50">
               <tr>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide">Name</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide">Category</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide">Month</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-400 uppercase tracking-wide">Amount</th>
-                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400 uppercase tracking-wide">Notes</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-400 uppercase tracking-wide">Actions</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400">Name</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400">Category</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400">Month</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-400">Amount</th>
+                <th className="px-4 py-2.5 text-left text-xs font-semibold text-stone-400">Notes</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold text-stone-400">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-700/40">
@@ -305,7 +305,7 @@ export default function OpexView() {
                   <td className="px-4 py-3 text-stone-400 text-xs">
                     {format(parseISO(entry.month + '-01'), 'MMM yyyy')}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-stone-100">{formatCurrency(entry.amount)}</td>
+                  <td className="px-4 py-3 text-right tabular-nums text-stone-100">{formatCurrency(entry.amount)}</td>
                   <td className="px-4 py-3 text-stone-400 text-xs max-w-xs truncate">{entry.notes || '—'}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -354,16 +354,16 @@ export default function OpexView() {
           </table>
 
           {byCategory.length > 0 && (
-            <div className="border-t border-stone-700 px-4 py-3 bg-stone-900/50">
+            <div className="border-t border-stone-700 px-4 py-3 bg-[var(--raised)]">
               <div className="flex items-center gap-4 flex-wrap">
-                <span className="text-xs font-semibold text-stone-400 uppercase tracking-wide">Totals:</span>
+                <span className="text-xs font-semibold text-stone-400">Totals:</span>
                 {byCategory.map(([cat, amt]) => (
                   <span key={cat} className="text-xs text-stone-400">
                     <span className="text-stone-400">{cat}: </span>
-                    <span className="font-mono text-stone-100">{formatCurrency(amt)}</span>
+                    <span className="tabular-nums text-stone-100">{formatCurrency(amt)}</span>
                   </span>
                 ))}
-                <span className="ml-auto text-xs font-semibold text-stone-100 font-mono">
+                <span className="ml-auto text-xs font-semibold text-stone-100 tabular-nums">
                   Total: {formatCurrency(totalOpex)}
                 </span>
               </div>

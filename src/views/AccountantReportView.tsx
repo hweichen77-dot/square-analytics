@@ -143,7 +143,7 @@ export default function AccountantReportView() {
       ? (grossProfit / coveredRevenue) * 100
       : null
 
-    const dateRange = `${format(dates.start, 'MMM d, yyyy')} — ${format(dates.end, 'MMM d, yyyy')}`
+    const dateRange = `${format(dates.start, 'MMM d, yyyy')} to ${format(dates.end, 'MMM d, yyyy')}`
 
     return {
       dateRange, totalRevenue, totalTransactions, avgTransaction,
@@ -253,16 +253,16 @@ export default function AccountantReportView() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Accountant Report</h1>
+          <h1 className="text-2xl font-semibold text-stone-100">Accountant report</h1>
           <p className="text-sm text-stone-400 mt-1">
-            One-click PDF summary ready to hand to your accountant — revenue, COGS, margins, and payment breakdown.
+            One-click PDF summary ready to hand to your accountant, revenue, COGS, margins, and payment breakdown.
           </p>
         </div>
         {transactions.length > 0 && (
           <div className="flex gap-2 shrink-0">
             <button
               onClick={handleExportXLSX}
-              className="px-4 py-2.5 bg-stone-700 border border-stone-600 text-stone-200 rounded-lg text-sm font-semibold hover:bg-stone-600 transition-colors"
+              className="px-4 py-2.5 bg-stone-700 border border-[#d4d2ce] text-stone-200 rounded-lg text-sm font-semibold hover:bg-stone-800 transition-colors"
             >
               QuickBooks XLSX
             </button>
@@ -276,8 +276,8 @@ export default function AccountantReportView() {
         )}
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5 space-y-4">
-        <h2 className="font-semibold text-stone-200">Report Period</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5 space-y-4">
+        <h2 className="font-semibold text-stone-200">Report period</h2>
         <div className="flex flex-wrap gap-2">
           {QUICK_RANGES.map(r => (
             <button
@@ -286,7 +286,7 @@ export default function AccountantReportView() {
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                 quick === r.key
                   ? 'bg-amber-500 text-stone-950'
-                  : 'bg-stone-800 text-stone-200 hover:bg-stone-600'
+                  : 'bg-stone-800 text-stone-200 hover:bg-stone-800'
               }`}
             >
               {r.label}
@@ -318,36 +318,36 @@ export default function AccountantReportView() {
         )}
 
         <div className="text-xs text-stone-400">
-          {format(dates.start, 'MMMM d, yyyy')} — {format(dates.end, 'MMMM d, yyyy')}
+          {format(dates.start, 'MMMM d, yyyy')} to {format(dates.end, 'MMMM d, yyyy')}
         </div>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-sm text-stone-400">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-8 text-center text-sm text-stone-400">
           No transactions in this period.
         </div>
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-              <h2 className="font-semibold text-stone-200 mb-3">Revenue Summary</h2>
-              <MetricRow label="Gross Revenue" value={formatCurrency(report.totalRevenue)} />
+            <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Revenue summary</h2>
+              <MetricRow label="Gross revenue" value={formatCurrency(report.totalRevenue)} />
               <MetricRow
                 label="Refunds / Adjustments"
                 value={`(${formatCurrency(Math.abs(report.refundRevenue))})`}
                 sub={`${report.refundCount} refund(s)`}
               />
-              <MetricRow label="Net Revenue" value={formatCurrency(report.netRevenue)} highlight />
+              <MetricRow label="Net revenue" value={formatCurrency(report.netRevenue)} highlight />
               <MetricRow
-                label="Total Transactions"
+                label="Total transactions"
                 value={formatNumber(report.totalTransactions)}
                 sub={`avg ${formatCurrency(report.avgTransaction)}`}
               />
               {hasCOGS && (
                 <>
-                  <MetricRow label="Cost of Goods Sold" value={formatCurrency(report.totalCOGS!)} />
+                  <MetricRow label="Cost of goods sold" value={formatCurrency(report.totalCOGS!)} />
                   <MetricRow
-                    label="Gross Profit"
+                    label="Gross profit"
                     value={formatCurrency(report.grossProfit!)}
                     sub={report.grossMarginPct !== null
                       ? `${report.grossMarginPct.toFixed(1)}% margin on costed items`
@@ -356,7 +356,7 @@ export default function AccountantReportView() {
                   />
                   {(report.coveragePct ?? 100) < 99 && (
                     <p className="text-xs text-amber-400/80 mt-2">
-                      Margin covers {(report.coveragePct ?? 0).toFixed(0)}% of revenue — {formatCurrency(report.coveredRevenue ?? 0)} of {formatCurrency(report.totalRevenue)} has cost data entered. Add costs for the rest to see full-store margin.
+                      Margin covers {(report.coveragePct ?? 0).toFixed(0)}% of revenue, {formatCurrency(report.coveredRevenue ?? 0)} of {formatCurrency(report.totalRevenue)} has cost data entered. Add costs for the rest to see full-store margin.
                     </p>
                   )}
                 </>
@@ -368,8 +368,8 @@ export default function AccountantReportView() {
               )}
             </div>
 
-            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-              <h2 className="font-semibold text-stone-200 mb-3">Payment Breakdown</h2>
+            <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Payment breakdown</h2>
               {report.paymentBreakdown.length > 0 && (
                 <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
@@ -389,14 +389,14 @@ export default function AccountantReportView() {
                     </Pie>
                     <ReTooltip
                       formatter={(v: number) => [formatCurrency(v), '']}
-                      contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
-                      labelStyle={{ color: '#fafaf9', fontWeight: 600 }}
-                      itemStyle={{ color: '#fafaf9' }}
+                      contentStyle={{ background: '#ffffff', border: '1px solid #e6e4e1', borderRadius: 8, fontSize: 12 }}
+                      labelStyle={{ color: '#121110', fontWeight: 600 }}
+                      itemStyle={{ color: '#121110' }}
                     />
                     <Legend
                       iconType="circle"
                       iconSize={8}
-                      formatter={(v) => <span style={{ color: '#e7e5e4', fontSize: 11 }}>{v}</span>}
+                      formatter={(v) => <span style={{ color: '#3f3c39', fontSize: 11 }}>{v}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -415,14 +415,14 @@ export default function AccountantReportView() {
           </div>
 
           {hasCOGS && (opexTotal > 0) && (
-            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-              <h2 className="font-semibold text-stone-200 mb-3">Profit & Loss Summary</h2>
-              <MetricRow label="Net Revenue" value={formatCurrency(report.netRevenue)} />
-              <MetricRow label="Cost of Goods Sold" value={`(${formatCurrency(report.totalCOGS!)})`} />
-              <MetricRow label="Gross Profit" value={formatCurrency(report.grossProfit!)} sub={report.grossMarginPct !== null ? `${report.grossMarginPct.toFixed(1)}% margin` : undefined} highlight />
-              <MetricRow label="Operating Expenses" value={`(${formatCurrency(opexTotal)})`} />
+            <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+              <h2 className="font-semibold text-stone-200 mb-3">Profit & loss summary</h2>
+              <MetricRow label="Net revenue" value={formatCurrency(report.netRevenue)} />
+              <MetricRow label="Cost of goods sold" value={`(${formatCurrency(report.totalCOGS!)})`} />
+              <MetricRow label="Gross profit" value={formatCurrency(report.grossProfit!)} sub={report.grossMarginPct !== null ? `${report.grossMarginPct.toFixed(1)}% margin` : undefined} highlight />
+              <MetricRow label="Operating expenses" value={`(${formatCurrency(opexTotal)})`} />
               <MetricRow
-                label="Net Operating Income"
+                label="Net operating income"
                 value={formatCurrency(report.grossProfit! - opexTotal)}
                 sub={(report.coveredRevenue ?? 0) > 0 ? `${((report.grossProfit! - opexTotal) / (report.coveredRevenue ?? 1) * 100).toFixed(1)}% net margin` : undefined}
                 highlight
@@ -431,18 +431,18 @@ export default function AccountantReportView() {
           )}
 
           {weeklyRevenue.length > 1 && (
-            <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-              <h2 className="font-semibold text-stone-200 mb-4">Weekly Revenue Trend</h2>
+            <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+              <h2 className="font-semibold text-stone-200 mb-4">Weekly revenue trend</h2>
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={weeklyRevenue} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={chart.grid} />
-                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#d6d3d1' }} />
-                  <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#d6d3d1' }} />
+                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#625f5b' }} />
+                  <YAxis tickFormatter={v => `$${(v/1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: '#625f5b' }} />
                   <ReTooltip
                     formatter={(v: number) => [formatCurrency(v), 'Revenue']}
-                    contentStyle={{ background: '#1c1917', border: '1px solid #44403c', borderRadius: 8, fontSize: 12 }}
-                    labelStyle={{ color: '#fafaf9' }}
-                    itemStyle={{ color: '#fafaf9' }}
+                    contentStyle={{ background: '#ffffff', border: '1px solid #e6e4e1', borderRadius: 8, fontSize: 12 }}
+                    labelStyle={{ color: '#121110' }}
+                    itemStyle={{ color: '#121110' }}
                   />
                   <Bar dataKey="revenue" fill={chart.bar} radius={[2, 2, 0, 0]} />
                 </BarChart>
@@ -450,26 +450,26 @@ export default function AccountantReportView() {
             </div>
           )}
 
-          <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-            <h2 className="font-semibold text-stone-200 mb-4">Revenue by Day of Week</h2>
+          <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+            <h2 className="font-semibold text-stone-200 mb-4">Revenue by day of week</h2>
             <div className="grid grid-cols-7 gap-2">
               {byDayOfWeek.map(d => (
                 <div key={d.day} className="text-center">
-                  <p className="text-[10px] font-semibold text-stone-400 uppercase mb-1">{d.day}</p>
+                  <p className="text-xs font-semibold text-stone-400 mb-1">{d.day}</p>
                   <p className="text-sm font-bold text-stone-100">{formatCurrency(d.revenue)}</p>
-                  <p className="text-[10px] text-stone-400">{d.transactions} txns</p>
+                  <p className="text-xs text-stone-400">{d.transactions} txns</p>
                 </div>
               ))}
             </div>
           </div>
 
           {categoryBreakdown.length > 0 && (
-            <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+            <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
               <div className="px-5 py-4 border-b border-stone-700/50">
-                <h2 className="font-semibold text-stone-200">Revenue by Category</h2>
+                <h2 className="font-semibold text-stone-200">Revenue by category</h2>
               </div>
               <table className="w-full text-xs">
-                <thead className="bg-stone-900/60">
+                <thead className="bg-[var(--raised)]">
                   <tr>
                     <th className="px-4 py-2.5 text-left text-stone-400 font-semibold">Category</th>
                     <th className="px-4 py-2.5 text-right text-stone-400 font-semibold">Products</th>
@@ -480,11 +480,11 @@ export default function AccountantReportView() {
                 </thead>
                 <tbody>
                   {categoryBreakdown.map((c, i) => (
-                    <tr key={c.category} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+                    <tr key={c.category} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-white' : ''}`}>
                       <td className="px-4 py-2 text-stone-100 font-medium">{c.category}</td>
                       <td className="px-4 py-2 text-right text-stone-200">{c.count}</td>
-                      <td className="px-4 py-2 text-right text-stone-200 font-mono">{c.units.toLocaleString()}</td>
-                      <td className="px-4 py-2 text-right text-stone-100 font-mono font-semibold">{formatCurrency(c.revenue)}</td>
+                      <td className="px-4 py-2 text-right text-stone-200 tabular-nums">{c.units.toLocaleString()}</td>
+                      <td className="px-4 py-2 text-right text-stone-100 tabular-nums font-semibold">{formatCurrency(c.revenue)}</td>
                       <td className="px-4 py-2 text-right text-stone-200">
                         {report.totalRevenue > 0 ? `${(c.revenue / report.totalRevenue * 100).toFixed(1)}%` : '—'}
                       </td>
@@ -496,10 +496,10 @@ export default function AccountantReportView() {
           )}
 
           {allProducts.length > 0 && (
-            <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+            <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
               <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
                 <div>
-                  <h2 className="font-semibold text-stone-200">All Products</h2>
+                  <h2 className="font-semibold text-stone-200">All products</h2>
                   <p className="text-xs text-stone-400 mt-0.5">{filteredProducts.length} of {allProducts.length} products</p>
                 </div>
                 <input
@@ -507,7 +507,7 @@ export default function AccountantReportView() {
                   placeholder="Search products..."
                   value={productSearch}
                   onChange={e => setProductSearch(e.target.value)}
-                  className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
+                  className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-52"
                 />
               </div>
               <div className="overflow-y-auto max-h-[32rem] overflow-x-auto">
@@ -525,18 +525,18 @@ export default function AccountantReportView() {
                   </thead>
                   <tbody>
                     {filteredProducts.map((p, i) => (
-                      <tr key={p.name} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+                      <tr key={p.name} className={`border-t border-stone-700/30 hover:bg-stone-700/20 ${i % 2 === 1 ? 'bg-white' : ''}`}>
                         <td className="px-4 py-2 text-stone-100 font-medium">{p.name}</td>
                         <td className="px-4 py-2 text-stone-200">{p.category}</td>
-                        <td className="px-4 py-2 text-right text-stone-200 font-mono">{p.units.toLocaleString()}</td>
-                        <td className="px-4 py-2 text-right text-stone-100 font-mono font-semibold">{formatCurrency(p.revenue)}</td>
-                        {hasCOGS && <td className="px-4 py-2 text-right text-stone-200 font-mono">{p.totalCost !== null ? formatCurrency(p.totalCost) : '—'}</td>}
-                        {hasCOGS && <td className="px-4 py-2 text-right font-mono font-semibold">
+                        <td className="px-4 py-2 text-right text-stone-200 tabular-nums">{p.units.toLocaleString()}</td>
+                        <td className="px-4 py-2 text-right text-stone-100 tabular-nums font-semibold">{formatCurrency(p.revenue)}</td>
+                        {hasCOGS && <td className="px-4 py-2 text-right text-stone-200 tabular-nums">{p.totalCost !== null ? formatCurrency(p.totalCost) : '—'}</td>}
+                        {hasCOGS && <td className="px-4 py-2 text-right tabular-nums font-semibold">
                           {p.grossProfit !== null ? (
                             <span className={p.grossProfit >= 0 ? 'text-emerald-400' : 'text-red-400'}>{formatCurrency(p.grossProfit)}</span>
                           ) : <span className="text-stone-200">—</span>}
                         </td>}
-                        {hasCOGS && <td className="px-4 py-2 text-right font-mono">
+                        {hasCOGS && <td className="px-4 py-2 text-right tabular-nums">
                           {p.marginPct !== null
                             ? <span className={p.marginPct >= 40 ? 'text-emerald-400' : p.marginPct >= 20 ? 'text-amber-400' : 'text-red-400'}>{p.marginPct.toFixed(0)}%</span>
                             : <span className="text-stone-200">—</span>}

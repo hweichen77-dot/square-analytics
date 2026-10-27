@@ -14,7 +14,7 @@ export default function SquareCallbackView() {
 
     if (!code) { setError('No authorization code returned by Square.'); return }
     if (!state || !storedState || state !== storedState) {
-      setError('OAuth state mismatch — possible CSRF.'); return
+      setError('OAuth state mismatch, possible CSRF.'); return
     }
 
     exchangeCodeForToken(code)
@@ -27,7 +27,7 @@ export default function SquareCallbackView() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c4242a" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </div>
           <p className="font-semibold text-red-400">{error}</p>
           <button onClick={() => navigate('/square-sync')} className="mt-4 text-sm text-amber-400 underline">

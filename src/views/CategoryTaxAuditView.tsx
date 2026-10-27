@@ -23,7 +23,7 @@ interface TaxMismatch {
 function StatCard({ label, value, tone }: { label: string; value: string; tone: 'good' | 'bad' | 'neutral' }) {
   const color = tone === 'bad' ? 'text-red-400' : tone === 'good' ? 'text-emerald-400' : 'text-stone-100'
   return (
-    <div className="bg-stone-800/30 border border-stone-700/40 p-4">
+    <div className="bg-white border border-[var(--border)] rounded-lg p-4">
       <p className="text-xs text-stone-400">{label}</p>
       <p className={`text-3xl font-bold mt-1 tabular-nums ${color}`}>{value}</p>
     </div>
@@ -63,7 +63,7 @@ export default function CategoryTaxAuditView() {
           expected,
           reason: expected
             ? `Should be TAXED (${TAXABLE_CATEGORY_LABEL}) but is marked non-taxable.`
-            : `Marked TAXABLE but is not merch, ramen, or a carbonated drink — should be non-taxable.`,
+            : `Marked TAXABLE but is not merch, ramen, or a carbonated drink, should be non-taxable.`,
         }
       })
       .sort((a, b) => String(a.product.name ?? '').localeCompare(String(b.product.name ?? '')))
@@ -138,10 +138,10 @@ export default function CategoryTaxAuditView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Category &amp; Tax Audit</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Category &amp; tax audit</h1>
         <p className="text-sm text-stone-400 mt-1">
-          Run this after adding items. Confirms every item has a category and that only the right items are taxed —
-          catches mistakes before a FABS audit does.
+          Run this after adding items. Confirms every item has a category and that only the right items are taxed,
+          so mistakes get caught before a FABS audit does.
         </p>
       </div>
 
@@ -152,7 +152,7 @@ export default function CategoryTaxAuditView() {
       </div>
 
       <div className="bg-stone-800/60 border border-stone-700 px-4 py-3 text-sm text-stone-400 flex items-start gap-2">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" className="shrink-0 mt-0.5">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d5fbf" strokeWidth="2" strokeLinecap="round" className="shrink-0 mt-0.5">
           <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
         </svg>
         <span>
@@ -165,7 +165,7 @@ export default function CategoryTaxAuditView() {
       {auditReady && (
         <div className="text-center py-14">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" strokeWidth="2" strokeLinecap="round">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2" strokeLinecap="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </div>
@@ -175,7 +175,7 @@ export default function CategoryTaxAuditView() {
       )}
 
       {linked.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5 space-y-3">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5 space-y-3">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="font-semibold text-stone-200">Push taxability to Square</h2>
@@ -236,7 +236,7 @@ export default function CategoryTaxAuditView() {
                   <div className="max-h-32 overflow-y-auto text-xs text-stone-200 space-y-1">
                     {plan.skipped.map((s, i) => (
                       <p key={`${s.itemName}-${i}`}>
-                        <span className="text-stone-100">{s.itemName}</span> — {s.reason}
+                        <span className="text-stone-100">{s.itemName}</span>: {s.reason}
                       </p>
                     ))}
                   </div>
@@ -265,7 +265,7 @@ export default function CategoryTaxAuditView() {
       )}
 
       {totalUncategorized > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold text-stone-200">Uncategorized items</h2>
@@ -276,7 +276,7 @@ export default function CategoryTaxAuditView() {
               placeholder="Search…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="border border-stone-600 rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-44"
+              className="border border-[#d4d2ce] rounded-lg px-3 py-1.5 text-sm bg-stone-900 text-stone-100 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 w-44"
             />
           </div>
           <div className="divide-y divide-stone-700/30 max-h-[32rem] overflow-y-auto">
@@ -293,7 +293,7 @@ export default function CategoryTaxAuditView() {
                   <select
                     defaultValue=""
                     onChange={e => assignCategory(p.id, e.target.value)}
-                    className="shrink-0 border border-stone-600 rounded-lg px-2 py-1.5 text-sm bg-stone-900 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
+                    className="shrink-0 border border-[#d4d2ce] rounded-lg px-2 py-1.5 text-sm bg-stone-900 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/30"
                   >
                     <option value="" disabled>Set category…</option>
                     {KNOWN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -309,7 +309,7 @@ export default function CategoryTaxAuditView() {
       )}
 
       {taxMismatches.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between gap-4">
             <div>
               <h2 className="font-semibold text-stone-200">Tax mismatches</h2>

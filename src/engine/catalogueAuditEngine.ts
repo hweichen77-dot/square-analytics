@@ -139,7 +139,7 @@ export function auditCatalogue(
         productId: id,
         productName: name,
         issue: 'Negative stock',
-        detail: `"${name}" has a quantity of ${p.quantity}. Stock cannot be negative — will be set to 0.`,
+        detail: `"${name}" has a quantity of ${p.quantity}. Stock cannot be negative, will be set to 0.`,
         severity: 'error',
         fixType: 'set_quantity_zero',
         fixValue: 0,
@@ -199,7 +199,7 @@ export function auditCatalogue(
         productId: id,
         productName: name,
         issue: 'Duplicate name',
-        detail: `"${name}" appears ${nameCount.get(name)} times in the catalogue. Square requires unique item names — duplicates will overwrite each other on import.`,
+        detail: `"${name}" appears ${nameCount.get(name)} times in the catalogue. Square requires unique item names, duplicates will overwrite each other on import.`,
         severity: 'error',
       })
     }
@@ -221,7 +221,7 @@ export function auditCatalogue(
         productId: id,
         productName: name,
         issue: 'Comma in name',
-        detail: `"${name}" contains a comma. Commas in item names break Square's CSV import — remove the comma before exporting.`,
+        detail: `"${name}" contains a comma. Commas in item names break Square's CSV import, remove the comma before exporting.`,
         severity: 'warning',
       })
     }
@@ -260,7 +260,7 @@ export function auditCatalogue(
         issues.push({
           id: nextId(),
           productName: soldName,
-          issue: 'Sold — not in catalogue',
+          issue: 'Sold, not in catalogue',
           detail: `"${soldName}" appears in sales data but has no catalogue entry. Add it to Square to track it properly.`,
           severity: 'warning',
         })

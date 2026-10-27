@@ -7,14 +7,11 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, subtitle, action }: EmptyStateProps) {
   return (
-    <div className="max-w-lg py-16 border-l-2 border-amber-500/60 pl-6">
-      <h3 className="font-display text-2xl font-700 text-stone-100 tracking-tight">{title}</h3>
-      {subtitle && <p className="text-sm text-stone-400 mt-2 leading-relaxed">{subtitle}</p>}
+    <div className="max-w-xl rounded-lg border border-dashed border-[var(--control)] bg-white px-6 py-8">
+      <h3 className="text-base font-semibold text-stone-100">{title}</h3>
+      {subtitle && <p className="text-sm text-stone-400 mt-1.5 leading-relaxed">{subtitle}</p>}
       {action && (
-        <Button
-          onClick={action.onClick}
-          className="mt-6 px-4 py-2 bg-amber-500 text-stone-950 rounded text-sm font-semibold hover:bg-amber-400 transition-colors cursor-pointer"
-        >
+        <Button onClick={action.onClick} className="mt-5 h-9 px-4 bg-stone-100 text-white rounded-md text-sm font-medium hover:bg-stone-300 transition-colors cursor-pointer">
           {action.label}
         </Button>
       )}

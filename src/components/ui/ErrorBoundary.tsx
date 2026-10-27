@@ -19,7 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         <div className="flex flex-col items-center justify-center py-24 text-center px-6">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-5">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c4242a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mb-5">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <h3 className="text-base font-semibold text-stone-200 mb-1">Something went wrong</h3>

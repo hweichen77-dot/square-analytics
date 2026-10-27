@@ -464,7 +464,7 @@ function buildSeasonalPDF(report: SeasonalReport, dateRange: string): jsPDF {
   for (const season of report.seasons) {
     if (season.topProducts.length === 0) continue
     if (y > 230) { doc.addPage(); y = drawHeader(doc, REPORT_META.seasonal.label, dateRange) }
-    y = drawSectionHeader(doc, `${season.icon} ${season.name} — Top Products`, y)
+    y = drawSectionHeader(doc, `${season.icon} ${season.name}: top products`, y)
     autoTable(doc, {
       ...TABLE_STYLES,
       startY: y,

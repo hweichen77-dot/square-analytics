@@ -3,13 +3,23 @@ import { startOfDay } from 'date-fns'
 import { useAllTransactions, useRestockLogs, useCatalogueProducts } from '../db/useTransactions'
 import { computeProductStats, productVelocity } from '../engine/analyticsEngine'
 
+export interface RestockAlert {
+  name: string
+  stockRemaining: number
+  daysUntilStockout: number | null
+}
+
 export function useRestockAlertCount(): number {
+  return useRestockQueue().length
+}
+
+export function useRestockQueue(): RestockAlert[] {
   const transactions = useAllTransactions()
   const restockLogs = useRestockLogs()
   const catalogueProducts = useCatalogueProducts()
 
   return useMemo(() => {
-    if (!transactions.length) return 0
+    if (!transactions.length) return []
 
     const stats = computeProductStats(transactions)
 
@@ -31,7 +41,7 @@ export function useRestockAlertCount(): number {
       return catalogueQtyLower[base]
     }
 
-    let count = 0
+    const queue: RestockAlert[] = []
 
     for (const product of stats) {
       const dailyVel = productVelocity(product)
@@ -55,12 +65,13 @@ export function useRestockAlertCount(): number {
         }
       }
 
-      if (stockRemaining !== null) {
-        if (stockRemaining <= 0) count++
-        else if (daysUntilStockout !== null && daysUntilStockout <= 5) count++
+      if (stockRemaining !== null && dailyVel > 0) {
+        if (stockRemaining <= 0 || (daysUntilStockout !== null && daysUntilStockout <= 5)) {
+          queue.push({ name: product.name, stockRemaining, daysUntilStockout: stockRemaining <= 0 ? 0 : daysUntilStockout })
+        }
       }
     }
 
-    return count
+    return queue.sort((a, b) => (a.daysUntilStockout ?? 0) - (b.daysUntilStockout ?? 0) || a.stockRemaining - b.stockRemaining)
   }, [transactions, restockLogs, catalogueProducts])
 }

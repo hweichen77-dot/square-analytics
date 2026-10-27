@@ -110,16 +110,16 @@ export default function StaffView() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Staff Performance</h1>
+      <h1 className="text-2xl font-semibold text-stone-100">Staff performance</h1>
 
-      <div className="grid grid-cols-3 gap-4 cf-stagger">
-        <StatCard label="Staff Members" value={String(staffStats.length)} countTo={staffStats.length} format={(n) => Math.round(n).toLocaleString()} />
-        <StatCard label="Total Revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
-        <StatCard label="Total Transactions" value={formatNumber(transactions.length)} countTo={transactions.length} format={(n) => Math.round(n).toLocaleString()} />
+      <div className="grid grid-cols-3 gap-4 kpi-strip">
+        <StatCard label="Staff members" value={String(staffStats.length)} countTo={staffStats.length} format={(n) => Math.round(n).toLocaleString()} />
+        <StatCard label="Total revenue" value={formatCurrency(totalRevenue)} countTo={totalRevenue} format={(n) => formatCurrency(n)} />
+        <StatCard label="Total transactions" value={formatNumber(transactions.length)} countTo={transactions.length} format={(n) => Math.round(n).toLocaleString()} />
       </div>
 
       {staffStats.length > 0 && (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="px-5 py-4 border-b border-stone-700/50">
             <h2 className="text-base font-semibold text-stone-100">Leaderboard</h2>
           </div>
@@ -130,7 +130,7 @@ export default function StaffView() {
               return (
                 <div key={s.name} className="flex items-center gap-4 px-5 py-3">
                   <span className="w-6 text-center shrink-0">
-                    <span className="text-xs font-mono text-stone-300">{i + 1}</span>
+                    <span className="text-xs tabular-nums text-stone-300">{i + 1}</span>
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-stone-100 truncate">{s.name}</p>
@@ -138,21 +138,21 @@ export default function StaffView() {
                       <div className="h-1 bg-stone-700/60 rounded-full w-24">
                         <div className="h-1 bg-amber-500 rounded-full" style={{ width: `${share}%` }} />
                       </div>
-                      <span className="text-[10px] text-stone-300">{share.toFixed(1)}%</span>
+                      <span className="text-xs text-stone-300">{share.toFixed(1)}%</span>
                     </div>
                   </div>
                   <div className="hidden sm:flex items-center gap-8 shrink-0 text-right">
                     <div>
-                      <p className="text-[10px] text-stone-400">Revenue</p>
-                      <p className="text-sm font-mono font-semibold text-stone-100">{formatCurrency(s.totalSales)}</p>
+                      <p className="text-xs text-stone-400">Revenue</p>
+                      <p className="text-sm tabular-nums font-semibold text-stone-100">{formatCurrency(s.totalSales)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-stone-400">Transactions</p>
-                      <p className="text-sm font-mono text-stone-100">{formatNumber(s.transactionCount)}</p>
+                      <p className="text-xs text-stone-400">Transactions</p>
+                      <p className="text-sm tabular-nums text-stone-100">{formatNumber(s.transactionCount)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-stone-400">Avg Sale</p>
-                      <p className="text-sm font-mono text-stone-200">{formatCurrency(avg)}</p>
+                      <p className="text-xs text-stone-400">Avg Sale</p>
+                      <p className="text-sm tabular-nums text-stone-200">{formatCurrency(avg)}</p>
                     </div>
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function StaffView() {
         </div>
       )}
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50 flex items-center justify-between">
           <div>
             <h2 className="text-base font-semibold text-stone-100">Staff ROI</h2>
@@ -192,12 +192,12 @@ export default function StaffView() {
                 return (
                   <tr key={s.name} className="hover:bg-stone-700/20">
                     <td className="px-5 py-3 font-medium text-stone-200">{s.name}</td>
-                    <td className="px-4 py-3 font-mono text-stone-100 text-right">{formatCurrency(s.totalSales)}</td>
-                    <td className="px-4 py-3 font-mono text-stone-200 text-right">
+                    <td className="px-4 py-3 tabular-nums text-stone-100 text-right">{formatCurrency(s.totalSales)}</td>
+                    <td className="px-4 py-3 tabular-nums text-stone-200 text-right">
                       {s.hours.toFixed(1)}h
-                      {s.estimatedHours && <span className="ml-1 text-[10px] text-stone-400 font-sans">est.</span>}
+                      {s.estimatedHours && <span className="ml-1 text-xs text-stone-400 font-sans">est.</span>}
                     </td>
-                    <td className="px-4 py-3 font-mono text-stone-100 text-right">
+                    <td className="px-4 py-3 tabular-nums text-stone-100 text-right">
                       {s.revenuePerHour != null ? formatCurrency(s.revenuePerHour) : '—'}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -216,16 +216,16 @@ export default function StaffView() {
                             type="number"
                             value={wageInput}
                             onChange={e => setWageInput(e.target.value)}
-                            className="w-16 bg-stone-900 border border-amber-500/50 px-2 py-0.5 text-xs text-stone-200 font-mono text-right focus:outline-none focus-visible:border-amber-400"
+                            className="w-16 bg-stone-900 border border-amber-500/50 px-2 py-0.5 text-xs text-stone-200 tabular-nums text-right focus:outline-none focus-visible:border-amber-400"
                             placeholder="0.00"
                           />
-                          <button type="submit" className="text-xs text-amber-400 hover:text-amber-300 px-1">✓</button>
-                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-stone-400 hover:text-stone-100">✕</button>
+                          <button type="submit" className="text-xs text-amber-400 hover:text-amber-300 px-1">Save</button>
+                          <button type="button" onClick={() => setEditingWage(null)} className="text-xs text-stone-400 hover:text-stone-100">Cancel</button>
                         </form>
                       ) : (
                         <button
                           onClick={() => { setEditingWage(s.name); setWageInput(s.wage?.toString() ?? '') }}
-                          className={`font-mono text-xs px-2 py-0.5 border border-transparent hover:border-stone-600 hover:bg-stone-700/40 rounded ${
+                          className={`tabular-nums text-xs px-2 py-0.5 border border-transparent hover:border-[#d4d2ce] hover:bg-stone-700/40 rounded ${
                             s.wage != null ? 'text-stone-100' : 'text-stone-200 hover:text-stone-200'
                           }`}
                         >
@@ -233,10 +233,10 @@ export default function StaffView() {
                         </button>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-mono text-stone-200 text-right">
+                    <td className="px-4 py-3 tabular-nums text-stone-200 text-right">
                       {s.wageCost != null ? formatCurrency(s.wageCost) : '—'}
                     </td>
-                    <td className="px-4 py-3 font-mono font-semibold text-right">
+                    <td className="px-4 py-3 tabular-nums font-semibold text-right">
                       {s.netROI != null ? (
                         <span className={s.netROI >= 0 ? 'text-emerald-400' : 'text-red-400'}>
                           {formatCurrency(s.netROI)}
@@ -253,8 +253,8 @@ export default function StaffView() {
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue by Staff Member</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="text-base font-semibold text-stone-100 mb-4">Revenue by staff member</h2>
         <ResponsiveContainer width="100%" height={Math.max(200, staffStats.length * 40)}>
           <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 60, left: 16, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chart.grid} />
@@ -274,9 +274,9 @@ export default function StaffView() {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+      <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
         <div className="px-5 py-4 border-b border-stone-700/50">
-          <h2 className="text-base font-semibold text-stone-100">Staff Breakdown</h2>
+          <h2 className="text-base font-semibold text-stone-100">Staff breakdown</h2>
           <p className="text-xs text-stone-400 mt-0.5">Click a row to see individual transactions</p>
         </div>
         <div className="divide-y divide-stone-700/40">
@@ -318,15 +318,15 @@ export default function StaffView() {
                   <div className="hidden sm:flex items-center gap-8 shrink-0">
                     <div className="text-right">
                       <p className="text-xs text-stone-400">Transactions</p>
-                      <p className="font-mono font-semibold text-sm text-stone-100">{formatNumber(staff.transactionCount)}</p>
+                      <p className="tabular-nums font-semibold text-sm text-stone-100">{formatNumber(staff.transactionCount)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-stone-400">Total Sales</p>
-                      <p className="font-mono font-semibold text-sm text-stone-100">{formatCurrency(staff.totalSales)}</p>
+                      <p className="tabular-nums font-semibold text-sm text-stone-100">{formatCurrency(staff.totalSales)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-stone-400">Avg Sale</p>
-                      <p className="font-mono text-sm text-stone-100">{formatCurrency(avg)}</p>
+                      <p className="tabular-nums text-sm text-stone-100">{formatCurrency(avg)}</p>
                     </div>
                   </div>
 
@@ -336,8 +336,8 @@ export default function StaffView() {
                 {isExpanded && (
                   <div className="border-t border-stone-700/50 bg-stone-900">
                     <div className="px-5 py-3">
-                      <p className="text-xs font-semibold text-stone-400 uppercase tracking-wide mb-2">
-                        Recent Transactions — {staff.name}
+                      <p className="text-xs font-semibold text-stone-400 mb-2">
+                        Recent transactions for {staff.name}
                       </p>
                       {staffTxs.length === 0 ? (
                         <p className="text-xs text-stone-400">No transactions found.</p>
@@ -356,12 +356,12 @@ export default function StaffView() {
                             <tbody>
                               {staffTxs.slice(0, 20).map(tx => (
                                 <tr key={tx.transactionID} className="border-b border-stone-700/50 hover:bg-stone-800">
-                                  <td className="py-1.5 font-mono text-stone-200">{format(tx.date, 'MMM d, yyyy h:mm a')}</td>
+                                  <td className="py-1.5 tabular-nums text-stone-200">{format(tx.date, 'MMM d, yyyy h:mm a')}</td>
                                   <td className="py-1.5">
                                     <span className="font-semibold text-stone-200">{tx.staffName.trim() || 'Unknown'}</span>
                                   </td>
                                   <td className="py-1.5 text-stone-200 max-w-56 truncate">{tx.itemDescription || '—'}</td>
-                                  <td className="py-1.5 font-mono font-semibold text-stone-100 text-right">{formatCurrency(tx.netSales)}</td>
+                                  <td className="py-1.5 tabular-nums font-semibold text-stone-100 text-right">{formatCurrency(tx.netSales)}</td>
                                   <td className="py-1.5 text-stone-200">{tx.paymentMethod || '—'}</td>
                                 </tr>
                               ))}

@@ -68,7 +68,7 @@ export default function AnomalyView() {
   if (computing && !anomaliesRaw) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Anomaly Alerts</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Anomaly alerts</h1>
         <div className="flex items-center justify-center gap-3 text-stone-400 text-sm py-24">
           <div className="w-4 h-4 border-2 border-stone-700 border-t-amber-400 rounded-full animate-spin" />
           Analyzing…
@@ -80,13 +80,13 @@ export default function AnomalyView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Anomaly Alerts</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Anomaly alerts</h1>
         <p className="text-sm text-stone-400 mt-1">
           Days that were unusually above or below your typical revenue for that day of the week.
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 cf-stagger">
+      <div className="grid grid-cols-3 gap-4 kpi-strip">
         <StatCard
           label="Total anomalies"
           value={String(anomalies.length)}
@@ -108,11 +108,11 @@ export default function AnomalyView() {
       </div>
 
       {anomalies.length === 0 ? (
-        <div className="bg-stone-800/30 border border-stone-700/40 p-8 text-center text-stone-400 text-sm">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-8 text-center text-stone-400 text-sm">
           No anomalous days detected. Your revenue is remarkably consistent!
         </div>
       ) : (
-        <div className="bg-stone-800/30 border border-stone-700/40 overflow-hidden">
+        <div className="bg-white border border-[var(--border)] rounded-lg overflow-hidden">
           <div className="flex border-b border-stone-700/50">
             {(['all', 'above', 'below'] as Filter[]).map(f => (
               <button

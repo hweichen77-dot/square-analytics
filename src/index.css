@@ -1,34 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-stone-950: oklch(0.09 0.007 55);
-  --color-stone-900: oklch(0.12 0.008 55);
-  --color-stone-800: oklch(0.17 0.007 55);
-  --color-stone-700: oklch(0.23 0.006 55);
-  --color-stone-600: oklch(0.35 0.007 55);
-  --color-stone-500: oklch(0.47 0.008 65);
-  --color-stone-400: oklch(0.61 0.009 65);
-  --color-stone-300: oklch(0.74 0.007 65);
-  --color-stone-200: oklch(0.87 0.005 65);
-  --color-stone-100: oklch(0.93 0.004 65);
-  --color-stone-50:  oklch(0.97 0.003 65);
+  --color-stone-950: #f4f3f1;
+  --color-stone-900: #ffffff;
+  --color-stone-800: #eceae7;
+  --color-stone-700: #e2e0dc;
+  --color-stone-600: #686561;
+  --color-stone-500: #625f5b;
+  --color-stone-400: #55524e;
+  --color-stone-300: #3f3c39;
+  --color-stone-200: #292725;
+  --color-stone-100: #121110;
+  --color-stone-50:  #000000;
 
-  --color-amber-950: oklch(0.20 0.030 72);
-  --color-amber-900: oklch(0.28 0.050 74);
-  --color-amber-800: oklch(0.38 0.075 75);
-  --color-amber-700: oklch(0.50 0.100 76);
-  --color-amber-600: oklch(0.62 0.125 77);
-  --color-amber-500: oklch(0.72 0.140 78);
-  --color-amber-400: oklch(0.80 0.130 80);
-  --color-amber-300: oklch(0.86 0.100 82);
-  --color-amber-200: oklch(0.91 0.070 84);
-  --color-amber-100: oklch(0.95 0.040 85);
-  --color-amber-50:  oklch(0.97 0.020 85);
+  --color-amber-950: #f1f0ee;
+  --color-amber-900: #e6e4e1;
+  --color-amber-800: #cfccc8;
+  --color-amber-700: #3d3a37;
+  --color-amber-600: #2b2927;
+  --color-amber-500: #141414;
+  --color-amber-400: #2b2927;
+  --color-amber-300: #3d3a37;
+  --color-amber-200: #3d3a37;
+  --color-amber-100: #55524e;
+  --color-amber-50:  #686561;
 
-  --font-sans:    'Geist', system-ui, sans-serif;
-  --font-mono:    'Geist Mono', ui-monospace, 'Cascadia Code', monospace;
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --color-emerald-700: #1b5e20;
+  --color-emerald-600: #22692a;
+  --color-emerald-500: #2e7d32;
+  --color-emerald-400: #2e7d32;
+  --color-emerald-300: #22692a;
+  --color-emerald-100: #dcfae5;
+
+  --color-red-700: #831c1e;
+  --color-red-500: #c4242a;
+  --color-red-400: #c4242a;
+  --color-red-300: #a51f24;
+
+  --font-sans:    'Geist', Inter, system-ui, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Geist', Inter, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --ground: #f4f3f1;
+  --surface: #ffffff;
+  --raised: #f7f6f4;
+  --active: #e9e7e4;
+  --border: #e6e4e1;
+  --rule: #efeeec;
+  --control: #d4d2ce;
+  --text: #121110;
+  --muted: #625f5b;
+  --data: #1d5fbf;
+  --data-soft: #c9d8ef;
+  --grid: #ebe9e6;
+  --positive: #2e7d32;
+  --negative: #c4242a;
 }
 
 *, *::before, *::after {
@@ -36,73 +66,59 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-:root {
-  color-scheme: dark;
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
 }
 
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: oklch(0.26 0.006 55);
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.33 0.007 55);
-}
+.tabular-nums, .font-mono, td, th { font-variant-numeric: tabular-nums; }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.6) brightness(1.2);
-  cursor: pointer;
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4d2ce; border-radius: 4px; border: 2px solid var(--ground); }
+::-webkit-scrollbar-thumb:hover { background: #b9b6b1; }
 
 input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.4;
-  filter: invert(0.8);
-}
+input[type="number"]::-webkit-outer-spin-button { opacity: 0.5; }
+
+:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; }
 
 @keyframes dropIn { from { opacity: 0; transform: translateY(-4px) scale(0.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
 
-@keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.cf-page-enter { animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
-
-.wa-star-glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
-.wa-star-glow > span {
-  position: absolute;
-  width: 300%;
-  height: 50%;
-  opacity: 0.7;
-  border-radius: 50%;
+.kpi-strip {
+  gap: 1px !important;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
 }
-.wa-star-glow > .wa-star-top { top: -8px; left: -250%; animation: wa-star-top linear infinite alternate; }
-.wa-star-glow > .wa-star-bottom { bottom: -8px; right: -250%; animation: wa-star-bottom linear infinite alternate; }
-@keyframes wa-star-top { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(100%,0); opacity: 0; } }
-@keyframes wa-star-bottom { 0% { transform: translate(0,0); opacity: 1; } 100% { transform: translate(-100%,0); opacity: 0; } }
+.kpi-strip > * { background: var(--surface); }
 
-.wa-navlink::after {
-  content: '';
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 2px;
-  height: 1.5px;
-  background: var(--color-amber-400);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+.recharts-cartesian-axis-tick-value,
+.recharts-polar-angle-axis-tick-value,
+.recharts-label { fill: var(--muted) !important; font-size: 12px; }
+.recharts-cartesian-grid line { stroke: var(--grid) !important; stroke-dasharray: 0 !important; }
+.recharts-cartesian-axis-line { stroke: var(--control) !important; }
+.recharts-legend-item-text { color: var(--muted) !important; }
+.recharts-default-tooltip {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+  font-size: 12px !important;
 }
-.wa-navlink.wa-navlink-active::after { transform: scaleX(1); }
+.recharts-tooltip-label { color: var(--text) !important; font-weight: 500; }
+.recharts-tooltip-item { color: var(--text) !important; }
+.recharts-tooltip-cursor { fill: rgb(0 0 0 / 0.04) !important; stroke: var(--control) !important; }
 
-@keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.cf-stagger > * { animation: riseIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.cf-stagger > *:nth-child(1){animation-delay:.02s} .cf-stagger > *:nth-child(2){animation-delay:.06s}
-.cf-stagger > *:nth-child(3){animation-delay:.10s} .cf-stagger > *:nth-child(4){animation-delay:.14s}
-.cf-stagger > *:nth-child(5){animation-delay:.18s} .cf-stagger > *:nth-child(n+6){animation-delay:.22s}
+input[class]:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),
+select[class],
+textarea[class] {
+  background-color: #ffffff;
+  border-color: var(--control);
+}

@@ -182,7 +182,7 @@ export default function ImportView() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div>
-        <h1 className="font-display text-2xl font-700 text-stone-100 tracking-tight">Import Data</h1>
+        <h1 className="text-2xl font-semibold text-stone-100">Import data</h1>
         <p className="text-sm text-stone-400 mt-1">
           {formatNumber(txCount)} transactions · {formatNumber(catCount)} catalogue products stored
         </p>
@@ -193,12 +193,12 @@ export default function ImportView() {
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         className={`border-2 border-dashed p-10 text-center cursor-pointer transition-colors ${
-          dragging ? 'border-amber-400 bg-amber-500/10' : 'border-stone-600 hover:border-amber-300 bg-stone-900'
+          dragging ? 'border-amber-400 bg-amber-500/10' : 'border-[#d4d2ce] hover:border-amber-300 bg-stone-900'
         }`}
         onClick={() => csvRef.current?.click()}
       >
-        <div className="w-12 h-12 rounded-xl bg-stone-700 border border-stone-600 flex items-center justify-center mx-auto mb-3">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <div className="w-12 h-12 rounded-lg bg-stone-700 border border-[#d4d2ce] flex items-center justify-center mx-auto mb-3">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8783" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         </div>
         <p className="font-medium text-stone-100">Drop Square CSV here or click to browse</p>
         <p className="text-sm text-stone-400 mt-1">Accepts Square transaction export (.csv)</p>
@@ -207,10 +207,10 @@ export default function ImportView() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            <h2 className="font-semibold text-stone-100">Shopify Orders</h2>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8783" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+            <h2 className="font-semibold text-stone-100">Shopify orders</h2>
           </div>
           <p className="text-sm text-stone-400 mb-3">Import from Shopify Admin → Orders → Export as CSV.</p>
           <Button
@@ -224,10 +224,10 @@ export default function ImportView() {
             onChange={e => { const f = e.target.files?.[0]; if (f) handleShopify(f); e.target.value = '' }} />
         </div>
 
-        <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+        <div className="bg-white border border-[var(--border)] rounded-lg p-5">
           <div className="flex items-center gap-2 mb-2">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-            <h2 className="font-semibold text-stone-100">Etsy Orders</h2>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8783" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+            <h2 className="font-semibold text-stone-100">Etsy orders</h2>
           </div>
           <p className="text-sm text-stone-400 mb-3">Import from Etsy Shop Manager → Orders → Download CSV.</p>
           <Button
@@ -242,9 +242,9 @@ export default function ImportView() {
         </div>
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <div className="flex items-center gap-2 mb-2">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8a8783" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
           <h2 className="font-semibold text-stone-100">Operating Expenses (XLSX)</h2>
         </div>
         <p className="text-sm text-stone-400 mb-3">Import the Walley's Ops spreadsheet to bulk-load operating expenses.</p>
@@ -259,7 +259,7 @@ export default function ImportView() {
           onChange={e => { const f = e.target.files?.[0]; if (f) handleOpex(f); e.target.value = '' }} />
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
         <h2 className="font-semibold text-stone-100 mb-3">Catalogue Import (XLSX)</h2>
         <p className="text-sm text-stone-400 mb-3">Import Square Item Library export to enable price tracking and catalogue checking.</p>
         <Button
@@ -273,8 +273,8 @@ export default function ImportView() {
           onChange={e => { const f = e.target.files?.[0]; if (f) handleXLSX(f); e.target.value = '' }} />
       </div>
 
-      <div className="bg-stone-800/30 border border-stone-700/40 p-5">
-        <h2 className="font-semibold text-stone-100 mb-1">Data Backup</h2>
+      <div className="bg-white border border-[var(--border)] rounded-lg p-5">
+        <h2 className="font-semibold text-stone-100 mb-1">Data backup</h2>
         <p className="text-sm text-stone-400 mb-4">Export all your data to a backup file. Restore it after reinstalling or on a new machine.</p>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -286,7 +286,7 @@ export default function ImportView() {
           <button
             onClick={() => backupRef.current?.click()}
             disabled={importing}
-            className="px-4 py-2 bg-stone-700 text-stone-200 border border-stone-600 rounded-lg text-sm font-medium hover:bg-stone-600 disabled:opacity-50"
+            className="px-4 py-2 bg-stone-700 text-stone-200 border border-[#d4d2ce] rounded-lg text-sm font-medium hover:bg-stone-800 disabled:opacity-50"
           >
             {importing ? 'Restoring…' : 'Restore from Backup'}
           </button>
@@ -298,7 +298,7 @@ export default function ImportView() {
 
       {(txCount > 0 || catCount > 0) && (
         <div className="bg-red-500/10 border border-red-500/30 p-4">
-          <h2 className="font-semibold text-red-300 mb-1">Clear All Data</h2>
+          <h2 className="font-semibold text-red-300 mb-1">Clear all data</h2>
           <p className="text-sm text-red-400 mb-3">Permanently deletes all transactions, catalogue products, and settings stored locally.</p>
           {confirmClear ? (
             <div className="flex items-center gap-3">
@@ -311,7 +311,7 @@ export default function ImportView() {
               </button>
               <button
                 onClick={() => setConfirmClear(false)}
-                className="px-4 py-2 bg-stone-800 border border-stone-600 text-stone-100 rounded-lg text-sm font-medium hover:bg-stone-700/50"
+                className="px-4 py-2 bg-stone-800 border border-[#d4d2ce] text-stone-100 rounded-lg text-sm font-medium hover:bg-stone-700/50"
               >
                 Cancel
               </button>

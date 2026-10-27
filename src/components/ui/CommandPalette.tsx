@@ -51,9 +51,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 bg-black/80" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 bg-black/20" onClick={onClose}>
       <div
-        className="w-full max-w-lg bg-stone-900 border border-stone-700 shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-white border border-[var(--border)] rounded-lg shadow-[0_16px_48px_rgb(0_0_0/0.16)] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 px-4 py-3 border-b border-stone-700">
@@ -67,7 +67,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             placeholder="Search products…"
             className="flex-1 bg-transparent text-stone-100 placeholder-stone-500 text-sm focus:outline-none"
           />
-          <kbd className="text-[10px] text-stone-300 border border-stone-700 px-1.5 py-0.5">esc</kbd>
+          <kbd className="text-xs text-stone-300 border border-stone-700 px-1.5 py-0.5">esc</kbd>
         </div>
 
         <div className="max-h-80 overflow-y-auto">
@@ -84,7 +84,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                 onMouseEnter={() => setSelected(i)}
               >
                 <span className="text-sm font-medium truncate">{p.name}</span>
-                <span className="text-xs text-stone-200 font-mono shrink-0 ml-4">
+                <span className="text-xs text-stone-200 tabular-nums shrink-0 ml-4">
                   {formatCurrency(p.totalRevenue)} · {formatNumber(p.totalUnitsSold)} units
                 </span>
               </button>
@@ -92,7 +92,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           )}
         </div>
 
-        <div className="px-4 py-2 border-t border-stone-700/50 flex items-center gap-4 text-[10px] text-stone-300">
+        <div className="px-4 py-2 border-t border-stone-700/50 flex items-center gap-4 text-xs text-stone-300">
           <span><kbd className="border border-stone-700 px-1">↑↓</kbd> navigate</span>
           <span><kbd className="border border-stone-700 px-1">↵</kbd> open</span>
           <span><kbd className="border border-stone-700 px-1">esc</kbd> close</span>

@@ -196,7 +196,7 @@ export async function refreshAccessToken(): Promise<void> {
   }
 
   if (!data.access_token) {
-    throw new Error(data.error_description ?? data.error ?? 'Token refresh failed — please reconnect.')
+    throw new Error(data.error_description ?? data.error ?? 'Token refresh failed, please reconnect.')
   }
 
   useAuthStore.getState().setCredentials({

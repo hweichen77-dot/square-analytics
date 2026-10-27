@@ -53,27 +53,27 @@ export function SortableTable<T>({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="bg-stone-900/70 text-stone-200 uppercase text-[10px] tracking-wider">
+        <thead className="text-stone-500 text-xs">
           <tr>
             {columns.map(col => (
               <th
                 key={col.key}
                 onClick={() => handleSort(col.key)}
-                className={`px-4 py-3 font-semibold cursor-pointer select-none hover:text-stone-300 transition-colors ${alignClass(col.align)}`}
+                className={`px-4 h-10 font-normal whitespace-nowrap border-b border-[var(--border)] cursor-pointer select-none hover:text-stone-100 transition-colors ${alignClass(col.align)}`}
               >
                 {col.label}
                 {sortKey === col.key && (
-                  <span className="ml-1 text-amber-400">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                  <span className="ml-1 text-stone-100">{sortDir === 'asc' ? '↑' : '↓'}</span>
                 )}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-stone-700/40">
-          {displayed.map((row, idx) => (
-            <tr key={rowKey(row)} className={`hover:bg-stone-700/30 transition-colors ${idx % 2 === 1 ? 'bg-stone-800/40' : ''}`}>
+        <tbody className="divide-y divide-[var(--rule)]">
+          {displayed.map(row => (
+            <tr key={rowKey(row)} className="hover:bg-[var(--raised)] transition-colors">
               {columns.map(col => (
-                <td key={col.key} className={`px-4 py-3 text-stone-100 ${alignClass(col.align)}`}>
+                <td key={col.key} className={`px-4 h-11 text-stone-100 tabular-nums ${alignClass(col.align)}`}>
                   {col.render ? col.render(row) : col.getValue ? String(col.getValue(row)) : ''}
                 </td>
               ))}
@@ -82,7 +82,7 @@ export function SortableTable<T>({
         </tbody>
       </table>
       {displayed.length === 0 && (
-        <div className="text-center py-10 text-stone-200 text-sm">No data to display.</div>
+        <div className="px-4 py-6 text-stone-500 text-sm">Nothing in this period.</div>
       )}
     </div>
   )
