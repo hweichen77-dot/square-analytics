@@ -504,6 +504,11 @@ export default function SquareSyncView() {
               </div>
             </div>
           )}
+          {store.stockHistoryError ? (
+            <p className="text-sm text-red-400">Stock history failed and will retry on the next sync. {store.stockHistoryError}</p>
+          ) : store.stockHistorySyncedThrough ? (
+            <p className="text-sm text-stone-400">Stock history synced through {new Date(store.stockHistorySyncedThrough).toLocaleDateString()}.</p>
+          ) : null}
           <button
             onClick={handleSync}
             disabled={syncing}

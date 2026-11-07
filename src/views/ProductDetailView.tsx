@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { useAllTransactions, useOverridesMap, useCatalogueProduct, useStockMovements } from '../db/useTransactions'
 import { stockMovementLabel } from '../types/models'
+import { useAuthStore } from '../store/authStore'
 import {
   computeProductStats,
   computeProductTimeSeries,
@@ -55,6 +56,8 @@ export default function ProductDetailView() {
   const overrides = useOverridesMap()
   const catalogueProduct = useCatalogueProduct(productName)
   const movements = useStockMovements(productName)
+  const stockHistorySyncedThrough = useAuthStore(s => s.stockHistorySyncedThrough)
+  const stockHistoryError = useAuthStore(s => s.stockHistoryError)
   const navigate = useNavigate()
   const [showAllTx, setShowAllTx] = useState(false)
   const [granularity, setGranularity] = useState<TimeGranularity>('Monthly')
@@ -248,7 +251,11 @@ export default function ProductDetailView() {
           </div>
           {movements.length === 0 ? (
             <div className="py-10 text-center text-stone-400 text-sm">
-              No stock updates recorded. Sync with Square to pull inventory history.
+              {stockHistoryError
+                ? `Stock history couldn't sync. ${stockHistoryError}`
+                : !stockHistorySyncedThrough
+                  ? 'Stock history loads after your next Square sync.'
+                  : `No stock updates for this product through ${format(new Date(stockHistorySyncedThrough), 'MMM d, yyyy')}.`}
             </div>
           ) : (
             <div className="overflow-x-auto max-h-80">
@@ -268,7 +275,7 @@ export default function ProductDetailView() {
                     const { label, delta } = stockMovementLabel(m)
                     return (
                       <tr key={m.id ?? m.changeId} className="hover:bg-stone-700/40">
-                        <td className="px-4 py-2 text-stone-400 tabular-nums whitespace-nowrap">
+                        <td className="px-4 py-2 text-left text-stone-400 whitespace-nowrap">
                           {format(m.occurredAt, 'MMM d, yyyy h:mm a')}
                         </td>
                         <td className="px-4 py-2 text-stone-100">{label}</td>

@@ -144,7 +144,7 @@ export interface CatalogueProduct {
   lastSyncedAt?: Date
 }
 
-export type StockMovementType = 'ADJUSTMENT' | 'PHYSICAL_COUNT' | 'TRANSFER'
+export type StockMovementType = 'ADJUSTMENT' | 'PHYSICAL_COUNT'
 
 export interface StockMovement {
   id?: number
@@ -162,7 +162,6 @@ export interface StockMovement {
 
 export function stockMovementLabel(m: StockMovement): { label: string; delta: number } {
   if (m.type === 'PHYSICAL_COUNT') return { label: 'Recount', delta: 0 }
-  if (m.type === 'TRANSFER') return { label: 'Transfer', delta: 0 }
 
   const from = m.fromState ?? 'NONE'
   const to = m.toState ?? 'NONE'

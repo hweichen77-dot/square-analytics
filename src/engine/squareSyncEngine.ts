@@ -5,7 +5,8 @@ import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fet
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
 import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs, upsertStockMovements } from '../db/dbUtils'
 import { db } from '../db/database'
-import type { SalesTransaction, CatalogueProduct, TransactionLineItem, StockMovement } from '../types/models'
+import { changesToStockRecords, stockHistoryStart, stockHistoryWindows } from './stockHistory'
+import type { SalesTransaction, CatalogueProduct, TransactionLineItem } from '../types/models'
 import { parseProductItems, splitItemVariation } from '../types/models'
 
 export interface SyncStatus {
@@ -397,50 +398,55 @@ async function _runSyncImpl(
   }
   await upsertCatalogueProducts(products)
 
-  try {
-    const changes = await fetchInventoryChanges(accessToken, locationID, startDate.toISOString(), endDate.toISOString())
-    const nameByVarId = new Map(products.map(p => [p.squareItemID, p.name]))
-
-    const restocks = changes.flatMap(c => {
-      if (c.type !== 'ADJUSTMENT') return []
-      const isReceiving = c.fromState == null || c.fromState === 'NONE'
-      if (!(c.quantity > 0) || c.toState !== 'IN_STOCK' || !isReceiving) return []
-      const productName = nameByVarId.get(c.catalogObjectId)
-      if (!productName) return []
-      const date = new Date(c.occurredAt)
-      if (isNaN(date.getTime())) return []
-      return [{ productName, date, quantity: c.quantity, notes: 'Square inventory' }]
-    })
-    await upsertRestockLogs(restocks)
-
-    const movements = changes.flatMap((c): Omit<StockMovement, 'id'>[] => {
-      const productName = nameByVarId.get(c.catalogObjectId)
-      if (!productName) return []
-      const occurredAt = new Date(c.occurredAt)
-      if (isNaN(occurredAt.getTime())) return []
-      return [{
-        changeId: c.id,
-        productName,
-        catalogObjectId: c.catalogObjectId,
-        type: c.type,
-        fromState: c.fromState,
-        toState: c.toState,
-        quantity: c.quantity,
-        occurredAt,
-        source: c.source,
-        staffName: c.teamMemberId ? (employeeMap[c.teamMemberId] ?? '') : '',
-      }]
-    })
-    await upsertStockMovements(movements)
-  } catch {
-  }
-
   useAuthStore.getState().setCredentials({
     lastSyncDate: endDate.toISOString(),
     lastSyncCount: ordersAdded,
   })
 
   onStatus({ phase: 'done', message: 'Sync complete', ordersAdded, productsAdded: products.length })
+
+  void syncStockHistory(products, employeeMap, daysBackStart)
+}
+
+let _stockHistoryInFlight = false
+const STOCK_HISTORY_ATTEMPTS = 3
+
+async function withRetries<T>(run: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await run()
+    } catch (e) {
+      if (attempt >= STOCK_HISTORY_ATTEMPTS || /Square API error 4(?!29)/.test(String(e))) throw e
+    }
+  }
+}
+
+async function syncStockHistory(
+  products: { squareItemID: string; name: string }[],
+  employeeMap: Record<string, string>,
+  earliest: Date,
+): Promise<void> {
+  if (_stockHistoryInFlight) return
+  _stockHistoryInFlight = true
+  const { setCredentials } = useAuthStore.getState()
+  try {
+    const { accessToken, locationID, stockHistorySyncedThrough } = useAuthStore.getState()
+    const nameByVarId = new Map(products.map(p => [p.squareItemID, p.name]))
+    const start = stockHistoryStart(stockHistorySyncedThrough, earliest)
+    for (const window of stockHistoryWindows(start, new Date())) {
+      const changes = await withRetries(() =>
+        fetchInventoryChanges(accessToken, locationID, window.begin.toISOString(), window.end.toISOString()),
+      )
+      const { restocks, movements } = changesToStockRecords(changes, nameByVarId, employeeMap)
+      await upsertRestockLogs(restocks)
+      await upsertStockMovements(movements)
+      setCredentials({ stockHistorySyncedThrough: window.end.toISOString(), stockHistoryError: null })
+    }
+  } catch (e) {
+    setCredentials({ stockHistoryError: e instanceof Error ? e.message : String(e) })
+  } finally {
+    _stockHistoryInFlight = false
+  }
 }
 
 export { parseProductItems }

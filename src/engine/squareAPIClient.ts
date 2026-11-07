@@ -494,7 +494,7 @@ export async function fetchShifts(
 
 export interface SquareInventoryChange {
   id: string
-  type: 'ADJUSTMENT' | 'PHYSICAL_COUNT' | 'TRANSFER'
+  type: 'ADJUSTMENT' | 'PHYSICAL_COUNT'
   catalogObjectId: string
   quantity: number
   fromState?: string
@@ -530,10 +530,10 @@ export async function fetchInventoryChanges(
   do {
     const body: Record<string, unknown> = {
       location_ids: [locationID],
-      types: ['ADJUSTMENT', 'PHYSICAL_COUNT', 'TRANSFER'],
+      types: ['ADJUSTMENT', 'PHYSICAL_COUNT'],
       updated_after: beginTime,
       updated_before: endTime,
-      limit: 1000,
+      limit: 100,
     }
     if (cursor) body.cursor = cursor
 
@@ -542,14 +542,13 @@ export async function fetchInventoryChanges(
         type?: string
         adjustment?: RawInventoryDetail
         physical_count?: RawInventoryDetail
-        transfer?: RawInventoryDetail
       }>
       cursor?: string
     }
 
     for (const c of data.changes ?? []) {
       const type = c.type as SquareInventoryChange['type'] | undefined
-      const detail = c.adjustment ?? c.physical_count ?? c.transfer
+      const detail = c.adjustment ?? c.physical_count
       if (!type || !detail?.catalog_object_id) continue
       const occurredAt = detail.occurred_at ?? detail.created_at ?? ''
       if (!occurredAt) continue
