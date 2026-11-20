@@ -15,7 +15,8 @@
     "cap:android": "npm run build:mobile && npx cap sync android && npx cap open android",
     "tauri": "tauri",
     "check:revenue": "esbuild src/engine/__checks__/revenueParity.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/revcheck.mjs --log-level=error && node node_modules/.cache/revcheck.mjs",
-    "check:stock": "esbuild src/engine/__checks__/stockHistory.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/stockcheck.mjs --log-level=error && node node_modules/.cache/stockcheck.mjs"
+    "check:stock": "esbuild src/engine/__checks__/stockHistory.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/stockcheck.mjs --log-level=error && node node_modules/.cache/stockcheck.mjs",
+    "check:loyalty": "esbuild src/engine/__checks__/loyalty.check.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/loyaltycheck.mjs --log-level=error && node node_modules/.cache/loyaltycheck.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^6.0.0",

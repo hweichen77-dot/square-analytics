@@ -29,6 +29,7 @@ export interface SalesTransaction {
   paymentSourceType?: string
   cardBrand?: string
   cardLastFour?: string
+  cardFingerprint?: string
 }
 
 export interface StoredRefund {

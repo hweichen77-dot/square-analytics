@@ -19,6 +19,11 @@ interface AuthStore {
   customerBackfillDone: boolean
   stockHistorySyncedThrough: string | null
   stockHistoryError: string | null
+  fingerprintBackfillDone: boolean
+  loyaltyLive: boolean
+  loyaltySquareIds: Record<string, string>
+  loyaltyCardsIssued: Record<string, string>
+  loyaltyLastApplied: string | null
 
   setCredentials: (creds: Partial<AuthStore>) => void
   clearAuth: () => void
@@ -43,6 +48,11 @@ export const useAuthStore = create<AuthStore>()(
       customerBackfillDone: false,
       stockHistorySyncedThrough: null,
       stockHistoryError: null,
+      fingerprintBackfillDone: false,
+      loyaltyLive: false,
+      loyaltySquareIds: {},
+      loyaltyCardsIssued: {},
+      loyaltyLastApplied: null,
 
       setCredentials: creds => set(s => ({ ...s, ...creds })),
       clearAuth: () => set({
@@ -51,6 +61,10 @@ export const useAuthStore = create<AuthStore>()(
         customerBackfillDone: false,
         stockHistorySyncedThrough: null,
         stockHistoryError: null,
+        fingerprintBackfillDone: false,
+        loyaltyLive: false,
+        loyaltySquareIds: {},
+        loyaltyLastApplied: null,
       }),
     }),
     { name: 'walleys-auth', storage: createJSONStorage(authStorage) }

@@ -39,7 +39,7 @@ async function squareFetch(
 
 async function squareRequest(
   token: string,
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   url: string,
   body?: unknown,
 ): Promise<unknown> {
@@ -287,6 +287,7 @@ export interface SquareCustomer {
   family_name?: string
   email_address?: string
   phone_number?: string
+  group_ids?: string[]
 }
 
 export async function fetchCustomersByIds(token: string, ids: string[]): Promise<SquareCustomer[]> {
@@ -313,7 +314,7 @@ export interface SquarePayment {
   processingFee?: Array<{ amountMoney: { amount: number } }>
   status: string
   sourceType: string
-  cardDetails?: { card?: { cardBrand?: string; last4?: string } }
+  cardDetails?: { card?: { cardBrand?: string; last4?: string; fingerprint?: string } }
   createdAt: string
 }
 
@@ -326,7 +327,7 @@ interface RawSquarePayment {
   processing_fee?: Array<{ amount_money?: { amount: number } }>
   status?: string
   source_type?: string
-  card_details?: { card?: { card_brand?: string; last_4?: string } }
+  card_details?: { card?: { card_brand?: string; last_4?: string; fingerprint?: string } }
   created_at?: string
 }
 
@@ -341,7 +342,7 @@ function mapPayment(p: RawSquarePayment): SquarePayment {
     status: p.status ?? '',
     sourceType: p.source_type ?? '',
     cardDetails: p.card_details
-      ? { card: { cardBrand: p.card_details.card?.card_brand, last4: p.card_details.card?.last_4 } }
+      ? { card: { cardBrand: p.card_details.card?.card_brand, last4: p.card_details.card?.last_4, fingerprint: p.card_details.card?.fingerprint } }
       : undefined,
     createdAt: p.created_at ?? '',
   }
@@ -642,4 +643,64 @@ export async function updateItemTaxes(
     taxes_to_enable: taxesToEnable,
     taxes_to_disable: taxesToDisable,
   })
+}
+
+export async function searchCustomersByEmail(token: string, fuzzyEmail: string): Promise<SquareCustomer[]> {
+  const customers: SquareCustomer[] = []
+  let cursor: string | undefined
+  do {
+    const data = await squareRequest(token, 'POST', `${BASE}/customers/search`, {
+      limit: 100,
+      ...(cursor ? { cursor } : {}),
+      query: { filter: { email_address: { fuzzy: fuzzyEmail } } },
+    }) as { customers?: SquareCustomer[]; cursor?: string }
+    customers.push(...(data.customers ?? []))
+    cursor = data.cursor
+  } while (cursor)
+  return customers
+}
+
+export interface SquareCustomerGroup {
+  id: string
+  name: string
+}
+
+export async function listCustomerGroups(token: string): Promise<SquareCustomerGroup[]> {
+  const groups: SquareCustomerGroup[] = []
+  let cursor: string | undefined
+  do {
+    const url = `${BASE}/customers/groups${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`
+    const data = await squareRequest(token, 'GET', url) as { groups?: SquareCustomerGroup[]; cursor?: string }
+    groups.push(...(data.groups ?? []))
+    cursor = data.cursor
+  } while (cursor)
+  return groups
+}
+
+export async function createCustomerGroup(token: string, name: string, idempotencyKey: string): Promise<SquareCustomerGroup> {
+  const data = await squareRequest(token, 'POST', `${BASE}/customers/groups`, {
+    idempotency_key: idempotencyKey,
+    group: { name },
+  }) as { group: SquareCustomerGroup }
+  return data.group
+}
+
+export async function addCustomerToGroup(token: string, customerId: string, groupId: string): Promise<void> {
+  await squareRequest(token, 'PUT', `${BASE}/customers/${encodeURIComponent(customerId)}/groups/${encodeURIComponent(groupId)}`)
+}
+
+export async function removeCustomerFromGroup(token: string, customerId: string, groupId: string): Promise<void> {
+  await squareRequest(token, 'DELETE', `${BASE}/customers/${encodeURIComponent(customerId)}/groups/${encodeURIComponent(groupId)}`)
+}
+
+export interface CatalogUpsertResult {
+  idMappings: { clientObjectId: string; objectId: string }[]
+}
+
+export async function batchUpsertCatalog(token: string, objects: unknown[], idempotencyKey: string): Promise<CatalogUpsertResult> {
+  const data = await squareRequest(token, 'POST', `${BASE}/catalog/batch-upsert`, {
+    idempotency_key: idempotencyKey,
+    batches: [{ objects }],
+  }) as { id_mappings?: { client_object_id: string; object_id: string }[] }
+  return { idMappings: (data.id_mappings ?? []).map(m => ({ clientObjectId: m.client_object_id, objectId: m.object_id })) }
 }

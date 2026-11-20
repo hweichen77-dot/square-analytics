@@ -3,6 +3,7 @@ import { useAuthStore } from '../store/authStore'
 import { refreshAccessToken } from './squareAuth'
 import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts, fetchVendors } from './squareAPIClient'
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
+import { runLoyaltyStep } from './squareLoyalty'
 import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs, upsertStockMovements } from '../db/dbUtils'
 import { db } from '../db/database'
 import { changesToStockRecords, stockHistoryStart, stockHistoryWindows } from './stockHistory'
@@ -224,6 +225,30 @@ async function backfillCustomerLinks(
   })
 }
 
+async function backfillCardFingerprints(accessToken: string, locationID: string): Promise<void> {
+  const earliest = await db.salesTransactions.orderBy('date').first()
+  if (!earliest) return
+  const payments = await fetchPayments(accessToken, locationID, new Date(earliest.date).toISOString(), new Date().toISOString())
+  const byOrderId = new Map(
+    payments
+      .filter(p => p.orderId && p.cardDetails?.card?.fingerprint)
+      .map(p => [p.orderId!, p]),
+  )
+  if (byOrderId.size === 0) return
+  const stored = await db.salesTransactions
+    .filter(t => !t.cardFingerprint && byOrderId.has(t.transactionID))
+    .toArray()
+  await db.transaction('rw', db.salesTransactions, async () => {
+    for (const tx of stored) {
+      const payment = byOrderId.get(tx.transactionID)!
+      await db.salesTransactions.update(tx.id!, {
+        cardFingerprint: payment.cardDetails!.card!.fingerprint,
+        customerID: tx.customerID ?? payment.customerId,
+      })
+    }
+  })
+}
+
 export async function runSquareSync(
   onStatus: (status: SyncStatus) => void,
 ): Promise<void> {
@@ -283,6 +308,7 @@ async function _runSyncImpl(
       tx.processingFee = payment.processingFee?.[0]?.amountMoney?.amount ?? 0
       tx.cardBrand = payment.cardDetails?.card?.cardBrand
       tx.cardLastFour = payment.cardDetails?.card?.last4
+      tx.cardFingerprint = payment.cardDetails?.card?.fingerprint
       if (!tx.customerID && payment.customerId) {
         tx.customerID = payment.customerId
       }
@@ -349,6 +375,14 @@ async function _runSyncImpl(
     }
   }
 
+  if (!useAuthStore.getState().fingerprintBackfillDone) {
+    try {
+      await backfillCardFingerprints(accessToken, locationID)
+      useAuthStore.getState().setCredentials({ fingerprintBackfillDone: true })
+    } catch {
+    }
+  }
+
   onStatus({ phase: 'catalogue', message: 'Fetching catalogue...', ordersAdded, productsAdded: 0 })
   const catObjects = await fetchCatalogue(accessToken)
 
@@ -402,6 +436,11 @@ async function _runSyncImpl(
     lastSyncDate: endDate.toISOString(),
     lastSyncCount: ordersAdded,
   })
+
+  try {
+    await runLoyaltyStep()
+  } catch {
+  }
 
   onStatus({ phase: 'done', message: 'Sync complete', ordersAdded, productsAdded: products.length })
 

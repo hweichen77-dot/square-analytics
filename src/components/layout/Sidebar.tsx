@@ -30,6 +30,7 @@ const NAV_SECTIONS: { heading?: string; items: NavItem[] }[] = [
       { label: 'Seasonal and events', path: '/seasonal' },
       { label: 'Profit margins', path: '/profit' },
       { label: 'Customers', path: '/customers' },
+      { label: 'Loyalty', path: '/loyalty' },
     ],
   },
   {
