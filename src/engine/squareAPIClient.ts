@@ -85,6 +85,7 @@ export interface SquareOrderLineItem {
   gross_sales_money?: { amount: number; currency: string }
   total_discount_money?: { amount: number; currency: string }
   total_tax_money?: { amount: number; currency: string }
+  item_type?: string
 }
 
 export interface SquareOrder {
@@ -93,9 +94,12 @@ export interface SquareOrder {
   closed_at?: string
   tenders?: { type: string; amount_money?: { amount: number } }[]
   line_items?: SquareOrderLineItem[]
-  net_amounts?: { total_money: { amount: number } }
+  net_amounts?: { total_money: { amount: number }; tax_money?: { amount: number }; tip_money?: { amount: number }; service_charge_money?: { amount: number } }
+  returns?: { return_line_items?: { name?: string; item_type?: string; gross_return_money?: { amount: number }; total_discount_money?: { amount: number } }[] }[]
   total_money?: { amount: number }
   return_amounts?: { total_money: { amount: number } }
+  total_tax_money?: { amount: number }
+  total_tip_money?: { amount: number }
   employee_id?: string
   customer_id?: string
 }
@@ -288,6 +292,8 @@ export interface SquareCustomer {
   email_address?: string
   phone_number?: string
   group_ids?: string[]
+  reference_id?: string
+  version?: number
 }
 
 export async function fetchCustomersByIds(token: string, ids: string[]): Promise<SquareCustomer[]> {
@@ -645,19 +651,23 @@ export async function updateItemTaxes(
   })
 }
 
-export async function searchCustomersByEmail(token: string, fuzzyEmail: string): Promise<SquareCustomer[]> {
+async function searchCustomers(token: string, filter: Record<string, unknown>): Promise<SquareCustomer[]> {
   const customers: SquareCustomer[] = []
   let cursor: string | undefined
   do {
     const data = await squareRequest(token, 'POST', `${BASE}/customers/search`, {
       limit: 100,
       ...(cursor ? { cursor } : {}),
-      query: { filter: { email_address: { fuzzy: fuzzyEmail } } },
+      query: { filter },
     }) as { customers?: SquareCustomer[]; cursor?: string }
     customers.push(...(data.customers ?? []))
     cursor = data.cursor
   } while (cursor)
   return customers
+}
+
+export function searchCustomersByEmail(token: string, fuzzyEmail: string): Promise<SquareCustomer[]> {
+  return searchCustomers(token, { email_address: { fuzzy: fuzzyEmail } })
 }
 
 export interface SquareCustomerGroup {
@@ -693,6 +703,13 @@ export async function removeCustomerFromGroup(token: string, customerId: string,
   await squareRequest(token, 'DELETE', `${BASE}/customers/${encodeURIComponent(customerId)}/groups/${encodeURIComponent(groupId)}`)
 }
 
+export async function setCustomerReferenceId(token: string, customerId: string, referenceId: string, version?: number): Promise<void> {
+  await squareRequest(token, 'PUT', `${BASE}/customers/${encodeURIComponent(customerId)}`, {
+    reference_id: referenceId,
+    ...(version !== undefined ? { version } : {}),
+  })
+}
+
 export interface CatalogUpsertResult {
   idMappings: { clientObjectId: string; objectId: string }[]
 }
@@ -703,4 +720,35 @@ export async function batchUpsertCatalog(token: string, objects: unknown[], idem
     batches: [{ objects }],
   }) as { id_mappings?: { client_object_id: string; object_id: string }[] }
   return { idMappings: (data.id_mappings ?? []).map(m => ({ clientObjectId: m.client_object_id, objectId: m.object_id })) }
+}
+
+export interface SquareCatalogObjectSummary {
+  id: string
+  type: string
+  name: string
+}
+
+export async function searchCatalogByTypes(token: string, objectTypes: string[]): Promise<SquareCatalogObjectSummary[]> {
+  const out: SquareCatalogObjectSummary[] = []
+  let cursor: string | undefined
+  do {
+    const data = await squareRequest(token, 'POST', `${BASE}/catalog/search`, {
+      object_types: objectTypes,
+      include_deleted_objects: false,
+      limit: 1000,
+      ...(cursor ? { cursor } : {}),
+    }) as { objects?: { id: string; type: string; is_deleted?: boolean; discount_data?: { name?: string }; pricing_rule_data?: { name?: string }; product_set_data?: { name?: string }; item_data?: { name?: string } }[]; cursor?: string }
+    for (const o of data.objects ?? []) {
+      if (o.is_deleted) continue
+      const name = o.discount_data?.name ?? o.pricing_rule_data?.name ?? o.product_set_data?.name ?? o.item_data?.name ?? ''
+      out.push({ id: o.id, type: o.type, name })
+    }
+    cursor = data.cursor
+  } while (cursor)
+  return out
+}
+
+export async function searchCustomersInGroups(token: string, groupIds: string[]): Promise<SquareCustomer[]> {
+  if (groupIds.length === 0) return []
+  return searchCustomers(token, { group_ids: { any: groupIds } })
 }

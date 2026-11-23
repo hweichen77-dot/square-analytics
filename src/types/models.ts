@@ -30,6 +30,7 @@ export interface SalesTransaction {
   cardBrand?: string
   cardLastFour?: string
   cardFingerprint?: string
+  loyaltySpend?: number
 }
 
 export interface StoredRefund {

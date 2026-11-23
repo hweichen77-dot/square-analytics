@@ -1,6 +1,8 @@
-import { computeStandings, levelName, allLevels, membersFromCustomers, qualifyingAmount, weekStartOf } from '../loyaltyEngine'
+import { computeStandings, levelName, allLevels, membersFromCustomers, qualifyingAmount, weekStartOf, orderLoyaltySpend, planGroupChanges, cardNumberKey, newMemberCode, normalizeMemberCode, codeCheckChar, resolveMemberCodes } from '../loyaltyEngine'
+import { qrModules } from '../loyaltyCards'
 import type { LoyaltyTx } from '../loyaltyEngine'
 import type { SalesTransaction } from '../../types/models'
+import type { SquareOrder } from '../squareAPIClient'
 
 let failures = 0
 function check(name: string, ok: boolean, detail = ''): void {
@@ -71,6 +73,98 @@ check('linking a card makes its past spend count', benCard.tier === 'Bronze' && 
 check('a card used by two members stays with the first and is flagged', r.sharedCards.length === 1 && r.sharedCards[0].owner === 'ben@warriorlife.net')
 
 check('weeks start on Monday', weekStartOf(new Date(2026, 7, 9)).getDate() === 3)
+
+const order: SquareOrder = {
+  id: 'o1', created_at: '2026-09-01T18:00:00Z',
+  net_amounts: { total_money: { amount: 3500 }, tax_money: { amount: 250 }, tip_money: { amount: 150 } },
+  line_items: [
+    { name: 'Gift Card', quantity: '1', item_type: 'GIFT_CARD', gross_sales_money: { amount: 2000, currency: 'USD' } },
+    { name: 'Hoodie', quantity: '1', item_type: 'ITEM', gross_sales_money: { amount: 1200, currency: 'USD' }, total_discount_money: { amount: 100, currency: 'USD' } },
+  ],
+}
+check('spend excludes tax, tip and gift cards', Math.abs(orderLoyaltySpend(order) - 11) < 1e-9, `got ${orderLoyaltySpend(order)}`)
+const returned: SquareOrder = {
+  ...order,
+  net_amounts: { total_money: { amount: 1500 }, tax_money: { amount: 250 }, tip_money: { amount: 150 }, service_charge_money: { amount: 100 } },
+  returns: [{ return_line_items: [{ name: 'Gift Card', item_type: 'GIFT_CARD', gross_return_money: { amount: 2000 } }] }],
+}
+check('returned gift cards and service charges handled', Math.abs(orderLoyaltySpend(returned) - 10) < 1e-9, `got ${orderLoyaltySpend(returned)}`)
+const namedGift: SquareOrder = { id: 'o3', created_at: order.created_at, net_amounts: { total_money: { amount: 2500 } },
+  line_items: [{ name: 'Gift Card', quantity: '1', item_type: 'ITEM', gross_sales_money: { amount: 2000, currency: 'USD' } }] }
+check('a catalog item named Gift Card does not count as spend', Math.abs(orderLoyaltySpend(namedGift) - 5) < 1e-9)
+const refundOrder: SquareOrder = { id: 'o4', created_at: order.created_at, net_amounts: { total_money: { amount: -6480 }, tax_money: { amount: -480 } } }
+check('a refund order lowers spend', Math.abs(orderLoyaltySpend(refundOrder) + 60) < 1e-9, `got ${orderLoyaltySpend(refundOrder)}`)
+const legacyOrder: SquareOrder = { id: 'o5', created_at: order.created_at, total_money: { amount: 1080 }, return_amounts: { total_money: { amount: 500 } }, total_tax_money: { amount: 80 } }
+check('orders without net amounts drop tax and returns', Math.abs(orderLoyaltySpend(legacyOrder) - 5) < 1e-9, `got ${orderLoyaltySpend(legacyOrder)}`)
+check('stored loyalty spend wins over net sales', qualifyingAmount({ ...gift, netSales: 40, loyaltySpend: 7 }) === 7)
+
+const numTxs: LoyaltyTx[] = [...storeWeeks(12)]
+for (let w = 4; w < 8; w++) numTxs.push({ date: day(w), amount: 13, customerID: 'A1' })
+const first = computeStandings(numTxs, members, day(9))
+check('first Bronze gets No. 001', first.cardNumbers[cardNumberKey('Bronze', 'ann@warriorlife.net')] === 1)
+for (let w = 0; w < 4; w++) numTxs.push({ date: day(w), amount: 13, customerID: 'C1' })
+const later = computeStandings(numTxs, members, day(9), undefined, first.cardNumbers)
+check('printed numbers never shift when earlier history appears',
+  later.cardNumbers[cardNumberKey('Bronze', 'ann@warriorlife.net')] === 1 && later.cardNumbers[cardNumberKey('Bronze', 'cat@warriorlife.net')] === 2)
+
+const groupNames = { g2: 'Loyalty Bronze 2%', g3: 'Loyalty Bronze 3%', g3dup: 'Loyalty Bronze 3%', other: 'Square Online' }
+const res = computeStandings(stepTxs, members, day(6, 0))
+const customersInSquare = [
+  { id: 'C1', email_address: 'cat@warriorlife.net', group_ids: ['g2', 'g3dup', 'other'] },
+  { id: 'X9', email_address: 'old@gmail.com', group_ids: ['g3', 'other'] },
+]
+const preview = planGroupChanges(res, customersInSquare, groupNames).find(c => c.customerId === 'C1')
+check('before setup, a same-named group counts as the level', !!preview && preview.add === null && preview.remove.map(g => g.id).join() === 'g2')
+const plan = planGroupChanges(res, customersInSquare, groupNames, { 'Loyalty Bronze 3%': 'g3' })
+const cat = plan.find(c => c.customerId === 'C1')
+const stale = plan.find(c => c.customerId === 'X9')
+check('member in a duplicate group moves to the group the discount targets',
+  !!cat && cat.add === 'Loyalty Bronze 3%' && cat.remove.map(g => g.id).sort().join() === 'g2,g3dup', JSON.stringify(cat))
+check('non-loyalty groups are never touched', plan.every(c => c.remove.every(g => g.id !== 'other')))
+check('a non-member left in a loyalty group is removed by its real group id', !!stale && stale.remove.map(g => g.id).join() === 'g3')
+
+const codes = Array.from({ length: 2000 }, () => newMemberCode())
+check('new codes are valid and canonical', codes.every(c => normalizeMemberCode(c) === c && /^WL-[2-9A-HJKMNP-Z]{9}$/.test(c)))
+check('new codes do not repeat in 2000 draws', new Set(codes).size === codes.length)
+check('a code avoids taken codes', newMemberCode(new Set(codes)) !== codes[0])
+const sample = codes[0]
+check('scanner input is normalized', normalizeMemberCode(` ${sample.toLowerCase().replace('-', '')}\n`) === sample)
+const body = sample.slice(3, 11)
+const swapped = body[1] + body[0] + body.slice(2)
+const wrongChar = (body[0] === '2' ? '3' : '2') + body.slice(1)
+check('one wrong character is rejected', normalizeMemberCode(`WL-${wrongChar}${sample[11]}`) === null)
+check('two swapped neighbours are rejected', body[0] === body[1] || codeCheckChar(swapped) !== codeCheckChar(body))
+check('non-codes are rejected', ['', 'WL-', 'hello', 'WL-0O1IL2345', `XX-${body}${sample[11]}`].every(x => normalizeMemberCode(x) === null))
+
+const codeMembers = membersFromCustomers([
+  { id: 'P1', email_address: 'pat@warriorlife.net' },
+  { id: 'P2', email_address: 'pat@warriorlife.net' },
+  { id: 'Q1', email_address: 'quin@warriorlife.net' },
+  { id: 'R1', email_address: 'ray@warriorlife.net' },
+  { id: 'T1', email_address: 'tay@warriorlife.net' },
+])
+const squareProfiles = [
+  { id: 'P1', reference_id: '', version: 3 },
+  { id: 'P2', reference_id: codes[1].toLowerCase(), version: 1 },
+  { id: 'Q1', reference_id: 'STUDENT-123', version: 2 },
+  { id: 'R1', version: 5 },
+  { id: 'T1', reference_id: codes[1] },
+]
+const resolved = resolveMemberCodes(codeMembers, squareProfiles, { 'ray@warriorlife.net': codes[2], 'tay@warriorlife.net': codes[1] })
+check('a code already on any profile wins', resolved.codes['pat@warriorlife.net'] === codes[1])
+check('a saved code is reused when Square has none', resolved.codes['ray@warriorlife.net'] === codes[2])
+check('every member gets a distinct code', new Set(Object.values(resolved.codes)).size === codeMembers.length)
+check('a code on two members is reported and the second gets a new one',
+  resolved.codes['tay@warriorlife.net'] !== codes[1] && resolved.problems.some(p => p.includes('both')))
+check('no write when the code is already in Square', !resolved.writes.some(w => w.email === 'pat@warriorlife.net'))
+check('an empty profile gets the code, with its version', resolved.writes.some(w => w.customerId === 'R1' && w.code === codes[2] && w.version === 5))
+check('a foreign reference ID is never overwritten',
+  !resolved.writes.some(w => w.customerId === 'Q1') && resolved.problems.some(p => p.startsWith('quin@')))
+check('codes are stable across refreshes', JSON.stringify(resolveMemberCodes(codeMembers, squareProfiles, resolved.codes).codes) === JSON.stringify(resolved.codes))
+
+const modules = qrModules(sample)
+const finder = (r: number, c: number) => [0, 6].every(i => modules[r + i][c] && modules[r][c + i] && modules[r + 6][c + i] && modules[r + i][c + 6])
+check('QR for a code is version 1 with three finder patterns', modules.length === 21 && finder(0, 0) && finder(0, 14) && finder(14, 0))
 
 console.log(failures === 0 ? 'all loyalty checks passed' : `${failures} loyalty checks failed`)
 if (failures) process.exit(1)

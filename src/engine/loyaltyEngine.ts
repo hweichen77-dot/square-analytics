@@ -1,4 +1,5 @@
 import type { SalesTransaction } from '../types/models'
+import type { SquareCustomer, SquareOrder } from './squareAPIClient'
 
 export type Tier = 'Bronze' | 'Silver' | 'Gold'
 
@@ -63,9 +64,8 @@ export interface LoyaltyResult {
   standings: MemberStanding[]
   countedWeeks: string[]
   sharedCards: { fingerprint: string; owner: string; alsoUsedBy: string[] }[]
+  cardNumbers: Record<string, number>
 }
-
-const DAY_MS = 86_400_000
 
 export function weekStartOf(date: Date): Date {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate())
@@ -95,8 +95,9 @@ export function allLevels(rules: LoyaltyRules = LOYALTY_RULES): { tier: Tier; pc
 }
 
 export function qualifyingAmount(tx: SalesTransaction): number {
+  if (tx.loyaltySpend !== undefined) return tx.loyaltySpend
   const giftCards = (tx.lineItems ?? [])
-    .filter(li => /gift\s*card/i.test(li.name))
+    .filter(li => isGiftCardLine(li.name, undefined))
     .reduce((sum, li) => sum + li.unitPrice * li.qty, 0)
   return tx.netSales - giftCards
 }
@@ -111,7 +112,7 @@ export function membersFromCustomers(customers: { id: string; email_address?: st
   for (const c of customers) {
     const email = (c.email_address ?? '').trim().toLowerCase()
     if (!email.endsWith(rules.memberEmailDomain)) continue
-    const name = [c.given_name, c.family_name].filter(Boolean).join(' ')
+    const name = customerDisplayName(c)
     const m = byEmail.get(email) ?? { email, name, customerIds: [] }
     if (!m.name && name) m.name = name
     if (!m.customerIds.includes(c.id)) m.customerIds.push(c.id)
@@ -125,7 +126,7 @@ function sum(values: number[]): number {
 }
 
 export function computeStandings(txs: LoyaltyTx[], members: LoyaltyMember[], now: Date,
-  rules: LoyaltyRules = LOYALTY_RULES): LoyaltyResult {
+  rules: LoyaltyRules = LOYALTY_RULES, fixedNumbers: Record<string, number> = {}): LoyaltyResult {
   const sorted = [...txs].sort((a, b) => a.date.getTime() - b.date.getTime())
   const currentWeek = weekKey(now)
   const countedWeeks = [...new Set(sorted.map(t => weekKey(t.date)))].filter(w => w < currentWeek).sort()
@@ -193,12 +194,16 @@ export function computeStandings(txs: LoyaltyTx[], members: LoyaltyMember[], now
     }
   })
 
-  const numbers = new Map<string, number>()
+  const numbers = new Map<string, number>(Object.entries(fixedNumbers))
   for (const tier of ['Bronze', 'Silver', 'Gold'] as Tier[]) {
+    let next = Math.max(0, ...[...numbers.entries()].filter(([k]) => k.startsWith(`${tier}|`)).map(([, n]) => n)) + 1
     const reached = raw
       .flatMap(r => r.promotions.filter(p => p.tier === tier).map(p => ({ email: r.member.email, weekStart: p.weekStart })))
       .sort((a, b) => a.weekStart.localeCompare(b.weekStart) || a.email.localeCompare(b.email))
-    reached.forEach((r, i) => numbers.set(`${tier}|${r.email}`, i + 1))
+    for (const r of reached) {
+      const key = cardNumberKey(tier, r.email)
+      if (!numbers.has(key)) numbers.set(key, next++)
+    }
   }
 
   const standings: MemberStanding[] = raw.map(r => ({
@@ -211,7 +216,7 @@ export function computeStandings(txs: LoyaltyTx[], members: LoyaltyMember[], now
     discountPct: r.pct,
     level: r.tier ? levelName(r.tier, r.pct) : null,
     weeksToNextStep: r.weeksToNextStep,
-    promotions: r.promotions.map(p => ({ ...p, number: numbers.get(`${p.tier}|${r.member.email}`)! })),
+    promotions: r.promotions.map(p => ({ ...p, number: numbers.get(cardNumberKey(p.tier, r.member.email))! })),
     totalSpend: r.total,
     averageLast4: r.avg4,
     progress: r.progress,
@@ -220,7 +225,11 @@ export function computeStandings(txs: LoyaltyTx[], members: LoyaltyMember[], now
   const sharedCards = [...cardOthers.entries()].map(([fingerprint, others]) => ({
     fingerprint, owner: cardOwner.get(fingerprint)!, alsoUsedBy: [...others],
   }))
-  return { standings, countedWeeks, sharedCards }
+  return { standings, countedWeeks, sharedCards, cardNumbers: Object.fromEntries(numbers) }
+}
+
+export function cardNumberKey(tier: Tier, email: string): string {
+  return `${tier}|${email}`
 }
 
 export function weekDate(key: string): Date {
@@ -228,6 +237,157 @@ export function weekDate(key: string): Date {
   return new Date(y, m - 1, d)
 }
 
-export function isClosedWeek(key: string, now: Date): boolean {
-  return weekDate(key).getTime() + 7 * DAY_MS <= weekStartOf(now).getTime()
+export function isGiftCardLine(name: string | undefined, itemType: string | undefined): boolean {
+  return itemType === 'GIFT_CARD' || /gift\s*card/i.test(name ?? '')
+}
+
+export function customerDisplayName(c: { given_name?: string; family_name?: string }): string {
+  return [c.given_name, c.family_name].filter(Boolean).join(' ')
+}
+
+export const LOYALTY_LEVEL_NAMES: ReadonlySet<string> = new Set(allLevels().map(l => l.name))
+
+export function orderLoyaltySpend(order: SquareOrder): number {
+  const net = order.net_amounts
+  const total = net ? net.total_money.amount : (order.total_money?.amount ?? 0) - (order.return_amounts?.total_money?.amount ?? 0)
+  const tax = net ? (net.tax_money?.amount ?? 0) : (order.total_tax_money?.amount ?? 0)
+  const tip = net ? (net.tip_money?.amount ?? 0) : (order.total_tip_money?.amount ?? 0)
+  const service = net?.service_charge_money?.amount ?? 0
+  const soldGiftCards = (order.line_items ?? [])
+    .filter(li => isGiftCardLine(li.name, li.item_type))
+    .reduce((sum, li) => sum + (li.gross_sales_money?.amount ?? 0) - (li.total_discount_money?.amount ?? 0), 0)
+  const returnedGiftCards = (order.returns ?? [])
+    .flatMap(r => r.return_line_items ?? [])
+    .filter(li => isGiftCardLine(li.name, li.item_type))
+    .reduce((sum, li) => sum + (li.gross_return_money?.amount ?? 0) - (li.total_discount_money?.amount ?? 0), 0)
+  return (total - tax - tip - service - (soldGiftCards - returnedGiftCards)) / 100
+}
+
+export interface GroupRef {
+  id: string
+  name: string
+}
+
+export interface GroupChange {
+  customerId: string
+  email: string
+  name: string
+  add: string | null
+  remove: GroupRef[]
+}
+
+export function planGroupChanges(result: LoyaltyResult, customers: SquareCustomer[], groupNames: Record<string, string>,
+  configuredGroupIds: Record<string, string> = {}): GroupChange[] {
+  const byId = new Map(customers.map(c => [c.id, c]))
+  const loyaltyGroupsOf = (id: string): GroupRef[] =>
+    (byId.get(id)?.group_ids ?? []).filter(g => LOYALTY_LEVEL_NAMES.has(groupNames[g] ?? '')).map(g => ({ id: g, name: groupNames[g] }))
+  const changes: GroupChange[] = []
+  const memberIds = new Set<string>()
+  for (const s of result.standings) {
+    for (const id of s.customerIds) {
+      memberIds.add(id)
+      const current = loyaltyGroupsOf(id)
+      const target = s.level ? configuredGroupIds[s.level] : undefined
+      const keep = s.level ? current.find(g => (target ? g.id === target : g.name === s.level)) : undefined
+      const add = s.level && !keep ? s.level : null
+      const remove = current.filter(g => g !== keep)
+      if (add || remove.length) changes.push({ customerId: id, email: s.email, name: s.name, add, remove })
+    }
+  }
+  for (const c of byId.values()) {
+    if (memberIds.has(c.id)) continue
+    const current = loyaltyGroupsOf(c.id)
+    if (current.length) changes.push({ customerId: c.id, email: c.email_address ?? '', name: customerDisplayName(c), add: null, remove: current })
+  }
+  return changes
+}
+
+export const MEMBER_CODE_PREFIX = 'WL'
+const CODE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'
+const CODE_BODY_LENGTH = 8
+
+export function codeCheckChar(body: string): string {
+  let total = 0
+  for (let i = 0; i < body.length; i++) total += (i + 1) * CODE_ALPHABET.indexOf(body[i])
+  return CODE_ALPHABET[total % CODE_ALPHABET.length]
+}
+
+function randomCodeChar(): string {
+  const limit = Math.floor(256 / CODE_ALPHABET.length) * CODE_ALPHABET.length
+  const byte = new Uint8Array(1)
+  do crypto.getRandomValues(byte)
+  while (byte[0] >= limit)
+  return CODE_ALPHABET[byte[0] % CODE_ALPHABET.length]
+}
+
+export function newMemberCode(taken: ReadonlySet<string> = new Set()): string {
+  for (;;) {
+    let body = ''
+    for (let i = 0; i < CODE_BODY_LENGTH; i++) body += randomCodeChar()
+    const code = `${MEMBER_CODE_PREFIX}-${body}${codeCheckChar(body)}`
+    if (!taken.has(code)) return code
+  }
+}
+
+export function normalizeMemberCode(input: string): string | null {
+  const raw = input.toUpperCase().replace(/[\s-]/g, '')
+  if (!raw.startsWith(MEMBER_CODE_PREFIX)) return null
+  const rest = raw.slice(MEMBER_CODE_PREFIX.length)
+  if (rest.length !== CODE_BODY_LENGTH + 1 || [...rest].some(ch => !CODE_ALPHABET.includes(ch))) return null
+  const body = rest.slice(0, CODE_BODY_LENGTH)
+  if (codeCheckChar(body) !== rest[CODE_BODY_LENGTH]) return null
+  return `${MEMBER_CODE_PREFIX}-${rest}`
+}
+
+export interface CodeWrite {
+  customerId: string
+  email: string
+  code: string
+  version?: number
+}
+
+export interface MemberCodes {
+  codes: Record<string, string>
+  writes: CodeWrite[]
+  problems: string[]
+}
+
+export function resolveMemberCodes(members: LoyaltyMember[], customers: { id: string; reference_id?: string; version?: number }[],
+  stored: Record<string, string>, makeCode: (taken: ReadonlySet<string>) => string = newMemberCode): MemberCodes {
+  const byId = new Map(customers.map(c => [c.id, c]))
+  const codes: Record<string, string> = {}
+  const owner = new Map<string, string>()
+  const problems: string[] = []
+  const claim = (email: string, code: string): boolean => {
+    const holder = owner.get(code)
+    if (holder && holder !== email) {
+      problems.push(`${code} is on profiles of both ${holder} and ${email}; fix one in Square`)
+      return false
+    }
+    owner.set(code, email)
+    codes[email] = code
+    return true
+  }
+  const pending: LoyaltyMember[] = []
+  for (const m of members) {
+    const onProfile = m.customerIds.map(id => normalizeMemberCode(byId.get(id)?.reference_id ?? '')).find((c): c is string => !!c)
+    if (onProfile && claim(m.email, onProfile)) continue
+    pending.push(m)
+  }
+  for (const m of pending) {
+    const saved = normalizeMemberCode(stored[m.email] ?? '')
+    if (saved && !owner.has(saved) && claim(m.email, saved)) continue
+    claim(m.email, makeCode(new Set(owner.keys())))
+  }
+  const writes: CodeWrite[] = []
+  for (const m of members) {
+    const code = codes[m.email]
+    if (!code) continue
+    const profiles = m.customerIds.map(id => byId.get(id)).filter((c): c is NonNullable<typeof c> => !!c)
+    if (profiles.some(c => normalizeMemberCode(c.reference_id ?? '') === code)) continue
+    const target = profiles.find(c => !(c.reference_id ?? '').trim())
+    if (target) writes.push({ customerId: target.id, email: m.email, code, version: target.version })
+    else if (profiles.length) problems.push(`${m.email} already has a different reference ID on every profile; add ${code} by hand`)
+  }
+  return { codes, writes, problems }
 }

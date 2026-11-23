@@ -4,6 +4,7 @@ import { refreshAccessToken } from './squareAuth'
 import { fetchOrders, fetchCatalogue, fetchInventory, fetchInventoryChanges, fetchTeamMembers, fetchCustomersByIds, fetchPayments, fetchRefunds, fetchShifts, fetchVendors } from './squareAPIClient'
 import type { SquareOrder, SquareCatalogItem } from './squareAPIClient'
 import { runLoyaltyStep } from './squareLoyalty'
+import { orderLoyaltySpend } from './loyaltyEngine'
 import { upsertTransactions, upsertCatalogueProducts, upsertRefunds, upsertShifts, mergeSquareProductCosts, upsertRestockLogs, upsertStockMovements } from '../db/dbUtils'
 import { db } from '../db/database'
 import { changesToStockRecords, stockHistoryStart, stockHistoryWindows } from './stockHistory'
@@ -72,6 +73,7 @@ function orderToTransaction(order: SquareOrder, employeeMap: Record<string, stri
     dayOfWeek: date.getDay() + 1,
     hour: date.getHours(),
     source: 'api',
+    loyaltySpend: orderLoyaltySpend(order),
   }
   if (lineItemPrices.length > 0) tx.lineItems = lineItemPrices
   return tx
@@ -225,25 +227,46 @@ async function backfillCustomerLinks(
   })
 }
 
-async function backfillCardFingerprints(accessToken: string, locationID: string): Promise<void> {
+const BACKFILL_CHUNK_DAYS = 31
+
+async function backfillLoyaltyFields(accessToken: string, locationID: string): Promise<void> {
+  const { loyaltyBackfillThrough, setCredentials } = useAuthStore.getState()
   const earliest = await db.salesTransactions.orderBy('date').first()
   if (!earliest) return
-  const payments = await fetchPayments(accessToken, locationID, new Date(earliest.date).toISOString(), new Date().toISOString())
-  const byOrderId = new Map(
-    payments
-      .filter(p => p.orderId && p.cardDetails?.card?.fingerprint)
-      .map(p => [p.orderId!, p]),
-  )
-  if (byOrderId.size === 0) return
-  const stored = await db.salesTransactions
-    .filter(t => !t.cardFingerprint && byOrderId.has(t.transactionID))
-    .toArray()
+  const now = new Date()
+  let cursor = loyaltyBackfillThrough ? new Date(loyaltyBackfillThrough) : new Date(earliest.date)
+  while (cursor < now) {
+    const chunkEnd = new Date(Math.min(now.getTime(), cursor.getTime() + BACKFILL_CHUNK_DAYS * 86_400_000))
+    await backfillLoyaltyWindow(accessToken, locationID, cursor, chunkEnd)
+    setCredentials({ loyaltyBackfillThrough: chunkEnd.toISOString() })
+    cursor = chunkEnd
+  }
+}
+
+async function backfillLoyaltyWindow(accessToken: string, locationID: string, start: Date, end: Date): Promise<void> {
+  const [payments, orders] = await Promise.all([
+    fetchPayments(accessToken, locationID, start.toISOString(), end.toISOString()),
+    fetchOrders(accessToken, locationID, start, end),
+  ])
+  const paymentByOrderId = new Map(payments.filter(p => p.orderId).map(p => [p.orderId!, p]))
+  const spendByOrderId = new Map(orders.map(o => [o.id, orderLoyaltySpend(o)]))
+  const orderIds = [...new Set([...paymentByOrderId.keys(), ...spendByOrderId.keys()])]
+  const stored = (await db.salesTransactions.where('transactionID').anyOf(orderIds).toArray())
+    .filter(t => t.loyaltySpend === undefined || (!t.cardFingerprint && !!paymentByOrderId.get(t.transactionID)?.cardDetails?.card?.fingerprint))
+  if (stored.length === 0) return
+  const newCustomerIds = [...new Set(stored
+    .map(t => (!t.customerID ? paymentByOrderId.get(t.transactionID)?.customerId : undefined))
+    .filter((id): id is string => !!id))]
+  const names = await fetchCustomerNames(accessToken, newCustomerIds)
   await db.transaction('rw', db.salesTransactions, async () => {
     for (const tx of stored) {
-      const payment = byOrderId.get(tx.transactionID)!
+      const payment = paymentByOrderId.get(tx.transactionID)
+      const customerID = tx.customerID ?? payment?.customerId
       await db.salesTransactions.update(tx.id!, {
-        cardFingerprint: payment.cardDetails!.card!.fingerprint,
-        customerID: tx.customerID ?? payment.customerId,
+        cardFingerprint: tx.cardFingerprint ?? payment?.cardDetails?.card?.fingerprint,
+        customerID,
+        customerName: tx.customerName ?? (customerID ? names[customerID] : undefined),
+        loyaltySpend: spendByOrderId.get(tx.transactionID) ?? tx.loyaltySpend,
       })
     }
   })
@@ -375,11 +398,12 @@ async function _runSyncImpl(
     }
   }
 
-  if (!useAuthStore.getState().fingerprintBackfillDone) {
+  if (!useAuthStore.getState().loyaltyBackfillDone) {
     try {
-      await backfillCardFingerprints(accessToken, locationID)
-      useAuthStore.getState().setCredentials({ fingerprintBackfillDone: true })
-    } catch {
+      await backfillLoyaltyFields(accessToken, locationID)
+      useAuthStore.getState().setCredentials({ loyaltyBackfillDone: true, loyaltyBackfillError: null })
+    } catch (err) {
+      useAuthStore.getState().setCredentials({ loyaltyBackfillError: `History backfill failed, will retry on the next sync: ${(err as Error).message}` })
     }
   }
 
@@ -437,12 +461,8 @@ async function _runSyncImpl(
     lastSyncCount: ordersAdded,
   })
 
-  try {
-    await runLoyaltyStep()
-  } catch {
-  }
-
   onStatus({ phase: 'done', message: 'Sync complete', ordersAdded, productsAdded: products.length })
+  void runLoyaltyStep()
 
   void syncStockHistory(products, employeeMap, daysBackStart)
 }

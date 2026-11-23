@@ -19,10 +19,16 @@ interface AuthStore {
   customerBackfillDone: boolean
   stockHistorySyncedThrough: string | null
   stockHistoryError: string | null
-  fingerprintBackfillDone: boolean
+  loyaltyBackfillDone: boolean
+  loyaltyBackfillThrough: string | null
+  loyaltyCardNumbers: Record<string, number>
+  loyaltyLastError: string | null
+  loyaltyBackfillError: string | null
+  loyaltyPausePending: boolean
   loyaltyLive: boolean
   loyaltySquareIds: Record<string, string>
   loyaltyCardsIssued: Record<string, string>
+  loyaltyMemberCodes: Record<string, string>
   loyaltyLastApplied: string | null
 
   setCredentials: (creds: Partial<AuthStore>) => void
@@ -48,10 +54,16 @@ export const useAuthStore = create<AuthStore>()(
       customerBackfillDone: false,
       stockHistorySyncedThrough: null,
       stockHistoryError: null,
-      fingerprintBackfillDone: false,
+      loyaltyBackfillDone: false,
+      loyaltyBackfillThrough: null,
+      loyaltyCardNumbers: {},
+      loyaltyLastError: null,
+      loyaltyBackfillError: null,
+      loyaltyPausePending: false,
       loyaltyLive: false,
       loyaltySquareIds: {},
       loyaltyCardsIssued: {},
+      loyaltyMemberCodes: {},
       loyaltyLastApplied: null,
 
       setCredentials: creds => set(s => ({ ...s, ...creds })),
@@ -61,7 +73,10 @@ export const useAuthStore = create<AuthStore>()(
         customerBackfillDone: false,
         stockHistorySyncedThrough: null,
         stockHistoryError: null,
-        fingerprintBackfillDone: false,
+        loyaltyBackfillDone: false,
+        loyaltyBackfillThrough: null,
+        loyaltyLastError: null,
+        loyaltyBackfillError: null,
         loyaltyLive: false,
         loyaltySquareIds: {},
         loyaltyLastApplied: null,
